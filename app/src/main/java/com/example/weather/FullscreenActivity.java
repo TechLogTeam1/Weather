@@ -64,10 +64,20 @@ public class FullscreenActivity extends AppCompatActivity {
     private RadioButton mRadio1;
     private RadioButton mRadio2;
     private RadioButton mRadio3;
+    private RadioButton mRadio4;
+    private RadioButton mRadio5;
+    private RadioButton mRadio6;
+    private RadioButton mRadio7;
+    private RadioButton mRadio8;
+    private RadioButton mRadio9;
+    private RadioButton mRadio10;
+    private RadioButton mRadio11;
 
     ProgressDialog progressDialog;
 
-    private String API="400b0e4928077be78efaf4523cd3a3b5";
+    private String APIOpen="400b0e4928077be78efaf4523cd3a3b5";
+    private String APIAccu="GXj9XbCK7EOk5cVRnAOVN62PdDGJaTD6";
+
     private String City;
     private String Code;
     private String CodeTxt;
@@ -79,8 +89,12 @@ public class FullscreenActivity extends AppCompatActivity {
     private String Contents;
     private String Units;
     private String UnitsTxt;
+    private String SiteUse;
+    private String OutList;
+    private String Date;
+    private String CityKey;
     private int i;
-
+    private int Period;
     //Edit AndroidManifest.xml
     //Add <uses-permission android:name="android.permission.INTERNET" />
     //after package command
@@ -101,15 +115,25 @@ public class FullscreenActivity extends AppCompatActivity {
 
         mButton1= (Button) findViewById(R.id.button);
         mCity=(EditText) findViewById(R.id.editText);
-        mCode=(EditText) findViewById(R.id.editText2);
+        //mCode=(EditText) findViewById(R.id.editText2);
         mRadio1= (RadioButton) findViewById(R.id.radioButton);
         mRadio2= (RadioButton) findViewById(R.id.radioButton2);
         mRadio3= (RadioButton) findViewById(R.id.radioButton3);
+        mRadio4= (RadioButton) findViewById(R.id.radioButton5);
+        mRadio5= (RadioButton) findViewById(R.id.radioButton6);
+        mRadio6= (RadioButton) findViewById(R.id.radioButton7);
+
+        mRadio7= (RadioButton) findViewById(R.id.radioButton4);
+        mRadio8= (RadioButton) findViewById(R.id.radioButton8);
+        mRadio9= (RadioButton) findViewById(R.id.radioButton9);
+        mRadio10= (RadioButton) findViewById(R.id.radioButton10);
+        mRadio11= (RadioButton) findViewById(R.id.radioButton11);
 
         City="London";Code="uk";
-        Units="C";
+        Units="C";Period=1;
+        SiteUse="OpenWeather";
         mCity.setText(City);
-        mCode.setText(Code);
+        //mCode.setText(Code);
         mTextView.setText("");
 
         mButton1.setOnClickListener(new View.OnClickListener() {
@@ -117,7 +141,7 @@ public class FullscreenActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 City=mCity.getText().toString();
-                Code=mCode.getText().toString();
+                //Code=mCode.getText().toString();
                 Content content=new Content();
                 content.execute();
 
@@ -156,6 +180,101 @@ public class FullscreenActivity extends AppCompatActivity {
             }
         });
 
+        mRadio4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                mRadio4.setChecked(true);
+                mRadio5.setChecked(false);
+                mRadio6.setChecked(false);
+                Period=1;
+            }
+        });
+
+        mRadio5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                mRadio4.setChecked(false);
+                mRadio5.setChecked(true);
+                mRadio6.setChecked(false);
+                Period=2;
+            }
+        });
+        mRadio6.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                mRadio4.setChecked(false);
+                mRadio5.setChecked(false);
+                mRadio6.setChecked(true);
+                Period=3;
+            }
+        });
+        mRadio7.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                mRadio7.setChecked(true);
+                mRadio8.setChecked(false);
+                mRadio9.setChecked(false);
+                mRadio10.setChecked(false);
+                mRadio11.setChecked(false);
+                SiteUse="OpenWeather";
+            }
+
+        });
+        mRadio8.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                mRadio7.setChecked(false);
+                mRadio8.setChecked(true);
+                mRadio9.setChecked(false);
+                mRadio10.setChecked(false);
+                mRadio11.setChecked(false);
+                SiteUse="AccuWeather";
+            }
+        });
+
+        mRadio9.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                mRadio7.setChecked(false);
+                mRadio8.setChecked(false);
+                mRadio9.setChecked(true);
+                mRadio10.setChecked(false);
+                mRadio11.setChecked(false);
+                SiteUse="WeatherStack";
+            }
+        });
+        mRadio10.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                mRadio7.setChecked(false);
+                mRadio8.setChecked(false);
+                mRadio9.setChecked(false);
+                mRadio10.setChecked(true);
+                mRadio11.setChecked(false);
+                SiteUse="DarkSky";
+            }
+        });
+        mRadio11.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                mRadio7.setChecked(false);
+                mRadio8.setChecked(false);
+                mRadio9.setChecked(false);
+                mRadio10.setChecked(false);
+                mRadio11.setChecked(true);
+                SiteUse="Weatherbit";
+            }
+        });
+
+
     }
 
     private class Content extends AsyncTask<Void,Void,Void>
@@ -176,51 +295,200 @@ public class FullscreenActivity extends AppCompatActivity {
             progressDialog.dismiss();
         }
 
-        @Override
-        protected Void doInBackground(Void... voids) {
-
-            Document doc= null;
-            OutText="";
-            //Code="";
-            //Units="C";
-            //City="London";Code="uk";
-            //City="Paris";Code="fr";
-            //City="Nigrita";Code="gr";
-
+        void ReadFromOpen()
+        {
             if (Units=="C") UnitsTxt="&units=metric";     //Celsius
             if (Units=="F") UnitsTxt="&units=imperial";   //Fahrenheit
             if (Units=="K") UnitsTxt="";                  //Kelvin
 
             if (Code.length()<2) CodeTxt=""; else CodeTxt=","+Code;
 
+            if (Period==1)
+                try {
+                    CallUrl="http://api.openweathermap.org/data/2.5/weather?q="+City+CodeTxt+UnitsTxt+"&APPID="+APIOpen;
+                    //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
+                    Contents="";
+                    Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
+
+                    try {
+                        JSONObject jsonObj = new JSONObject(Contents);
+                        JSONObject obj2=jsonObj.getJSONObject("coord");
+                        JSONObject obj3=jsonObj.getJSONObject("main");
+
+                        CallCode=jsonObj.getString("cod"); //404 = City not found
+                        Coords="Latitude:"+obj2.getString("lat");
+                        Coords+="\n"+"Longitude:"+obj2.getString("lon");
+                        Temp="Temperature:"+obj3.getString("temp")+" "+Units;
+                        Humidity="Humidity:"+obj3.getString("humidity")+"%";
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    //OutText=Contents;
+                    OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
+                            +Coords+"\n"+Temp+"\n"+Humidity;
+                    //OutText=CallUrl;
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+            if (Period==3)
+                try {
+                    CallUrl="http://api.openweathermap.org/data/2.5/forecast?q="+City+CodeTxt+UnitsTxt+"&APPID="+APIOpen;
+                    //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
+                    Contents="";
+                    Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
+
+                    try {
+                        JSONObject jsonObj = new JSONObject(Contents);
+                        JSONArray baseArray =jsonObj.getJSONArray("list");
+
+                        OutList="";
+
+                        JSONObject objcoords1 = jsonObj.getJSONObject("city");
+                        JSONObject objcoords2 = objcoords1.getJSONObject("coord");
+                        Coords="Latitude:"+objcoords2.getString("lat");
+                        Coords+="\n"+"Longitude:"+objcoords2.getString("lon");
+
+                        for (int i = 0; i < baseArray.length(); i++) {
+                            JSONObject json2 = baseArray.getJSONObject(i);
+                            JSONObject obj2 = json2.getJSONObject("main");
+
+                            Temp = obj2.getString("temp") + " " + Units;
+                            Humidity = "Humidity:" + obj2.getString("humidity") + "%";
+                            Date=json2.getString("dt_txt");
+
+
+                            //OutList+="Date:"+Date+"\n"+"ArrayPos:"+(i+1)+"\n"+Temp+"\n"+Humidity+"\n";
+
+                            OutList+="---------------------------------------------\n"+"Date:"+Date+
+                                    "\n---------------------------------------------\n"+
+                                    Temp+"\n"+Humidity+"\n";
+
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    OutText="City:"+City+CodeTxt+"\n"+Coords+"\n"+
+                            OutList;
+
+                    //OutText=Contents;
+                    //OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
+                    //  +Temp+"\n"+Humidity;
+
+                    //OutText=CallUrl;
+
+
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            if (Period==2) OutText="Period: Last 24 hours";
+            //if (Period==3) OutText="Period: Last 5 days";
+
+            return;
+        }
+
+        void ReadFromAccu()
+        {
+            if (Units=="C") UnitsTxt="&units=metric";     //Celsius
+            if (Units=="F") UnitsTxt="&units=imperial";   //Fahrenheit
+            if (Units=="K") UnitsTxt="";                  //Kelvin
+
+            if (Code.length()<2) CodeTxt=""; else CodeTxt=","+Code;
+
+            //CityKey="328328"; //London
+            //CallUrl="http://dataservice.accuweather.com/locations/v1/cities/search?q=London&apikey=GXj9XbCK7EOk5cVRnAOVN62PdDGJaTD6";
+            //CallUrl="http://dataservice.accuweather.com/locations/v1/cities/search?q="+City+"&apikey="+APIAccu;
+
+            //First Call
             try {
-                CallUrl="http://api.openweathermap.org/data/2.5/weather?q="+City+CodeTxt+UnitsTxt+"&APPID="+API;
-                //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
+                CallUrl="http://dataservice.accuweather.com/locations/v1/cities/search?q="+City+"&apikey="+APIAccu;
+                Contents="";
                 Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
+                Contents=Contents.substring(1,Contents.length());
 
                 try {
-                    JSONObject jsonObj = new JSONObject(Contents);
-                    JSONObject obj2=jsonObj.getJSONObject("coord");
-                    JSONObject obj3=jsonObj.getJSONObject("main");
 
-                    CallCode=jsonObj.getString("cod"); //404 = City not found
-                    Coords="Latitude:"+obj2.getString("lat");
-                    Coords+="\n"+"Longitude:"+obj2.getString("lon");
-                    Temp="Temperature:"+obj3.getString("temp")+" "+Units;
-                    Humidity="Humidity:"+obj3.getString("humidity")+"%";
+                    JSONObject jsonObj = new JSONObject(Contents);
+                    JSONObject obj2 = jsonObj.getJSONObject("GeoPosition");
+                    CityKey=jsonObj.getString("Key");
+                    Coords="Latitude:"+obj2.getString("Latitude");
+                    Coords+="\n"+"Longitude:"+obj2.getString("Longitude");
 
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
+
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            //Second Call
+            try {
+                //CallUrl="http://api.openweathermap.org/data/2.5/weather?q="+City+CodeTxt+UnitsTxt+"&APPID="+API;
+                //CallUrl="http://dataservice.accuweather.com/locations/v1/cities/search?q="+City+"&apikey="+APIAccu;
+                CallUrl="http://dataservice.accuweather.com/currentconditions/v1/"+CityKey+"?apikey="+APIAccu+"&details=true";
+
+                Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
+                Contents=Contents.substring(1,Contents.length());
+                try {
+                    JSONObject jsonObj = new JSONObject(Contents);
+                    JSONObject obj2 = jsonObj.getJSONObject("Temperature");
+                    JSONObject obj3;
+
+                    if (Units=="C")
+                        obj3 = obj2.getJSONObject("Metric");
+                    else
+                    if (Units=="F")
+                        obj3 = obj2.getJSONObject("Imperial");
+                    else
+                        obj3 = obj2.getJSONObject("Metric");
+
+                    Temp="Temperature:"+obj3.getString("Value")+" "+Units;
+                    Humidity="Humidity:"+jsonObj.getString("RelativeHumidity")+"%";
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                //"WeatherText"
+                //OutText=WeatherText;
                 //OutText=Contents;
+
                 OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
                         +Coords+"\n"+Temp+"\n"+Humidity;
+
+                //OutText=CityKey;
+                //OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
+                //      +Coords+"\n"+Temp+"\n"+Humidity;
                 //OutText=CallUrl;
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+
+            return;
+        }
+
+
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            Document doc= null;
+            OutText="";
+
+            if (SiteUse=="OpenWeather") ReadFromOpen();
+            if (SiteUse=="AccuWeather") ReadFromAccu();
 
             return null;
         }
