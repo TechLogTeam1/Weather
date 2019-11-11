@@ -68,6 +68,7 @@ public class FullscreenActivity extends AppCompatActivity {
     ProgressDialog progressDialog;
 
     private String API="400b0e4928077be78efaf4523cd3a3b5";
+    private String APIWB="e3e95e3f1df44bfbaa8008f57cd3b303";
     private String City;
     private String Code;
     private String CodeTxt;
@@ -194,20 +195,22 @@ public class FullscreenActivity extends AppCompatActivity {
             if (Code.length()<2) CodeTxt=""; else CodeTxt=","+Code;
 
             try {
-                CallUrl="http://api.openweathermap.org/data/2.5/weather?q="+City+CodeTxt+UnitsTxt+"&APPID="+API;
+                //CallUrl="http://api.openweathermap.org/data/2.5/weather?q="+City+CodeTxt+UnitsTxt+"&APPID="+API;
+                CallUrl="https://api.weatherbit.io/v2.0/current?&city="+City+"&country="+CodeTxt+"&key="+APIWB;
                 //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
                 Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
 
                 try {
                     JSONObject jsonObj = new JSONObject(Contents);
-                    JSONObject obj2=jsonObj.getJSONObject("coord");
+                    JSONObject obj2=jsonObj.getJSONObject("data");
                     JSONObject obj3=jsonObj.getJSONObject("main");
 
-                    CallCode=jsonObj.getString("cod"); //404 = City not found
-                    Coords="Latitude:"+obj2.getString("lat");
-                    Coords+="\n"+"Longitude:"+obj2.getString("lon");
-                    Temp="Temperature:"+obj3.getString("temp")+" "+Units;
-                    Humidity="Humidity:"+obj3.getString("humidity")+"%";
+                    //CallCode=jsonObj.getString("cod"); //404 = City not found
+                    Coords="Latitude:"+obj2.get("lat");
+                    Coords+="\n"+"Longitude:"+obj2.get("lon");
+                    Temp="Temperature:"+obj2.get("temp")+" "+Units;
+
+                    //Humidity="Humidity:"+obj3.getString("humidity")+"%";
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -215,7 +218,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
                 //OutText=Contents;
                 OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
-                        +Coords+"\n"+Temp+"\n"+Humidity;
+                        +Coords+"\n"+Temp;
                 //OutText=CallUrl;
 
             } catch (IOException e) {
