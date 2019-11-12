@@ -103,7 +103,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
     //If not runs in newer emulator (e.x. Pixel 2 API 29) simple uninstall app
     // from mobile emulator and run again
-
+      //
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
