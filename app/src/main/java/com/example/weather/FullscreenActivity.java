@@ -1,44 +1,29 @@
 package com.example.weather;
 
-import android.annotation.SuppressLint;
-
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ActionBar;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.res.AssetManager;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.telecom.Call;
-import android.text.method.ScrollingMovementMethod;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONStringer;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-
-import static org.jsoup.nodes.Entities.EscapeMode.base;
 
 
 /**
@@ -49,8 +34,12 @@ public class FullscreenActivity extends AppCompatActivity {
 
     //private View mContentView;
     private TextView mTextView;
-
-
+    private TextView mDeg;
+    private TextView mUnits;
+    private TextView mDegSymbol;
+    private TextView mHum;
+    private TextView mConditions;
+    private ImageView mWIcon;
     // Delayed removal of status and navigation bar
 
     // Note that some of these constants are new as of API 16 (Jelly Bean)
@@ -85,7 +74,7 @@ public class FullscreenActivity extends AppCompatActivity {
     private String CallCode;
     private String Coords;
     private String Temp;
-    private String Humidity;
+    private String HumidityTxt;
     private String Contents;
     private String Units;
     private String UnitsTxt;
@@ -93,8 +82,13 @@ public class FullscreenActivity extends AppCompatActivity {
     private String OutList;
     private String Date;
     private String CityKey;
+    private String WeatherCon;
     private int i;
     private int Period;
+
+    private float Temperature;
+    private float Humidity;
+
     //Edit AndroidManifest.xml
     //Add <uses-permission android:name="android.permission.INTERNET" />
     //after package command
@@ -111,7 +105,12 @@ public class FullscreenActivity extends AppCompatActivity {
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         //mContentView = findViewById(R.id.fullscreen_content);
         mTextView = findViewById(R.id.textView);
-        mTextView.setMovementMethod(new ScrollingMovementMethod());
+        mDeg = findViewById(R.id.textTemp);
+        mUnits = findViewById(R.id.textUnit);
+        mDegSymbol=findViewById(R.id.textDeg);
+        mHum=findViewById(R.id.textHum);
+        mConditions=findViewById(R.id.WeatherState);
+        //mTextView.setMovementMethod(new ScrollingMovementMethod());
 
         mButton1= (Button) findViewById(R.id.button);
         mCity=(EditText) findViewById(R.id.editText);
@@ -129,12 +128,22 @@ public class FullscreenActivity extends AppCompatActivity {
         mRadio10= (RadioButton) findViewById(R.id.radioButton10);
         mRadio11= (RadioButton) findViewById(R.id.radioButton11);
 
-        City="London";Code="uk";
+        mWIcon= (ImageView) findViewById(R.id.imageView2);
+
+        City="London";Code="";
+        //Code="uk";
         Units="C";Period=1;
         SiteUse="OpenWeather";
         mCity.setText(City);
         //mCode.setText(Code);
-        mTextView.setText("");
+        //mTextView.setText("");
+        Temperature=0;
+        Humidity=0;
+
+        mDeg.setText("--");
+        mHum.setText("Humidity "+"--"+" %");
+        mConditions.setText("--");
+        
 
         mButton1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -286,12 +295,156 @@ public class FullscreenActivity extends AppCompatActivity {
             progressDialog.show();
         }
 
+        int ConvertToDp(int x)
+        {
+            int ret;
+            final float scale = getBaseContext().getResources().getDisplayMetrics().density;
+
+            ret =  (int)(x * scale + 0.5f);
+        return ret;
+        }
+
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            if (OutText=="") OutText="Problem: Probably city not found";
+            //if (OutText=="") OutText="Problem: Probably city not found";
 
-            mTextView.setText(OutText);
+            if (OutText=="")
+            {
+                mDeg.setText("--");
+                mHum.setText("Humidity "+"--"+" %");
+                mConditions.setText("--");
+                progressDialog.dismiss();
+                return;
+            }
+
+
+            int valuex,valuey,deglen;
+            int mainx,mainy;
+            int l,t;
+            int minusx;
+            minusx=85;
+
+            mDeg.setText(String.valueOf(Temperature));
+            mHum.setText("Humidity "+String.valueOf(Humidity)+" %");
+            mConditions.setText(WeatherCon);
+
+            if (SiteUse=="OpenWeather")
+            {
+                if (WeatherCon.equals("Clear")) mWIcon.setImageResource(R.drawable.clearday);
+                if (WeatherCon.equals("Clouds")) mWIcon.setImageResource(R.drawable.clouds);
+                if (WeatherCon.equals("Rain")) mWIcon.setImageResource(R.drawable.rain);
+                if (WeatherCon.equals("Drizzle")) mWIcon.setImageResource(R.drawable.drizzleday); //Light Rain
+                if (WeatherCon.equals("Thunderstorm")) mWIcon.setImageResource(R.drawable.thunder);
+                if (WeatherCon.equals("Snow")) mWIcon.setImageResource(R.drawable.snow);
+            }
+
+            if (SiteUse=="AccuWeather")
+            {
+
+                //Clear
+                if (WeatherCon.equalsIgnoreCase("Sunny")) mWIcon.setImageResource(R.drawable.clearday);
+                if (WeatherCon.equalsIgnoreCase("Mostly sunny")) mWIcon.setImageResource(R.drawable.clearday);
+                if (WeatherCon.equalsIgnoreCase("Partly sunny")) mWIcon.setImageResource(R.drawable.clearday);
+                if (WeatherCon.equalsIgnoreCase("Intermittent clouds")) mWIcon.setImageResource(R.drawable.clearday);
+
+                //Clouds
+                if (WeatherCon.equalsIgnoreCase("Cloudy")) mWIcon.setImageResource(R.drawable.clouds);
+                if (WeatherCon.equalsIgnoreCase("Mostly cloudy")) mWIcon.setImageResource(R.drawable.clouds);
+                if (WeatherCon.equalsIgnoreCase("Hazy sunshine")) mWIcon.setImageResource(R.drawable.clouds);
+                if (WeatherCon.equalsIgnoreCase("Dreary (Overcast)")) mWIcon.setImageResource(R.drawable.clouds);
+                if (WeatherCon.equalsIgnoreCase("Fog")) mWIcon.setImageResource(R.drawable.clouds);
+
+                //Rain
+                if (WeatherCon.equalsIgnoreCase("Showers")) mWIcon.setImageResource(R.drawable.rain);
+                if (WeatherCon.equalsIgnoreCase("Mostly Cloudy w/ Showers")) mWIcon.setImageResource(R.drawable.rain);
+                if (WeatherCon.equalsIgnoreCase("Partly Sunny w/ Showers")) mWIcon.setImageResource(R.drawable.rain);
+
+                //Thunders
+                if (WeatherCon.equalsIgnoreCase("T-Storms")) mWIcon.setImageResource(R.drawable.thunder);
+                if (WeatherCon.equalsIgnoreCase("Mostly Cloudy w/ T-Storms")) mWIcon.setImageResource(R.drawable.thunder);
+                if (WeatherCon.equalsIgnoreCase("Partly Sunny w/ T-Storms")) mWIcon.setImageResource(R.drawable.thunder);
+
+                if (WeatherCon.equalsIgnoreCase("Rain")) mWIcon.setImageResource(R.drawable.rain);
+                if (WeatherCon.equalsIgnoreCase("Flurries")) mWIcon.setImageResource(R.drawable.rain);
+                if (WeatherCon.equalsIgnoreCase("Mostly Cloudy w/ Flurries")) mWIcon.setImageResource(R.drawable.rain);
+                if (WeatherCon.equalsIgnoreCase("Partly Sunny w/ Flurries")) mWIcon.setImageResource(R.drawable.rain);
+
+                //Snow
+                if (WeatherCon.equalsIgnoreCase("Snow")) mWIcon.setImageResource(R.drawable.snow);
+                if (WeatherCon.equalsIgnoreCase("Mostly Cloudy w/ Snow")) mWIcon.setImageResource(R.drawable.snow);
+                if (WeatherCon.equalsIgnoreCase("Ice")) mWIcon.setImageResource(R.drawable.snow);
+                if (WeatherCon.equalsIgnoreCase("Sleet")) mWIcon.setImageResource(R.drawable.snow); //Χιονόνερο
+                if (WeatherCon.equalsIgnoreCase("Freezing rain")) mWIcon.setImageResource(R.drawable.snow);
+                if (WeatherCon.equalsIgnoreCase("Rain and snow")) mWIcon.setImageResource(R.drawable.snow);
+
+                //Windy (Clouds)
+                if (WeatherCon.equalsIgnoreCase("Windy")) mWIcon.setImageResource(R.drawable.clouds);
+
+                //Clear
+                if (WeatherCon.equalsIgnoreCase("Clear")) mWIcon.setImageResource(R.drawable.clearday);
+                if (WeatherCon.equalsIgnoreCase("Mostly clear")) mWIcon.setImageResource(R.drawable.clearday);
+                if (WeatherCon.equalsIgnoreCase("Partly cloudy")) mWIcon.setImageResource(R.drawable.clearday);
+
+                //Clouds
+                if (WeatherCon.equalsIgnoreCase("Intermittent clouds")) mWIcon.setImageResource(R.drawable.clouds);
+
+                //Rain
+
+                if (WeatherCon.equalsIgnoreCase("Partly Cloudy w/ Showers")) mWIcon.setImageResource(R.drawable.rain);
+                if (WeatherCon.equalsIgnoreCase("Mostly Cloudy w/ Showers")) mWIcon.setImageResource(R.drawable.rain);
+
+                if (WeatherCon.equalsIgnoreCase("Partly Cloudy w/ T-Storms")) mWIcon.setImageResource(R.drawable.thunder);
+                if (WeatherCon.equalsIgnoreCase("Mostly Cloudy w/ T-Storms")) mWIcon.setImageResource(R.drawable.thunder);
+
+                if (WeatherCon.equalsIgnoreCase("Mostly Cloudy w/ Flurries")) mWIcon.setImageResource(R.drawable.rain);
+
+                //Snow
+                if (WeatherCon.equalsIgnoreCase("Mostly Cloudy w/ Snow")) mWIcon.setImageResource(R.drawable.snow);
+
+            }
+
+
+
+
+            mUnits.setText(Units);
+            FrameLayout.LayoutParams params1 = new FrameLayout.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
+            final float scale = getBaseContext().getResources().getDisplayMetrics().density;
+
+            // convert the DP into pixel
+
+            deglen=String.valueOf(Temperature).length();
+            valuex=165;valuey=490;
+            if (deglen>5) valuex+=10;
+
+            valuex-=minusx;
+            params1.setMargins(ConvertToDp(valuex),ConvertToDp(valuey),0,0);
+            mDeg.setLayoutParams(params1);
+
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
+
+            // convert the DP into pixel
+
+            deglen=String.valueOf(Temperature).length();
+            valuex=210;valuey=480;valuex+=deglen*10;
+            if (deglen>5) valuex+=10;
+
+            valuex-=minusx;
+            params.setMargins(ConvertToDp(valuex),ConvertToDp(valuey),0,0);
+            mDegSymbol.setLayoutParams(params);
+
+            FrameLayout.LayoutParams params2 = new FrameLayout.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
+
+            deglen=String.valueOf(Temperature).length();
+            valuex=210+30;valuey=480;valuex+=deglen*10;
+            if (deglen>5) valuex+=10;
+
+            valuex-=minusx;
+            params2.setMargins(ConvertToDp(valuex),ConvertToDp(valuey),0,0);
+
+            mUnits.setLayoutParams(params2);
+
+            //mTextView.setText(OutText);
             progressDialog.dismiss();
         }
 
@@ -303,7 +456,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
             if (Code.length()<2) CodeTxt=""; else CodeTxt=","+Code;
 
-            if (Period==1)
+            //if (Period==1) //Not Ready Yet
                 try {
                     CallUrl="http://api.openweathermap.org/data/2.5/weather?q="+City+CodeTxt+UnitsTxt+"&APPID="+APIOpen;
                     //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
@@ -311,15 +464,23 @@ public class FullscreenActivity extends AppCompatActivity {
                     Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
 
                     try {
+
                         JSONObject jsonObj = new JSONObject(Contents);
                         JSONObject obj2=jsonObj.getJSONObject("coord");
                         JSONObject obj3=jsonObj.getJSONObject("main");
+
+                        JSONArray WeatherArray =jsonObj.getJSONArray("weather");
+                        JSONObject json2 = WeatherArray.getJSONObject(0);
 
                         CallCode=jsonObj.getString("cod"); //404 = City not found
                         Coords="Latitude:"+obj2.getString("lat");
                         Coords+="\n"+"Longitude:"+obj2.getString("lon");
                         Temp="Temperature:"+obj3.getString("temp")+" "+Units;
-                        Humidity="Humidity:"+obj3.getString("humidity")+"%";
+                        HumidityTxt="Humidity:"+obj3.getString("humidity")+"%";
+
+                        Temperature=Float.valueOf(obj3.getString("temp"));
+                        Humidity=Float.valueOf(obj3.getString("humidity"));
+                        WeatherCon=json2.getString("main");
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -327,14 +488,14 @@ public class FullscreenActivity extends AppCompatActivity {
 
                     //OutText=Contents;
                     OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
-                            +Coords+"\n"+Temp+"\n"+Humidity;
+                            +Coords+"\n"+Temp+"\n"+HumidityTxt;
                     //OutText=CallUrl;
 
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
-
+            if (2<1) //PREV
             if (Period==3)
                 try {
                     CallUrl="http://api.openweathermap.org/data/2.5/forecast?q="+City+CodeTxt+UnitsTxt+"&APPID="+APIOpen;
@@ -358,7 +519,7 @@ public class FullscreenActivity extends AppCompatActivity {
                             JSONObject obj2 = json2.getJSONObject("main");
 
                             Temp = obj2.getString("temp") + " " + Units;
-                            Humidity = "Humidity:" + obj2.getString("humidity") + "%";
+                            HumidityTxt = "Humidity:" + obj2.getString("humidity") + "%";
                             Date=json2.getString("dt_txt");
 
 
@@ -366,7 +527,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
                             OutList+="---------------------------------------------\n"+"Date:"+Date+
                                     "\n---------------------------------------------\n"+
-                                    Temp+"\n"+Humidity+"\n";
+                                    Temp+"\n"+HumidityTxt+"\n";
 
                         }
 
@@ -389,7 +550,7 @@ public class FullscreenActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-            if (Period==2) OutText="Period: Last 24 hours";
+            //if (Period==2) OutText="Period: Last 24 hours";
             //if (Period==3) OutText="Period: Last 5 days";
 
             return;
@@ -454,7 +615,12 @@ public class FullscreenActivity extends AppCompatActivity {
                         obj3 = obj2.getJSONObject("Metric");
 
                     Temp="Temperature:"+obj3.getString("Value")+" "+Units;
-                    Humidity="Humidity:"+jsonObj.getString("RelativeHumidity")+"%";
+                    HumidityTxt="Humidity:"+jsonObj.getString("RelativeHumidity")+"%";
+
+                    Temperature=Float.valueOf(obj3.getString("Value"));
+                    Humidity=Float.valueOf(jsonObj.getString("RelativeHumidity"));
+
+                    WeatherCon=jsonObj.getString("WeatherText");
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -464,7 +630,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 //OutText=Contents;
 
                 OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
-                        +Coords+"\n"+Temp+"\n"+Humidity;
+                        +Coords+"\n"+Temp+"\n"+HumidityTxt;
 
                 //OutText=CityKey;
                 //OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
@@ -486,6 +652,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
             Document doc= null;
             OutText="";
+            WeatherCon="";
 
             if (SiteUse=="OpenWeather") ReadFromOpen();
             if (SiteUse=="AccuWeather") ReadFromAccu();

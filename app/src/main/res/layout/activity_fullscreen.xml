@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0099cc"
+    android:background="@drawable/background">
     tools:context=".FullscreenActivity">
 
     <!-- The primary full-screen view. This can be replaced with whatever view
@@ -34,7 +35,7 @@
             android:layout_gravity="bottom|center_horizontal"
             android:background="@color/black_overlay"
             android:orientation="horizontal"
-            tools:ignore="UselessParent"/>
+            tools:ignore="UselessParent" />
 
         <Button
             android:id="@+id/button"
@@ -45,20 +46,12 @@
             android:text="Search" />
 
         <TextView
-            android:id="@+id/textView"
-            android:layout_width="match_parent"
-            android:layout_height="323dp"
-            android:layout_marginTop="400dp"
-            android:scrollbars="vertical"
-            android:text="TextView"
-            android:textSize="24sp" />
-
-        <TextView
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:text="City"
+            android:textColor="#FFFF"
             android:textSize="30sp" />
 
         <EditText
@@ -68,7 +61,8 @@
             android:layout_marginTop="50dp"
             android:ems="10"
             android:inputType="textPersonName"
-            android:text="Name" />
+            android:text="Name"
+            android:textColor="#FFFF" />
 
         <RadioButton
             android:id="@+id/radioButton"
@@ -76,7 +70,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="250dp"
             android:checked="true"
-            android:text="Celsius" />
+            android:text="Celsius"
+            android:textColor="#FFFF" />
 
         <RadioButton
             android:id="@+id/radioButton2"
@@ -84,7 +79,8 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="100dp"
             android:layout_marginTop="250dp"
-            android:text="Fahrenheit " />
+            android:text="Fahrenheit "
+            android:textColor="#FFFF" />
 
         <RadioButton
             android:id="@+id/radioButton3"
@@ -92,7 +88,8 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="220dp"
             android:layout_marginTop="250dp"
-            android:text="Kelvin" />
+            android:text="Kelvin"
+            android:textColor="#FFFF" />
 
         <RadioButton
             android:id="@+id/radioButton5"
@@ -100,7 +97,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="300dp"
             android:checked="true"
-            android:text="Current" />
+            android:text="Current"
+            android:textColor="#FFFF" />
 
         <RadioButton
             android:id="@+id/radioButton6"
@@ -108,7 +106,8 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="100dp"
             android:layout_marginTop="300dp"
-            android:text="24hrs" />
+            android:text="24hrs"
+            android:textColor="#FFFF" />
 
         <RadioButton
             android:id="@+id/radioButton7"
@@ -116,7 +115,8 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="200dp"
             android:layout_marginTop="300dp"
-            android:text="5 Days" />
+            android:text="5 Days"
+            android:textColor="#FFFF" />
 
         <RadioGroup
             android:layout_width="wrap_content"
@@ -129,7 +129,8 @@
             android:layout_marginLeft="0dp"
             android:layout_marginTop="150dp"
             android:checked="true"
-            android:text="OpenWeather" />
+            android:text="OpenWeather"
+            android:textColor="#FFFF" />
 
         <RadioButton
             android:id="@+id/radioButton8"
@@ -137,7 +138,8 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="120dp"
             android:layout_marginTop="150dp"
-            android:text="AccuWeather" />
+            android:text="AccuWeather"
+            android:textColor="#FFFF" />
 
         <RadioButton
             android:id="@+id/radioButton9"
@@ -145,7 +147,8 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="250dp"
             android:layout_marginTop="150dp"
-            android:text="WeatherStack" />
+            android:text="WeatherStack"
+            android:textColor="#FFFF" />
 
         <RadioButton
             android:id="@+id/radioButton10"
@@ -153,7 +156,8 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="0dp"
             android:layout_marginTop="200dp"
-            android:text="DarkSky" />
+            android:text="DarkSky"
+            android:textColor="#FFFF" />
 
         <RadioButton
             android:id="@+id/radioButton11"
@@ -161,7 +165,76 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="120dp"
             android:layout_marginTop="200dp"
-            android:text="Weatherbit" />
+            android:text="Weatherbit"
+            android:textColor="#FFFF" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="500dp"
+            android:text="Temp"
+            android:textColor="#FFFF"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/textHum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="550dp"
+            android:text="Humidity"
+            android:textColor="#FFFF"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/WeatherState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="250dp"
+            android:layout_marginTop="440dp"
+            android:text="Clear"
+            android:textColor="#FFFF"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/textTemp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="85dp"
+            android:layout_marginTop="490dp"
+            android:text="15"
+            android:textColor="#FFFF"
+            android:textSize="36sp" />
+
+        <TextView
+            android:id="@+id/textUnit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="180dp"
+            android:layout_marginTop="480dp"
+            android:text="C"
+            android:textColor="#FFFF"
+            android:textSize="36sp" />
+
+        <TextView
+            android:id="@+id/textDeg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="130dp"
+            android:layout_marginTop="480dp"
+            android:text="o"
+            android:textColor="#FFFF"
+            android:textSize="36sp" />
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="250dp"
+            android:layout_marginTop="500dp"
+            app:srcCompat="@drawable/clouds" />
 
     </FrameLayout>
 
