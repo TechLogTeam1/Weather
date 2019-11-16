@@ -77,7 +77,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
     private String APIOpen="400b0e4928077be78efaf4523cd3a3b5";
     private String APIAccu="GXj9XbCK7EOk5cVRnAOVN62PdDGJaTD6";
-    private String APIDark = " e478e283b61f95dc70771be89db8ce1c";
+    private String APIDark="e478e283b61f95dc70771be89db8ce1c";
 
     private String City;
     private String Code;
@@ -103,7 +103,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
     //If not runs in newer emulator (e.x. Pixel 2 API 29) simple uninstall app
     // from mobile emulator and run again
-      //
+    //
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -513,9 +513,9 @@ public class FullscreenActivity extends AppCompatActivity {
                 }
 
                 //OutText=Contents;
-                OutText=Latitude+","+Longitude;
-                //OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
-                //      +Coords+"\n"+Temp+"\n"+Humidity;
+                // OutText=Latitude+","+Longitude;
+                OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
+                        +Coords+"\n"+Temp+"\n"+Humidity;
                 //OutText=CallUrl;
 
             } catch (IOException e) {
@@ -528,6 +528,7 @@ public class FullscreenActivity extends AppCompatActivity {
             //if (2<1)
             try {
                 CallUrl="https://api.darksky.net/forecast/"+APIDark+"/"+Latitude+","+Longitude+UnitsTxt;
+                //https://api.darksky.net/forecast/153f92e90eba11f8a60979ad1f5d791b/37.8267,-122.4233?units=si
                 //CallUrl="https://api.darksky.net/forecast/153f92e90eba11f8a60979ad1f5d791b/37.8267,-122.4233";
                 //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
                 Contents="";
