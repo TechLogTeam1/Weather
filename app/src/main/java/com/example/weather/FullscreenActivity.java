@@ -95,6 +95,7 @@ public class FullscreenActivity extends AppCompatActivity {
     private String Date;
     private String CityKey;
     private String WeatherCon;
+    private String WeatherConIcon;
     private int i;
     private int Period;
     private String Longitude,Latitude;
@@ -413,6 +414,22 @@ public class FullscreenActivity extends AppCompatActivity {
 
             }
 
+            if (SiteUse=="DarkSky")
+            {
+                if (WeatherConIcon.equalsIgnoreCase("clear-day")) mWIcon.setImageResource(R.drawable.clearday);
+                if (WeatherConIcon.equalsIgnoreCase("clear-night")) mWIcon.setImageResource(R.drawable.clearday); //CHECK
+
+                if (WeatherConIcon.equalsIgnoreCase("party-cloudy-day")) mWIcon.setImageResource(R.drawable.clouds);
+                if (WeatherConIcon.equalsIgnoreCase("party-cloudy-night")) mWIcon.setImageResource(R.drawable.clouds);
+                if (WeatherConIcon.equalsIgnoreCase("cloudy")) mWIcon.setImageResource(R.drawable.clouds);
+
+                if (WeatherConIcon.equalsIgnoreCase("rain")) mWIcon.setImageResource(R.drawable.rain);
+                if (WeatherConIcon.equalsIgnoreCase("sleet")) mWIcon.setImageResource(R.drawable.rain); //Χιονόνερο
+                if (WeatherConIcon.equalsIgnoreCase("snow")) mWIcon.setImageResource(R.drawable.snow);
+                if (WeatherConIcon.equalsIgnoreCase("wind")) mWIcon.setImageResource(R.drawable.clouds);
+                
+                if (WeatherConIcon.equalsIgnoreCase("fog")) mWIcon.setImageResource(R.drawable.clouds); //Ομίχλη
+                }
 
 
 
@@ -654,6 +671,106 @@ public class FullscreenActivity extends AppCompatActivity {
             return;
         }
 
+        void ReadFromDark()
+        {
+
+            if (Units=="C") UnitsTxt="?units=si";     //Celsius
+            if (Units=="F") UnitsTxt="";   //Fahrenheit
+            //if (Units=="F") UnitsTxt="&units=imperial";   //Fahrenheit
+            //if (Units=="K") UnitsTxt="";                  //Kelvin
+
+            if (Code.length()<2) CodeTxt=""; else CodeTxt=","+Code;
+
+            float HumFloat;
+            //First Call (Get Coords)
+
+            try {
+                CallUrl="http://api.openweathermap.org/data/2.5/weather?q="+City+CodeTxt+"&APPID="+APIOpen;
+                //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
+                Contents="";
+                Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
+
+                try {
+                    JSONObject jsonObj = new JSONObject(Contents);
+                    JSONObject obj2=jsonObj.getJSONObject("coord");
+                    CallCode=jsonObj.getString("cod"); //404 = City not found
+                    Latitude=obj2.getString("lat");
+                    Longitude=obj2.getString("lon");
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                //OutText=Contents;
+                // OutText=Latitude+","+Longitude;
+                OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
+                        +Coords+"\n"+Temp+"\n"+HumidityTxt;
+                //OutText=CallUrl;
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            //Second call (Call DarkSky)
+            //Contents=loadJSONFromAsset("DarkSky.json");
+            //if (2<1)
+            try {
+                CallUrl="https://api.darksky.net/forecast/"+APIDark+"/"+Latitude+","+Longitude+UnitsTxt;
+                //https://api.darksky.net/forecast/153f92e90eba11f8a60979ad1f5d791b/37.8267,-122.4233?units=si
+                //CallUrl="https://api.darksky.net/forecast/153f92e90eba11f8a60979ad1f5d791b/37.8267,-122.4233";
+                //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
+                Contents="";
+                Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
+
+                try {
+                    JSONObject jsonObj = new JSONObject(Contents);
+                    JSONObject obj2=jsonObj.getJSONObject("currently");
+                    Coords="Latitude:"+Latitude;
+                    Coords+="\n"+"Longitude:"+Longitude;
+
+                    Temperature=Float.valueOf(obj2.getString("temperature"));
+                    Humidity=Float.valueOf(obj2.getString("humidity"))*100;
+
+                    Temp="Temperature:"+obj2.getString("temperature")+" "+Units;
+                    HumFloat=Float.valueOf(obj2.getString("humidity"));
+                    HumidityTxt="Humidity:"+(int)(HumFloat*100)+"%";
+
+                    WeatherCon=obj2.getString("summary");
+                    WeatherConIcon=obj2.getString("icon");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                //OutText=Contents;
+                //OutText=Coords+"\n"+Temp;
+                OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
+                        +Coords+"\n"+Temp+"\n"+HumidityTxt;
+                //OutText=CallUrl;
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            //RUNS
+            /*
+            try {
+                JSONObject jsonObj = new JSONObject(Contents);
+                JSONObject obj2=jsonObj.getJSONObject("currently");
+                Temp=obj2.getString("temperature");
+
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+
+            OutText=Temp;
+*/
+            return;
+        }
+
 
 
         @Override
@@ -665,7 +782,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
             if (SiteUse=="OpenWeather") ReadFromOpen();
             if (SiteUse=="AccuWeather") ReadFromAccu();
-
+            if (SiteUse=="DarkSky") ReadFromDark();
             return null;
         }
     }
