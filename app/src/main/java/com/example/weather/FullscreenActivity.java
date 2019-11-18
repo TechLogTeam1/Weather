@@ -20,10 +20,19 @@ import android.widget.TextView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONStringer;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+
+import static org.jsoup.nodes.Entities.EscapeMode.base;
 
 
 /**
@@ -66,6 +75,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
     private String APIOpen="400b0e4928077be78efaf4523cd3a3b5";
     private String APIAccu="GXj9XbCK7EOk5cVRnAOVN62PdDGJaTD6";
+    private String APIDark="e478e283b61f95dc70771be89db8ce1c";
 
     private String City;
     private String Code;
@@ -74,6 +84,8 @@ public class FullscreenActivity extends AppCompatActivity {
     private String CallCode;
     private String Coords;
     private String Temp;
+    private float Temperature;
+    private float Humidity;
     private String HumidityTxt;
     private String Contents;
     private String Units;
@@ -85,10 +97,7 @@ public class FullscreenActivity extends AppCompatActivity {
     private String WeatherCon;
     private int i;
     private int Period;
-
-    private float Temperature;
-    private float Humidity;
-
+    private String Longitude,Latitude;
     //Edit AndroidManifest.xml
     //Add <uses-permission android:name="android.permission.INTERNET" />
     //after package command
