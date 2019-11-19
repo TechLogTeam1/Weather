@@ -75,12 +75,16 @@ public class FullscreenActivity extends AppCompatActivity {
     private String CallUrl;
     private String CallCode;
     private String Coords;
+    private float Temperature;
+    private float Humidity;
     private String Temp;
-    private String Humidity;
+    private String WeatherCon;
+    private String HumidityTxt;
     private String Contents;
     private String Units;
     private String UnitsTxt;
     private int i;
+    private int Period=2;
 
     //Edit AndroidManifest.xml
     //Add <uses-permission android:name="android.permission.INTERNET" />
@@ -107,7 +111,7 @@ public class FullscreenActivity extends AppCompatActivity {
         mRadio2= (RadioButton) findViewById(R.id.radioButton2);
         mRadio3= (RadioButton) findViewById(R.id.radioButton3);
 
-        City="London";Code="uk";
+        City="London";Code="UK";
         Units="C";
         mCity.setText(City);
         mCode.setText(Code);
@@ -188,42 +192,146 @@ public class FullscreenActivity extends AppCompatActivity {
             //City="Paris";Code="fr";
             //City="Nigrita";Code="gr";
 
-            if (Units=="C") UnitsTxt="&units=metric";     //Celsius
-            if (Units=="F") UnitsTxt="&units=imperial";   //Fahrenheit
-            if (Units=="K") UnitsTxt="";                  //Kelvin
+            //if (Units=="C") UnitsTxt="&units=M";   //Celsius
+            if (Units=="C") UnitsTxt="";   //Celsius (Default)
+            if (Units=="F") UnitsTxt="&units=I";   //Fahrenheit
+            if (Units=="K") UnitsTxt="&units=S";   //Kelvin
 
             if (Code.length()<2) CodeTxt=""; else CodeTxt=","+Code;
 
-            try {
-                //CallUrl="http://api.openweathermap.org/data/2.5/weather?q="+City+CodeTxt+UnitsTxt+"&APPID="+API;
-                CallUrl="https://api.weatherbit.io/v2.0/current?&city="+City+"&country="+CodeTxt+"&key="+APIWB;
-                //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
-                Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
-
+            if (Period==1) {        //Current Weather
                 try {
-                    JSONObject jsonObj = new JSONObject(Contents);
-                    JSONObject obj2=jsonObj.getJSONObject("data");
-                    JSONObject obj3=jsonObj.getJSONObject("main");
 
-                    //CallCode=jsonObj.getString("cod"); //404 = City not found
-                    Coords="Latitude:"+obj2.get("lat");
-                    Coords+="\n"+"Longitude:"+obj2.get("lon");
-                    Temp="Temperature:"+obj2.get("temp")+" "+Units;
+                    CallUrl = "https://api.weatherbit.io/v2.0/current?city=" + City + "&key=" + APIWB + UnitsTxt;
 
-                    //Humidity="Humidity:"+obj3.getString("humidity")+"%";
+                    Contents = "";
+                    Contents = Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
 
-                } catch (JSONException e) {
+                    try {
+                        //JSONObject jsonObj = new JSONObject(Contents);
+                        JSONObject jsonObj = null;
+                        jsonObj = new JSONObject(Contents);
+                        JSONArray baseArray = jsonObj.getJSONArray("data");
+                        JSONObject json2 = baseArray.getJSONObject(0);
+                        JSONObject obj2 = json2.getJSONObject("weather");
+
+                        Temp = json2.getString("temp") + " " + Units;
+                        //JSONObject obj2 = json2.getJSONObject("weather");
+
+                        Temperature = Float.valueOf(json2.getString("temp"));
+                        Humidity = Float.valueOf(json2.getString("rh"));
+
+                        Coords = "Latitude:" + json2.getString("lat");
+                        Coords += "\n" + "Longitude:" + json2.getString("lon");
+                        HumidityTxt = "Humidity:" + json2.getString("rh") + "%"; //rh = Relative Humidity
+
+                        WeatherCon = obj2.getString("description");
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    //OutText=Contents;
+                    //OutText=Temp;
+                    OutText = "Current Weather:" + "\n" + "City:" + City + CodeTxt + "\n" + "---------------------------------------------" + "\n"
+                            + Coords + "\n" + Temp + "\n" + HumidityTxt;
+                    //OutText=CallUrl;
+
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
-
-                //OutText=Contents;
-                OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
-                        +Coords+"\n"+Temp;
-                //OutText=CallUrl;
-
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+
+
+
+            if (Period==2) {        //The Weather in 24 Hours
+                try {
+
+
+                    //CallUrl="https://api.weatherbit.io/v2.0/current?city="+City+"&key="+APIWB+UnitsTxt;
+                    CallUrl = "http://api.weatherbit.io/v2.0/forecast/hourly?city=" + City + "&key=" + APIWB + "&hours=24" + UnitsTxt;
+
+                    Contents = "";
+                    Contents = Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
+
+                    try {
+                        //JSONObject jsonObj = new JSONObject(Contents);
+                        JSONObject jsonObj = null;
+                        jsonObj = new JSONObject(Contents);
+                        JSONArray baseArray = jsonObj.getJSONArray("data");
+                        JSONObject json2 = baseArray.getJSONObject(23);
+                        JSONObject obj2 = json2.getJSONObject("weather");
+
+                        Temp = json2.getString("temp") + " " + Units;
+
+                        Temperature=Float.valueOf(json2.getString("temp"));
+                        Humidity=Float.valueOf(json2.getString("rh"));
+
+                        Coords="Latitude:"+jsonObj.getString("lat");
+                        Coords+="\n"+"Longitude:"+jsonObj.getString("lon");
+                        HumidityTxt="Humidity:"+json2.getString("rh")+"%"; //rh = Relative Humidity
+
+                        WeatherCon=obj2.getString("description");
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    //OutText=Contents;
+                    //OutText = Time;
+                    OutText = "The Weather in 24 Hours:" + "\n" + "City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
+                                   +Coords+"\n"+Temp+"\n"+HumidityTxt;
+                    //OutText=CallUrl;
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (Period==3) {        //The Weather in 5 Days !!!Doesn't work!!!
+                try {
+
+
+                    //CallUrl="https://api.weatherbit.io/v2.0/current?city="+City+"&key="+APIWB+UnitsTxt;
+                    CallUrl = "http://api.weatherbit.io/v2.0/forecast/hourly?city=" + City + "&key=" + APIWB + "&hours=120" + UnitsTxt;
+
+                    Contents = "";
+                    Contents = Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
+
+                    try {
+                        //JSONObject jsonObj = new JSONObject(Contents);
+                        JSONObject jsonObj = null;
+                        jsonObj = new JSONObject(Contents);
+                        JSONArray baseArray = jsonObj.getJSONArray("data");
+                        JSONObject json2 = baseArray.getJSONObject(119);
+                        JSONObject obj2 = json2.getJSONObject("weather");
+
+                        Temp = json2.getString("temp") + " " + Units;
+
+                        Temperature=Float.valueOf(json2.getString("temp"));
+                        Humidity=Float.valueOf(json2.getString("rh"));
+
+                        Coords="Latitude:"+jsonObj.getString("lat");
+                        Coords+="\n"+"Longitude:"+jsonObj.getString("lon");
+                        HumidityTxt="Humidity:"+json2.getString("rh")+"%"; //rh = Relative Humidity
+
+                        WeatherCon=obj2.getString("description");
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    //OutText=Contents;
+                    //OutText = Time;
+                    OutText = "The Weather in 5 Days:" + "\n" + "City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
+                            +Coords+"\n"+Temp+"\n"+HumidityTxt;
+                    //OutText=CallUrl;
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
 
             return null;
         }
