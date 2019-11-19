@@ -288,7 +288,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 }
             }
 
-            if (Period==3) {        //The Weather in 5 Days !!!Doesn't work!!!
+            /*if (Period==3) {        //The Weather in 5 Days !!!!!(DOESNT WORK) API Returns Only 48 Hours!!!!!
                 try {
 
 
@@ -331,8 +331,7 @@ public class FullscreenActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-
-
+            */
             return null;
         }
     }
