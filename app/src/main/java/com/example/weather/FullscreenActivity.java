@@ -76,6 +76,7 @@ public class FullscreenActivity extends AppCompatActivity {
     private String APIOpen="400b0e4928077be78efaf4523cd3a3b5";
     private String APIAccu="GXj9XbCK7EOk5cVRnAOVN62PdDGJaTD6";
     private String APIDark="e478e283b61f95dc70771be89db8ce1c";
+    private String APIBit="307702986d074885b6bdf41d74768e0c";
 
     private String City;
     private String Code;
@@ -341,8 +342,20 @@ public class FullscreenActivity extends AppCompatActivity {
 
             if (SiteUse=="OpenWeather")
             {
+                //check for "mist" string ret
                 if (WeatherCon.equals("Clear")) mWIcon.setImageResource(R.drawable.clearday);
                 if (WeatherCon.equals("Clouds")) mWIcon.setImageResource(R.drawable.clouds);
+
+                if (WeatherCon.equals("Mist")) mWIcon.setImageResource(R.drawable.clouds);
+                if (WeatherCon.equals("Smoke")) mWIcon.setImageResource(R.drawable.clouds);
+                if (WeatherCon.equals("Haze")) mWIcon.setImageResource(R.drawable.clouds);
+                if (WeatherCon.equals("Dust")) mWIcon.setImageResource(R.drawable.clouds);
+                if (WeatherCon.equals("Fog")) mWIcon.setImageResource(R.drawable.clouds);
+                if (WeatherCon.equals("Sand")) mWIcon.setImageResource(R.drawable.clouds);
+                if (WeatherCon.equals("Ash")) mWIcon.setImageResource(R.drawable.clouds);
+                if (WeatherCon.equals("Squall")) mWIcon.setImageResource(R.drawable.clouds);
+                if (WeatherCon.equals("Tornado")) mWIcon.setImageResource(R.drawable.clouds);
+
                 if (WeatherCon.equals("Rain")) mWIcon.setImageResource(R.drawable.rain);
                 if (WeatherCon.equals("Drizzle")) mWIcon.setImageResource(R.drawable.drizzleday); //Light Rain
                 if (WeatherCon.equals("Thunderstorm")) mWIcon.setImageResource(R.drawable.thunder);
@@ -431,7 +444,54 @@ public class FullscreenActivity extends AppCompatActivity {
                 if (WeatherConIcon.equalsIgnoreCase("fog")) mWIcon.setImageResource(R.drawable.clouds); //Ομίχλη
                 }
 
+            if (SiteUse=="Weatherbit") {
+                //check for "mist" string ret
+                if (WeatherCon.equalsIgnoreCase("Clear Sky")) mWIcon.setImageResource(R.drawable.clearday);
 
+                if (WeatherCon.equalsIgnoreCase("Few Clouds")) mWIcon.setImageResource(R.drawable.clouds);
+                if (WeatherCon.equalsIgnoreCase("Scattered clouds")) mWIcon.setImageResource(R.drawable.clouds);
+                if (WeatherCon.equalsIgnoreCase("Broken clouds")) mWIcon.setImageResource(R.drawable.clouds);
+                if (WeatherCon.equalsIgnoreCase("Overcast clouds")) mWIcon.setImageResource(R.drawable.clouds);
+
+                if (WeatherCon.equalsIgnoreCase("Unknown Precipitation")) mWIcon.setImageResource(R.drawable.rain);
+
+                if (WeatherCon.equalsIgnoreCase("Fog")) mWIcon.setImageResource(R.drawable.clouds);
+                if (WeatherCon.equalsIgnoreCase("Sand/dust")) mWIcon.setImageResource(R.drawable.clouds);
+                if (WeatherCon.equalsIgnoreCase("Haze")) mWIcon.setImageResource(R.drawable.clouds);
+                if (WeatherCon.equalsIgnoreCase("Smoke")) mWIcon.setImageResource(R.drawable.clouds);
+                if (WeatherCon.equalsIgnoreCase("Mist")) mWIcon.setImageResource(R.drawable.clouds);
+
+                if (WeatherCon.equalsIgnoreCase("Flurries")) mWIcon.setImageResource(R.drawable.rain);
+                if (WeatherCon.equalsIgnoreCase("Heavy snow shower")) mWIcon.setImageResource(R.drawable.rain); //Χιονόνερο
+                if (WeatherCon.equalsIgnoreCase("Snow shower")) mWIcon.setImageResource(R.drawable.rain);
+
+                if (WeatherCon.equalsIgnoreCase("Heavy sleet")) mWIcon.setImageResource(R.drawable.rain); //Χιονόνερο
+                if (WeatherCon.equalsIgnoreCase("Sleet")) mWIcon.setImageResource(R.drawable.rain); //Χιονόνερο
+                if (WeatherCon.equalsIgnoreCase("Mix snow/rain")) mWIcon.setImageResource(R.drawable.rain); //Χιονόνερο
+
+                if (WeatherCon.equalsIgnoreCase("Heavy Snow")) mWIcon.setImageResource(R.drawable.snow);
+                if (WeatherCon.equalsIgnoreCase("Snow")) mWIcon.setImageResource(R.drawable.snow);
+                if (WeatherCon.equalsIgnoreCase("Light Snow")) mWIcon.setImageResource(R.drawable.snow);
+
+                if (WeatherCon.equalsIgnoreCase("Heavy shower rain")) mWIcon.setImageResource(R.drawable.rain);
+                if (WeatherCon.equalsIgnoreCase("Shower rain")) mWIcon.setImageResource(R.drawable.rain);
+                if (WeatherCon.equalsIgnoreCase("Light shower rain")) mWIcon.setImageResource(R.drawable.rain);
+                if (WeatherCon.equalsIgnoreCase("Freezing rain")) mWIcon.setImageResource(R.drawable.rain);
+                if (WeatherCon.equalsIgnoreCase("Heavy Rain")) mWIcon.setImageResource(R.drawable.rain);
+                if (WeatherCon.equalsIgnoreCase("Moderate Rain")) mWIcon.setImageResource(R.drawable.rain);
+                if (WeatherCon.equalsIgnoreCase("Light Rain")) mWIcon.setImageResource(R.drawable.rain);
+                if (WeatherCon.equalsIgnoreCase("Heavy Drizzle")) mWIcon.setImageResource(R.drawable.rain);
+                if (WeatherCon.equalsIgnoreCase("Drizzle")) mWIcon.setImageResource(R.drawable.rain);
+                if (WeatherCon.equalsIgnoreCase("Light Drizzle")) mWIcon.setImageResource(R.drawable.rain);
+
+                if (WeatherCon.equalsIgnoreCase("Thunderstorm with Hail")) mWIcon.setImageResource(R.drawable.thunder);
+                if (WeatherCon.equalsIgnoreCase("Thunderstorm with drizzle")) mWIcon.setImageResource(R.drawable.thunder);
+                if (WeatherCon.equalsIgnoreCase("Thunderstorm with light drizzle")) mWIcon.setImageResource(R.drawable.thunder);
+                if (WeatherCon.equalsIgnoreCase("Thunderstorm with heavy rain")) mWIcon.setImageResource(R.drawable.thunder);
+                if (WeatherCon.equalsIgnoreCase("Thunderstorm with rain")) mWIcon.setImageResource(R.drawable.thunder);
+                if (WeatherCon.equalsIgnoreCase("Thunderstorm with light rain")) mWIcon.setImageResource(R.drawable.thunder);
+
+            }
 
             mUnits.setText(Units);
             FrameLayout.LayoutParams params1 = new FrameLayout.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
@@ -772,6 +832,66 @@ public class FullscreenActivity extends AppCompatActivity {
         }
 
 
+        void ReadFromBit()
+        {
+            //if (Units=="C") UnitsTxt="&units=M";   //Celsius
+            if (Units=="C") UnitsTxt="";   //Celsius (Default)
+            if (Units=="F") UnitsTxt="&units=I";   //Fahrenheit
+            if (Units=="K") UnitsTxt="&units=S";   //Kelvin
+
+            if (Code.length()<2) CodeTxt=""; else CodeTxt=","+Code;
+
+            if (Period==1)
+                try {
+
+                    CallUrl="https://api.weatherbit.io/v2.0/current?city="+City+"&key="+APIBit+UnitsTxt;
+
+                    Contents="";
+                    Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
+
+                    try {
+                        //JSONObject jsonObj = new JSONObject(Contents);
+                        JSONObject jsonObj = null;
+                        jsonObj = new JSONObject(Contents);
+                        JSONArray baseArray =jsonObj.getJSONArray("data");
+                        JSONObject json2 = baseArray.getJSONObject(0);
+                        JSONObject obj2=json2.getJSONObject("weather");
+
+                        Temp = json2.getString("temp") + " " + Units;
+                        //JSONObject obj2 = json2.getJSONObject("weather");
+
+                        Temperature=Float.valueOf(json2.getString("temp"));
+                        Humidity=Float.valueOf(json2.getString("rh"));
+
+                        Coords="Latitude:"+json2.getString("lat");
+                        Coords+="\n"+"Longitude:"+json2.getString("lon");
+                        HumidityTxt="Humidity:"+json2.getString("rh")+"%"; //rh = Relative Humidity
+
+                        WeatherCon=obj2.getString("description");
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    //OutText=Contents;
+                    //OutText=Temp;
+                    OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
+                            +Coords+"\n"+Temp+"\n"+HumidityTxt;
+                    //OutText=CallUrl;
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+
+            //if (Period==2) OutText="Period: Last 24 hours";
+            //if (Period==3) OutText="Period: Last 5 days";
+
+            return;
+        }
+
+
 
         @Override
         protected Void doInBackground(Void... voids) {
@@ -783,6 +903,8 @@ public class FullscreenActivity extends AppCompatActivity {
             if (SiteUse=="OpenWeather") ReadFromOpen();
             if (SiteUse=="AccuWeather") ReadFromAccu();
             if (SiteUse=="DarkSky") ReadFromDark();
+            if (SiteUse=="Weatherbit") ReadFromBit();
+
             return null;
         }
     }
