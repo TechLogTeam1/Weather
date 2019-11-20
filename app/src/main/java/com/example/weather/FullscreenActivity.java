@@ -22,6 +22,8 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
+import java.util.Date;
+import java.text.SimpleDateFormat;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -76,7 +78,6 @@ public class FullscreenActivity extends AppCompatActivity {
     ProgressDialog progressDialog;
 
     private String APIOpen="400b0e4928077be78efaf4523cd3a3b5";
-    private String APIAccu="GXj9XbCK7EOk5cVRnAOVN62PdDGJaTD6";
     private String APIDark="e478e283b61f95dc70771be89db8ce1c";
 
     private String City;
@@ -94,6 +95,14 @@ public class FullscreenActivity extends AppCompatActivity {
     private String OutList;
     private String Date;
     private String CityKey;
+    private String temperatureMin;
+    private String temperatureMax;
+    private String temperatureHigh;
+    private String hours;
+    private long DateUnix;
+
+
+
     private int i;
     private int Period;
     private String Longitude,Latitude;
@@ -276,6 +285,17 @@ public class FullscreenActivity extends AppCompatActivity {
             }
         });
 
+        public String ConvertUNIXtoDate(long unixSeconds) {
+
+            //long unixSeconds = DateUnix;
+            Date date = new java.util.Date(unixSeconds * 1000L);
+            SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+            String formattedDate = sdf.format(date);
+            Date = formattedDate;
+
+            return Date;
+
+        }
 
     }
 
@@ -396,91 +416,6 @@ public class FullscreenActivity extends AppCompatActivity {
 
             return;
         }
-
-        void ReadFromAccu()
-        {
-            if (Units=="C") UnitsTxt="&units=metric";     //Celsius
-            if (Units=="F") UnitsTxt="&units=imperial";   //Fahrenheit
-            if (Units=="K") UnitsTxt="";                  //Kelvin
-
-            if (Code.length()<2) CodeTxt=""; else CodeTxt=","+Code;
-
-            //CityKey="328328"; //London
-            //CallUrl="http://dataservice.accuweather.com/locations/v1/cities/search?q=London&apikey=GXj9XbCK7EOk5cVRnAOVN62PdDGJaTD6";
-            //CallUrl="http://dataservice.accuweather.com/locations/v1/cities/search?q="+City+"&apikey="+APIAccu;
-
-            //First Call
-            try {
-                CallUrl="http://dataservice.accuweather.com/locations/v1/cities/search?q="+City+"&apikey="+APIAccu;
-                Contents="";
-                Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
-                Contents=Contents.substring(1,Contents.length());
-
-                try {
-
-                    JSONObject jsonObj = new JSONObject(Contents);
-                    JSONObject obj2 = jsonObj.getJSONObject("GeoPosition");
-                    CityKey=jsonObj.getString("Key");
-                    Coords="Latitude:"+obj2.getString("Latitude");
-                    Coords+="\n"+"Longitude:"+obj2.getString("Longitude");
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            //Second Call
-            try {
-                //CallUrl="http://api.openweathermap.org/data/2.5/weather?q="+City+CodeTxt+UnitsTxt+"&APPID="+API;
-                //CallUrl="http://dataservice.accuweather.com/locations/v1/cities/search?q="+City+"&apikey="+APIAccu;
-                CallUrl="http://dataservice.accuweather.com/currentconditions/v1/"+CityKey+"?apikey="+APIAccu+"&details=true";
-
-                Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
-                Contents=Contents.substring(1,Contents.length());
-                try {
-                    JSONObject jsonObj = new JSONObject(Contents);
-                    JSONObject obj2 = jsonObj.getJSONObject("Temperature");
-                    JSONObject obj3;
-
-                    if (Units=="C")
-                        obj3 = obj2.getJSONObject("Metric");
-                    else
-                    if (Units=="F")
-                        obj3 = obj2.getJSONObject("Imperial");
-                    else
-                        obj3 = obj2.getJSONObject("Metric");
-
-                    Temp="Temperature:"+obj3.getString("Value")+" "+Units;
-                    Humidity="Humidity:"+jsonObj.getString("RelativeHumidity")+"%";
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                //"WeatherText"
-                //OutText=WeatherText;
-                //OutText=Contents;
-
-                OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
-                        +Coords+"\n"+Temp+"\n"+Humidity;
-
-                //OutText=CityKey;
-                //OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
-                //      +Coords+"\n"+Temp+"\n"+Humidity;
-                //OutText=CallUrl;
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-            return;
-        }
-
         void ReadFromDark()
         {
 
@@ -513,9 +448,9 @@ public class FullscreenActivity extends AppCompatActivity {
                 }
 
                 //OutText=Contents;
-                // OutText=Latitude+","+Longitude;
-                OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
-                        +Coords+"\n"+Temp+"\n"+Humidity;
+                OutText=Latitude+","+Longitude;
+                //OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
+                //      +Coords+"\n"+Temp+"\n"+Humidity;
                 //OutText=CallUrl;
 
             } catch (IOException e) {
@@ -526,52 +461,148 @@ public class FullscreenActivity extends AppCompatActivity {
             //Second call (Call DarkSky)
             //Contents=loadJSONFromAsset("DarkSky.json");
             //if (2<1)
-            try {
-                CallUrl="https://api.darksky.net/forecast/"+APIDark+"/"+Latitude+","+Longitude+UnitsTxt;
-                //https://api.darksky.net/forecast/153f92e90eba11f8a60979ad1f5d791b/37.8267,-122.4233?units=si
-                //CallUrl="https://api.darksky.net/forecast/153f92e90eba11f8a60979ad1f5d791b/37.8267,-122.4233";
-                //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
-                Contents="";
-                Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
-
+            if (Period==1)
                 try {
-                    JSONObject jsonObj = new JSONObject(Contents);
-                    JSONObject obj2=jsonObj.getJSONObject("currently");
-                    Coords="Latitude:"+Latitude;
-                    Coords+="\n"+"Longitude:"+Longitude;
-                    Temp="Temperature:"+obj2.getString("temperature")+" "+Units;
-                    HumFloat=Float.valueOf(obj2.getString("humidity"));
-                    Humidity="Humidity:"+(int)(HumFloat*100)+"%";
+                    CallUrl="https://api.darksky.net/forecast/"+APIDark+"/"+Latitude+","+Longitude+UnitsTxt;
+                    //CallUrl="https://api.darksky.net/forecast/153f92e90eba11f8a60979ad1f5d791b/37.8267,-122.4233";
+                    //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
+                    Contents="";
+                    Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
 
-                } catch (JSONException e) {
+                    try {
+                        JSONObject jsonObj = new JSONObject(Contents);
+                        JSONObject obj2=jsonObj.getJSONObject("currently");
+                        Coords="Latitude:"+Latitude;
+                        Coords+="\n"+"Longitude:"+Longitude;
+                        Temp="Temperature:"+obj2.getString("temperature")+" "+Units;
+                        HumFloat=Float.valueOf(obj2.getString("humidity"));
+                        Humidity="Humidity:"+(int)(HumFloat*100)+"%";
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    //OutText=Contents;
+                    //OutText=Coords+"\n"+Temp;
+                    OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
+                            +Coords+"\n"+Temp+"\n"+Humidity;
+                    //OutText=CallUrl;
+
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
 
-                //OutText=Contents;
-                //OutText=Coords+"\n"+Temp;
-                OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
-                        +Coords+"\n"+Temp+"\n"+Humidity;
-                //OutText=CallUrl;
+            if (Period==2)
+                try {
+                    //CallUrl="http://api.openweathermap.org/data/2.5/forecast?q="+City+CodeTxt+UnitsTxt+"&APPID="+APIOpen;
+                    //CallUrl="http://api.openweathermap.org/data/2.5/forecast?q="+City+"&APPID="+APIOpen;
+                    //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+                    CallUrl="https://api.darksky.net/forecast/"+APIDark+"/"+Latitude+","+Longitude+UnitsTxt;
 
-            //RUNS
-            /*
-            try {
-                JSONObject jsonObj = new JSONObject(Contents);
-                JSONObject obj2=jsonObj.getJSONObject("currently");
-                Temp=obj2.getString("temperature");
+                    Contents="";
+                    Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
+
+                    Coords="Latitude:"+Latitude;
+                    Coords+="\n"+"Longitude:"+Longitude;
+
+                    try {
+                        JSONObject jsonObj = new JSONObject(Contents);
+                        JSONObject obj2=jsonObj.getJSONObject("hourly");
+                        JSONArray baseArray=obj2.getJSONArray("data");
+
+                        OutList="";
+
+                        for (i = 0; i < baseArray.length(); i++) {
+                            JSONObject json2 = baseArray.getJSONObject(i);
+                            //JSONObject obj3 = json2.getJSONObject("temperatureMaxTime");
+
+                            Temp = "Temp:" + json2.getString("temperature") + " " + Units;
+                            Humidity = "Humidity:" + json2.getString("humidity") + "%";
+                            DateUnix=Long.valueOf(json2.getString("time"));
+                            Date=ConvertUNIXtoDate(DateUnix);
+
+                            OutList+="---------------------------------------------\n"+"Date:"+Date+
+                                    "\n---------------------------------------------\n"+
+                                    Temp+"\n"+Humidity+"\n";
+
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    OutText="City:"+City+CodeTxt+"\n"+Coords+"\n"+
+                            OutList;
+
+                    //OutText=Contents;
+                    //OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
+                    //  +Temp+"\n"+Humidity;
+
+                    //OutText=CallUrl;
 
 
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
 
-            OutText=Temp;
-*/
+            if (Period==3)
+                try {
+                    //CallUrl="http://api.openweathermap.org/data/2.5/forecast?q="+City+CodeTxt+UnitsTxt+"&APPID="+APIOpen;
+                    //CallUrl="http://api.openweathermap.org/data/2.5/forecast?q="+City+"&APPID="+APIOpen;
+                    //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
+
+                    CallUrl="https://api.darksky.net/forecast/"+APIDark+"/"+Latitude+","+Longitude+UnitsTxt;
+
+                    Contents="";
+                    Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
+
+                    Coords="Latitude:"+Latitude;
+                    Coords+="\n"+"Longitude:"+Longitude;
+
+                    try {
+                        JSONObject jsonObj = new JSONObject(Contents);
+                        JSONObject obj2=jsonObj.getJSONObject("daily");
+                        JSONArray baseArray=obj2.getJSONArray("data");
+
+                        OutList="";
+
+                        for (i = 0; i < baseArray.length(); i++) {
+                            JSONObject json2 = baseArray.getJSONObject(i);
+                            //JSONObject obj3 = json2.getJSONObject("temperatureMaxTime");
+
+                            Temp = "Temp:"+json2.getString("temperatureMax") + " " + Units;
+                            Humidity = "Humidity:" + json2.getString("humidity") + "%";
+                            DateUnix=Long.valueOf(json2.getString("time"));
+                            Date=ConvertUNIXtoDate(DateUnix);
+
+                            OutList+="---------------------------------------------\n"+"Date:"+Date+
+                                    "\n---------------------------------------------\n"+
+                                    Temp+"\n"+Humidity+"\n";
+
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    OutText="City:"+City+CodeTxt+"\n"+Coords+"\n"+
+                            OutList;
+
+                    //OutText=Contents;
+                    //OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
+                    //  +Temp+"\n"+Humidity;
+
+                    //OutText=CallUrl;
+
+
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
             return;
         }
 
@@ -584,7 +615,6 @@ public class FullscreenActivity extends AppCompatActivity {
             OutText="";
 
             if (SiteUse=="OpenWeather") ReadFromOpen();
-            if (SiteUse=="AccuWeather") ReadFromAccu();
             if (SiteUse=="DarkSky") ReadFromDark();
             return null;
         }
