@@ -34,6 +34,27 @@ import java.util.ArrayList;
 
 import static org.jsoup.nodes.Entities.EscapeMode.base;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+
+import static org.jsoup.nodes.Entities.EscapeMode.base;
+import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.text.DateFormat;
+import java.util.TimeZone;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.FileReader;
+import java.io.BufferedReader;
+
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -87,6 +108,8 @@ public class FullscreenActivity extends AppCompatActivity {
     private String Temp;
     private float Temperature;
     private float Humidity;
+    private String TempT;
+    private String HumidityT;
     private String HumidityTxt;
     private String Contents;
     private String Units;
@@ -100,6 +123,24 @@ public class FullscreenActivity extends AppCompatActivity {
     private int i;
     private int Period;
     private String Longitude,Latitude;
+    private String Temp1;
+    private String Humidity1;
+
+
+    class HistoryDataClass
+    {
+        String City;
+        String Date;
+        float Temperature;
+        float Humidity;
+
+    }
+
+    HistoryDataClass HistoryData[]=new HistoryDataClass[10000];
+
+    private int HistoryPos;
+    private String st;
+
     //Edit AndroidManifest.xml
     //Add <uses-permission android:name="android.permission.INTERNET" />
     //after package command
@@ -296,6 +337,168 @@ public class FullscreenActivity extends AppCompatActivity {
 
 
     }
+
+    public void ReadHistory()
+
+    {
+        String datapath,strdata;
+        char[] scArray = new char[29];
+        datapath=getApplicationInfo().dataDir+"/Test.txt";
+        int o;
+        int stopPos;
+        float tempf,humf;
+        tempf=0;
+        humf=0;
+
+        try {
+            File fileSc = new File(datapath);
+            FileReader fileReader = new FileReader(fileSc);
+            StringBuffer stringBuffer = new StringBuffer();
+            int numCharsRead = 0; //NEW
+            char[] charArrayCity = new char[50]; //PREV
+            char[] charArray = new char[29]; //PREV
+            char[] charArray2 = new char[10]; //PREV
+            char[] charArray3 = new char[10]; //PREV
+            //char[] charArray = new char[16];
+            OutText="";
+            //PREV
+
+            for (i=0;i<=fileSc.length()/99;i++)
+            {
+                TempT="";HumidityT="";
+
+                fileReader.read(charArrayCity);
+                stringBuffer.append(charArrayCity, 0, 50);
+                City = stringBuffer.toString();
+                stringBuffer.delete(0, 50);
+
+
+                fileReader.read(charArray);
+                stringBuffer.append(charArray, 0, 29);
+                Date = stringBuffer.toString();
+                stringBuffer.delete(0, 29);
+
+                fileReader.read(charArray2);
+                stringBuffer.append(charArray2, 0, 10);
+                TempT = stringBuffer.toString();
+                stringBuffer.delete(0, 10);
+
+                fileReader.read(charArray3);
+                stringBuffer.append(charArray3, 0, 10);
+                HumidityT = stringBuffer.toString();
+                stringBuffer.delete(0, 10);
+
+                /*
+                stopPos=0;
+                for (o=0;o<=Humidity.length();o++) if (Humidity.charAt(o)==' ') {stopPos=o;break;}
+                Humidity=Humidity.substring(0,stopPos);
+
+                stopPos=0;
+                for (o=0;o<=Temp.length();o++) if (Temp.charAt(o)==' ') {stopPos=o;break;}
+                Temp=Temp.substring(0,stopPos);
+                */
+
+                OutText+="City:"+City+"\n"
+                        +"Date:"+Date+"\n"+
+                        "Temp:"+TempT+"\n"+
+                        "Humidity:"+HumidityT+"%\n";
+            }
+            //tempf=fileReader.read();
+            //humf=fileReader.read();
+            //OutText=String.valueOf(fileSc.length());
+            fileReader.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //Temp=String.valueOf(tempf);
+        //Humidity=String.valueOf(humf);
+        mTextView.setText(OutText);
+
+        return;
+    }
+
+    public void SaveHistory()
+    {
+
+        //Get Current Day
+        String CurrentDate;
+        String Path;
+        float TempF,HumF;
+        String PrevTemp,PrevHum;
+
+        Date date = new Date();
+        String strDateFormat = "yyyy-MM-dd HH:mm:ss z";
+        DateFormat dateFormat = new SimpleDateFormat(strDateFormat);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Athens"));
+        String formattedDate= dateFormat.format(date);
+        CurrentDate=formattedDate;
+
+        PrevTemp=TempT;
+        PrevHum=HumidityT;
+
+        TempT=Temp1;
+        HumidityT=Humidity1;
+
+        TempT+=" "+Units;
+        HumidityT+="%";
+        for (i=City.length();i<50;i++) City+=" ";
+        for (i=TempT.length();i<10;i++) TempT+=" ";
+        for (i=HumidityT.length();i<10;i++) HumidityT+=" ";
+
+        HistoryData[HistoryPos]=new HistoryDataClass();
+        HistoryData[HistoryPos].City=City;
+        HistoryData[HistoryPos].Date=CurrentDate;
+        //HistoryData[HistoryPos].Temperature=Float.valueOf(Temp);
+        //HistoryData[HistoryPos].Humidity=Float.valueOf(Humidity);
+
+        //TempF=Float.valueOf(Temp);
+        //HumF=Float.valueOf(Humidity);
+
+
+
+
+        int strlen;
+
+        String datapath;
+        datapath=getApplicationInfo().dataDir+"/Test.txt";
+        File fileSc = new File(datapath);
+
+
+        try {
+
+
+            //fileSc.createNewFile();
+
+            FileWriter fileWriter = new FileWriter(fileSc,true); //Append
+            //FileWriter fileWriter = new FileWriter(fileSc); //New
+
+            fileWriter.write(City, 0, 50);
+            fileWriter.write(CurrentDate, 0, 29);
+            fileWriter.write(TempT,0,10);
+            fileWriter.write(HumidityT,0,10);
+
+
+            fileWriter.flush();
+            fileWriter.close();
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        //mTextView.setText(String.valueOf(fileSc.length()));
+        //mTextView.setText(HistoryData[HistoryPos].Date);
+        HistoryPos++;
+
+        TempT=PrevTemp;
+        HumidityT=PrevHum;
+
+
+        return;
+    }
+
 
     private class Content extends AsyncTask<Void,Void,Void>
     {
@@ -535,6 +738,110 @@ public class FullscreenActivity extends AppCompatActivity {
         }
 
         void ReadFromOpen()
+        {
+            if (Units=="C") UnitsTxt="&units=metric";     //Celsius
+            if (Units=="F") UnitsTxt="&units=imperial";   //Fahrenheit
+            if (Units=="K") UnitsTxt="";                  //Kelvin
+
+            if (Code.length()<2) CodeTxt=""; else CodeTxt=","+Code;
+
+            if (Period==1)
+                try {
+                    CallUrl="http://api.openweathermap.org/data/2.5/weather?q="+City+CodeTxt+UnitsTxt+"&APPID="+APIOpen;
+                    //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
+                    Contents="";
+                    Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
+
+                    try {
+                        JSONObject jsonObj = new JSONObject(Contents);
+                        JSONObject obj2=jsonObj.getJSONObject("coord");
+                        JSONObject obj3=jsonObj.getJSONObject("main");
+
+                        CallCode=jsonObj.getString("cod"); //404 = City not found
+                        Coords="Latitude:"+obj2.getString("lat");
+                        Coords+="\n"+"Longitude:"+obj2.getString("lon");
+                        TempT="Temperature:"+obj3.getString("temp")+" "+Units;
+                        HumidityT="Humidity:"+obj3.getString("humidity")+"%";
+
+                        Temp1=obj3.getString("temp");
+                        Humidity1=obj3.getString("humidity");
+
+                        SaveHistory();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    //OutText=Contents;
+                    OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
+                            +Coords+"\n"+Temp+"\n"+Humidity;
+                    //OutText=CallUrl;
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+            if (Period==3)
+                try {
+                    CallUrl="http://api.openweathermap.org/data/2.5/forecast?q="+City+CodeTxt+UnitsTxt+"&APPID="+APIOpen;
+                    //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
+                    Contents="";
+                    Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
+
+                    try {
+                        JSONObject jsonObj = new JSONObject(Contents);
+                        JSONArray baseArray =jsonObj.getJSONArray("list");
+
+                        OutList="";
+
+                        JSONObject objcoords1 = jsonObj.getJSONObject("city");
+                        JSONObject objcoords2 = objcoords1.getJSONObject("coord");
+                        Coords="Latitude:"+objcoords2.getString("lat");
+                        Coords+="\n"+"Longitude:"+objcoords2.getString("lon");
+
+                        for (int i = 0; i < baseArray.length(); i++) {
+                            JSONObject json2 = baseArray.getJSONObject(i);
+                            JSONObject obj2 = json2.getJSONObject("main");
+
+                            Temp = obj2.getString("temp") + " " + Units;
+                            Humidity = "Humidity:" + obj2.getString("humidity") + "%";
+                            Date=json2.getString("dt_txt");
+
+
+                            //OutList+="Date:"+Date+"\n"+"ArrayPos:"+(i+1)+"\n"+Temp+"\n"+Humidity+"\n";
+
+                            OutList+="---------------------------------------------\n"+"Date:"+Date+
+                                    "\n---------------------------------------------\n"+
+                                    Temp+"\n"+Humidity+"\n";
+
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    OutText="City:"+City+CodeTxt+"\n"+Coords+"\n"+
+                            OutList;
+
+                    //OutText=Contents;
+                    //OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
+                    //  +Temp+"\n"+Humidity;
+
+                    //OutText=CallUrl;
+
+
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            if (Period==2) OutText="Period: Last 24 hours";
+            //if (Period==3) OutText="Period: Last 5 days";
+
+            return;
+        }
+
+        void ReadFromOpenPrev()
         {
             if (Units=="C") UnitsTxt="&units=metric";     //Celsius
             if (Units=="F") UnitsTxt="&units=imperial";   //Fahrenheit
