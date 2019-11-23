@@ -78,6 +78,7 @@ public class FullscreenActivity extends AppCompatActivity {
     private String APIAccu="GXj9XbCK7EOk5cVRnAOVN62PdDGJaTD6";
     private String APIDark="e478e283b61f95dc70771be89db8ce1c";
     private String APIBit="307702986d074885b6bdf41d74768e0c";
+    private String APIStack="516a194fae7c7db19dc99de1bfce0c6e\n";
 
     private String City;
     private String Code;
@@ -513,6 +514,33 @@ public class FullscreenActivity extends AppCompatActivity {
                 if (WeatherCon.equalsIgnoreCase("Thunderstorm with light rain")) mWIcon.setImageResource(R.drawable.thunder);
 
             }
+
+            if (SiteUse=="WeatherStack")
+            {
+                if (WeatherCon.equalsIgnoreCase("Clear")) mWIcon.setImageResource(R.drawable.clearday);
+                if (WeatherCon.equalsIgnoreCase("Cloudy")) mWIcon.setImageResource(R.drawable.clouds); //?
+                if (WeatherCon.equalsIgnoreCase("Partly Cloudy")) mWIcon.setImageResource(R.drawable.clouds);
+
+                //if (WeatherCon.equalsIgnoreCase("Rain")) mWIcon.setImageResource(R.drawable.rain);//>
+                //if (WeatherCon.equalsIgnoreCase("Moderate rain")) mWIcon.setImageResource(R.drawable.rain);
+
+                if (WeatherCon.contains("Cloudy")) mWIcon.setImageResource(R.drawable.clouds);
+                if (WeatherCon.contains("cloudy")) mWIcon.setImageResource(R.drawable.clouds);
+
+                if (WeatherCon.contains("Rain")) mWIcon.setImageResource(R.drawable.rain);
+                if (WeatherCon.contains("rain")) mWIcon.setImageResource(R.drawable.rain);
+
+                if (WeatherCon.contains("Snow")) mWIcon.setImageResource(R.drawable.snow);
+                if (WeatherCon.contains("snow")) mWIcon.setImageResource(R.drawable.snow);
+
+                if (WeatherCon.contains("Thunder")) mWIcon.setImageResource(R.drawable.thunder);
+                if (WeatherCon.contains("thunder")) mWIcon.setImageResource(R.drawable.thunder);
+
+                if (WeatherCon.contains("Drizzle")) mWIcon.setImageResource(R.drawable.rain);
+                if (WeatherCon.contains("drizzle")) mWIcon.setImageResource(R.drawable.rain);
+
+            }
+
 
             mUnits.setText(Units);
             FrameLayout.LayoutParams params1 = new FrameLayout.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
@@ -1013,6 +1041,10 @@ public class FullscreenActivity extends AppCompatActivity {
                         Temp="Temperature:"+obj3.getString("temperature")+" "+Units;
                         HumidityTxt="Humidity:"+obj3.getString("humidity")+"%";
 
+                        Temperature=Float.valueOf(obj3.getString("temperature"));
+                        Humidity=Float.valueOf(obj3.getString("humidity"));
+                        WeatherCon=obj3.getString("weather_descriptions");
+                        WeatherCon=WeatherCon.substring(2,WeatherCon.length()-2);
 
 
                     } catch (JSONException e) {
@@ -1103,6 +1135,7 @@ public class FullscreenActivity extends AppCompatActivity {
             if (SiteUse=="AccuWeather") ReadFromAccu();
             if (SiteUse=="DarkSky") ReadFromDark();
             if (SiteUse=="Weatherbit") ReadFromBit();
+            if (SiteUse=="WeatherStack") ReadFromStack();
 
             return null;
         }
