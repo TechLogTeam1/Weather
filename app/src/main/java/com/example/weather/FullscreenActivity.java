@@ -979,6 +979,117 @@ public class FullscreenActivity extends AppCompatActivity {
             return;
         }
 
+        void ReadFromStack()
+        {
+            if (Units=="C") UnitsTxt="&units=m";   //Celsius
+            if (Units=="F") UnitsTxt="&units=f";   //Fahrenheit
+            if (Units=="K") UnitsTxt="&units=s";   //Kelvin
+
+            if (Code.length()<2) CodeTxt=""; else CodeTxt=","+Code;
+            //http://api.weatherstack.com/current?access_key=e4c1390e4110c5a78e89c99f56b94b08&query=London
+            if (Period==1)
+                try {
+                    //CallUrl="http://api.openweathermap.org/data/2.5/weather?q="+City+CodeTxt+UnitsTxt+"&APPID="+APIOpen;
+                    //CallUrl="http://api.weatherstack.com/current?access_key=e4c1390e4110c5a78e89c99f56b94b08&query=London";
+
+
+                    CallUrl="http://api.weatherstack.com/current?access_key="+APIStack+"&query="+City+UnitsTxt;
+
+
+                    //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
+                    Contents="";
+                    Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
+
+                    try {
+                        JSONObject jsonObj = new JSONObject(Contents);
+
+                        JSONObject obj2=jsonObj.getJSONObject("location");
+                        JSONObject obj3=jsonObj.getJSONObject("current");
+
+
+                        //CallCode=jsonObj.getString("cod"); //404 = City not found
+                        Coords="Latitude:"+obj2.getString("lat");
+                        Coords+="\n"+"Longitude:"+obj2.getString("lon");
+                        Temp="Temperature:"+obj3.getString("temperature")+" "+Units;
+                        HumidityTxt="Humidity:"+obj3.getString("humidity")+"%";
+
+
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    //OutText=Contents;
+                    //OutText=Humidity;
+
+                    OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
+                            +Coords+"\n"+Temp+"\n"+Humidity;
+                    //OutText=CallUrl;
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+            if (Period==3)
+                try {
+                    CallUrl="http://api.openweathermap.org/data/2.5/forecast?q="+City+CodeTxt+UnitsTxt+"&APPID="+APIOpen;
+                    //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
+                    Contents="";
+                    Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
+
+                    try {
+                        JSONObject jsonObj = new JSONObject(Contents);
+                        JSONArray baseArray =jsonObj.getJSONArray("list");
+
+                        OutList="";
+
+                        JSONObject objcoords1 = jsonObj.getJSONObject("city");
+                        JSONObject objcoords2 = objcoords1.getJSONObject("coord");
+                        Coords="Latitude:"+objcoords2.getString("lat");
+                        Coords+="\n"+"Longitude:"+objcoords2.getString("lon");
+
+                        for (int i = 0; i < baseArray.length(); i++) {
+                            JSONObject json2 = baseArray.getJSONObject(i);
+                            JSONObject obj2 = json2.getJSONObject("main");
+
+                            Temp = obj2.getString("temp") + " " + Units;
+                            HumidityTxt = "Humidity:" + obj2.getString("humidity") + "%";
+                            Date=json2.getString("dt_txt");
+
+
+                            //OutList+="Date:"+Date+"\n"+"ArrayPos:"+(i+1)+"\n"+Temp+"\n"+Humidity+"\n";
+
+                            OutList+="---------------------------------------------\n"+"Date:"+Date+
+                                    "\n---------------------------------------------\n"+
+                                    Temp+"\n"+Humidity+"\n";
+
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    OutText="City:"+City+CodeTxt+"\n"+Coords+"\n"+
+                            OutList;
+
+                    //OutText=Contents;
+                    //OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
+                    //  +Temp+"\n"+Humidity;
+
+                    //OutText=CallUrl;
+
+
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            if (Period==2) OutText="Period: Last 24 hours";
+            //if (Period==3) OutText="Period: Last 5 days";
+
+            return;
+        }
 
 
         @Override
