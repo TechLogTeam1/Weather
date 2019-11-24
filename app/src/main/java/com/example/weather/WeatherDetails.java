@@ -96,7 +96,10 @@ public class WeatherDetails extends AppCompatActivity {
 
         mDataTxt.setMovementMethod(new ScrollingMovementMethod());
 
-        if (Period==2) mTitleText.setText("Next 24 hours");
+        if (Period==2) {
+            mTitleText.setText("Next 24 hours");
+            mDataTxt.setText(Contents);
+        }
         if (Period==3)
         {
             //ArrayList<WeatherRecord> recList = (ArrayList<WeatherRecord>) bundle.getSerializable("WeatherRec");
