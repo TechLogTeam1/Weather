@@ -468,7 +468,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 //Clear
                 if (WeatherCon.equalsIgnoreCase("Clear")) mWIcon.setImageResource(R.drawable.clearday);
                 if (WeatherCon.equalsIgnoreCase("Mostly clear")) mWIcon.setImageResource(R.drawable.clearday);
-                if (WeatherCon.equalsIgnoreCase("Partly cloudy")) mWIcon.setImageResource(R.drawable.clearday);
+                if (WeatherCon.equalsIgnoreCase("Partly cloudy")) mWIcon.setImageResource(R.drawable.clouds);
 
                 //Clouds
                 if (WeatherCon.equalsIgnoreCase("Intermittent clouds")) mWIcon.setImageResource(R.drawable.clouds);
@@ -748,6 +748,7 @@ public class FullscreenActivity extends AppCompatActivity {
         }
 
 
+
         void ReadFromAccu()
         {
             if (Units=="C") UnitsTxt="&units=metric";     //Celsius
@@ -980,106 +981,6 @@ public class FullscreenActivity extends AppCompatActivity {
             }
 
 
-            return;
-        }
-
-        void ReadFromDarkPrev()
-        {
-
-            if (Units=="C") UnitsTxt="?units=si";     //Celsius
-            if (Units=="F") UnitsTxt="";   //Fahrenheit
-            //if (Units=="F") UnitsTxt="&units=imperial";   //Fahrenheit
-            //if (Units=="K") UnitsTxt="";                  //Kelvin
-
-            if (Code.length()<2) CodeTxt=""; else CodeTxt=","+Code;
-
-            float HumFloat;
-            //First Call (Get Coords)
-
-            try {
-                CallUrl="http://api.openweathermap.org/data/2.5/weather?q="+City+CodeTxt+"&APPID="+APIOpen;
-                //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
-                Contents="";
-                Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
-
-                try {
-                    JSONObject jsonObj = new JSONObject(Contents);
-                    JSONObject obj2=jsonObj.getJSONObject("coord");
-                    CallCode=jsonObj.getString("cod"); //404 = City not found
-                    Latitude=obj2.getString("lat");
-                    Longitude=obj2.getString("lon");
-
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                //OutText=Contents;
-                // OutText=Latitude+","+Longitude;
-                OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
-                        +Coords+"\n"+Temp+"\n"+HumidityTxt;
-                //OutText=CallUrl;
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-            //Second call (Call DarkSky)
-            //Contents=loadJSONFromAsset("DarkSky.json");
-            //if (2<1)
-            try {
-                CallUrl="https://api.darksky.net/forecast/"+APIDark+"/"+Latitude+","+Longitude+UnitsTxt;
-                //https://api.darksky.net/forecast/153f92e90eba11f8a60979ad1f5d791b/37.8267,-122.4233?units=si
-                //CallUrl="https://api.darksky.net/forecast/153f92e90eba11f8a60979ad1f5d791b/37.8267,-122.4233";
-                //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
-                Contents="";
-                Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
-
-                try {
-                    JSONObject jsonObj = new JSONObject(Contents);
-                    JSONObject obj2=jsonObj.getJSONObject("currently");
-                    Coords="Latitude:"+Latitude;
-                    Coords+="\n"+"Longitude:"+Longitude;
-
-                    Temperature=Float.valueOf(obj2.getString("temperature"));
-                    Humidity=Float.valueOf(obj2.getString("humidity"))*100;
-
-                    Temp="Temperature:"+obj2.getString("temperature")+" "+Units;
-                    HumFloat=Float.valueOf(obj2.getString("humidity"));
-                    HumidityTxt="Humidity:"+(int)(HumFloat*100)+"%";
-
-                    WeatherCon=obj2.getString("summary");
-                    WeatherConIcon=obj2.getString("icon");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                //OutText=Contents;
-                //OutText=Coords+"\n"+Temp;
-                OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
-                        +Coords+"\n"+Temp+"\n"+HumidityTxt;
-                //OutText=CallUrl;
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            //RUNS
-            /*
-            try {
-                JSONObject jsonObj = new JSONObject(Contents);
-                JSONObject obj2=jsonObj.getJSONObject("currently");
-                Temp=obj2.getString("temperature");
-
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-
-            OutText=Temp;
-*/
             return;
         }
 
