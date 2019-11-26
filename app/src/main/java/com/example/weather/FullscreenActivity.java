@@ -1192,7 +1192,49 @@ public class FullscreenActivity extends AppCompatActivity {
 
 
 
-            //if (Period==2) OutText="Period: Last 24 hours";
+            if (Period==2) {        //The Weather in 24 Hours
+                try {
+
+
+                    //CallUrl="https://api.weatherbit.io/v2.0/current?city="+City+"&key="+APIWB+UnitsTxt;
+                    CallUrl = "http://api.weatherbit.io/v2.0/forecast/hourly?city=" + City + "&key=" + APIBit + "&hours=24" + UnitsTxt;
+
+                    Contents = "";
+                    Contents = Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
+
+                    try {
+                        //JSONObject jsonObj = new JSONObject(Contents);
+                        JSONObject jsonObj = null;
+                        jsonObj = new JSONObject(Contents);
+                        JSONArray baseArray = jsonObj.getJSONArray("data");
+                        JSONObject json2 = baseArray.getJSONObject(23);
+                        JSONObject obj2 = json2.getJSONObject("weather");
+
+                        Temp = json2.getString("temp") + " " + Units;
+
+                        Temperature=Float.valueOf(json2.getString("temp"));
+                        Humidity=Float.valueOf(json2.getString("rh"));
+
+                        Coords="Latitude:"+jsonObj.getString("lat");
+                        Coords+="\n"+"Longitude:"+jsonObj.getString("lon");
+                        HumidityTxt="Humidity:"+json2.getString("rh")+"%"; //rh = Relative Humidity
+
+                        WeatherCon=obj2.getString("description");
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    //OutText=Contents;
+                    //OutText = Time;
+                    OutText = "The Weather in 24 Hours:" + "\n" + "City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
+                            +Coords+"\n"+Temp+"\n"+HumidityTxt;
+                    //OutText=CallUrl;
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
             //if (Period==3) OutText="Period: Last 5 days";
 
             return;
