@@ -100,7 +100,6 @@ public class FullscreenActivity extends AppCompatActivity {
         setContentView(R.layout.activity_fullscreen);
 
         mControlsView = findViewById(R.id.fullscreen_content_controls);
-        //mContentView = findViewById(R.id.fullscreen_content);
         mTextView = findViewById(R.id.textView);
         mTextView.setMovementMethod(new ScrollingMovementMethod());
 
@@ -186,13 +185,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
             Document doc= null;
             OutText="";
-            //Code="";
-            //Units="C";
-            //City="London";Code="uk";
-            //City="Paris";Code="fr";
-            //City="Nigrita";Code="gr";
 
-            //if (Units=="C") UnitsTxt="&units=M";   //Celsius
             if (Units=="C") UnitsTxt="";   //Celsius (Default)
             if (Units=="F") UnitsTxt="&units=I";   //Fahrenheit
             if (Units=="K") UnitsTxt="&units=S";   //Kelvin
@@ -288,7 +281,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 }
             }
 
-            /*if (Period==3) {        //The Weather in 5 Days !!!!!(DOESNT WORK) API Returns Only 48 Hours!!!!!
+           /* if (Period==3) {        //The Weather in 5 Days !!!!!Wants Paymet!!!!!
                 try {
 
 
