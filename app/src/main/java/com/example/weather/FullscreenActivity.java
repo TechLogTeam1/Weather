@@ -27,11 +27,15 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,6 +68,7 @@ public class FullscreenActivity extends AppCompatActivity {
     private View mControlsView;
     private String OutText;
     private Button mButton1;
+    private Button mButton2;
     private EditText mCity,mCode;
     private RadioButton mRadio1;
     private RadioButton mRadio2;
@@ -109,13 +114,40 @@ public class FullscreenActivity extends AppCompatActivity {
     private String Date;
     private String CityKey;
     private String WeatherCon;
+    private String WeatherCon1;
+    private String WeatherConT;
     private String WeatherConIcon;
     private int i;
     private int Period;
+    private int PrevPeriod;
     private int ArraySize;
     private String Longitude,Latitude;
     private String jsonSTR;
     private long DateUnix;
+
+    class HistoryDataClass
+    {
+        String Site;
+        String City;
+        String Date;
+        float Temperature;
+        float Humidity;
+        String Units;
+        String WeatherCon;
+
+    }
+
+    HistoryDataClass HistoryData[]=new HistoryDataClass[10000];
+    private int HistoryPos;
+    private String TempT,HumidityT,UnitsT,SiteT;
+    private String Temp1;
+    private String Humidity1;
+    private String Site1;
+
+
+
+
+
     //Edit AndroidManifest.xml
     //Add <uses-permission android:name="android.permission.INTERNET" />
     //after package command
@@ -140,6 +172,7 @@ public class FullscreenActivity extends AppCompatActivity {
         //mTextView.setMovementMethod(new ScrollingMovementMethod());
 
         mButton1= (Button) findViewById(R.id.button);
+        mButton2= (Button) findViewById(R.id.buttonHistory);
         mCity=(EditText) findViewById(R.id.editText);
         //mCode=(EditText) findViewById(R.id.editText2);
         mRadio1= (RadioButton) findViewById(R.id.radioButton);
@@ -171,6 +204,7 @@ public class FullscreenActivity extends AppCompatActivity {
         mHum.setText("Humidity "+"--"+" %");
         mConditions.setText("--");
 
+        //ReadHistory();
 
         mButton1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -184,6 +218,14 @@ public class FullscreenActivity extends AppCompatActivity {
             }
         });
 
+        mButton2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+           ReadHistory();
+
+            }
+        });
         mRadio1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
@@ -358,6 +400,235 @@ public class FullscreenActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void ReadHistory()
+
+    {
+        String datapath,strdata;
+        char[] scArray = new char[29];
+        datapath=getApplicationInfo().dataDir+"/Weatherdat.txt";
+        int o;
+        int stopPos;
+        float tempf,humf;
+        tempf=0;
+        humf=0;
+        HistoryPos=0;
+
+
+        try {
+            File fileSc = new File(datapath);
+            FileReader fileReader = new FileReader(fileSc);
+            StringBuffer stringBuffer = new StringBuffer();
+            int numCharsRead = 0; //NEW
+            char[] charArrayCity = new char[50]; //PREV
+            char[] charArray = new char[29]; //PREV
+            char[] charArray2 = new char[10]; //PREV
+            char[] charArray3 = new char[10]; //PREV
+            char[] charArray4=new char[1];
+            char[] charArray5=new char[100];
+            char[] charArray6=new char[20];
+            //char[] charArray = new char[16];
+            OutText="";
+            //PREV
+
+            ArraySize=(int)(fileSc.length()-1)/220;
+            for (i=0;i<=(fileSc.length()-1)/220;i++)
+            {
+                TempT="";HumidityT="";WeatherConT="";SiteT="";
+
+                fileReader.read(charArray6);
+                stringBuffer.append(charArray6, 0, 20);
+                SiteT = stringBuffer.toString();
+                stringBuffer.delete(0, 20);
+
+                fileReader.read(charArrayCity);
+                stringBuffer.append(charArrayCity, 0, 50);
+                City = stringBuffer.toString();
+                stringBuffer.delete(0, 50);
+
+                fileReader.read(charArray);
+                stringBuffer.append(charArray, 0, 29);
+                Date = stringBuffer.toString();
+                stringBuffer.delete(0, 29);
+
+                fileReader.read(charArray2);
+                stringBuffer.append(charArray2, 0, 10);
+                TempT = stringBuffer.toString();
+                stringBuffer.delete(0, 10);
+
+                fileReader.read(charArray3);
+                stringBuffer.append(charArray3, 0, 10);
+                HumidityT = stringBuffer.toString();
+                stringBuffer.delete(0, 10);
+
+                fileReader.read(charArray5);
+                stringBuffer.append(charArray5, 0, 100);
+                WeatherConT = stringBuffer.toString();
+                stringBuffer.delete(0, 100);
+
+                fileReader.read(charArray4);
+                stringBuffer.append(charArray4, 0, 1);
+                UnitsT = stringBuffer.toString();
+                stringBuffer.delete(0, 1);
+
+
+
+
+                /*
+                stopPos=0;
+                for (o=0;o<=Humidity.length();o++) if (Humidity.charAt(o)==' ') {stopPos=o;break;}
+                Humidity=Humidity.substring(0,stopPos);
+
+                stopPos=0;
+                for (o=0;o<=Temp.length();o++) if (Temp.charAt(o)==' ') {stopPos=o;break;}
+                Temp=Temp.substring(0,stopPos);
+                */
+
+
+                HistoryData[HistoryPos]=new HistoryDataClass();
+                HistoryData[HistoryPos].Site=SiteT;
+                HistoryData[HistoryPos].City=City;
+                HistoryData[HistoryPos].Date=Date;
+                HistoryData[HistoryPos].Temperature=Float.valueOf(TempT);
+                HistoryData[HistoryPos].Humidity=Float.valueOf(HumidityT);
+                HistoryData[HistoryPos].WeatherCon=WeatherConT; //CHECK
+                HistoryData[HistoryPos].Units=UnitsT;
+
+                HistoryPos++;
+
+                OutText+="Site:"+HistoryData[HistoryPos-1].Site+"\n"+
+                        "City:"+HistoryData[HistoryPos-1].City+"\n"
+                        +"Date:"+HistoryData[HistoryPos-1].Date+"\n"+
+                        "Temp:"+HistoryData[HistoryPos-1].Temperature+" "+HistoryData[HistoryPos-1].Units+"\n"+
+                        "Humidity:"+HistoryData[HistoryPos-1].Humidity+"%\n"
+                        +"Conditions:"+HistoryData[HistoryPos-1].WeatherCon+"\n";
+
+            }
+            //tempf=fileReader.read();
+            //humf=fileReader.read();
+            //OutText=String.valueOf(fileSc.length());
+            fileReader.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //Temp=String.valueOf(tempf);
+        //Humidity=String.valueOf(humf);
+        //mTextView.setText(OutText);
+
+        PrevPeriod=Period;
+        Period=10;
+        Contents="Records\n";
+
+        Contents+=OutText;
+
+        if (2<1)
+        for (i=0;i<ArraySize;i++)
+        {
+            Contents+=DateTxt[i]+"\n"+"Temp:"+TemperatureData[i]+Units+"  Humidity:"+HumidityData[i]+"%"+"\n";
+        }
+
+
+        OpenDetailed();
+
+        Period=PrevPeriod;
+
+        return;
+    }
+
+    public void SaveHistory()
+    {
+
+        //Get Current Day
+        String CurrentDate;
+        String Path;
+        float TempF,HumF;
+        String PrevTemp,PrevHum,PrevCon,PrevSite;
+
+        Date date = new Date();
+        String strDateFormat = "yyyy-MM-dd HH:mm:ss z";
+        DateFormat dateFormat = new SimpleDateFormat(strDateFormat);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Athens"));
+        String formattedDate= dateFormat.format(date);
+        CurrentDate=formattedDate;
+
+        PrevTemp=TempT;
+        PrevHum=HumidityT;
+        PrevCon=WeatherConT;
+        PrevSite=SiteT;
+
+        TempT=Temp1;
+        HumidityT=Humidity1;
+        WeatherConT=WeatherCon1;
+        SiteT=Site1;
+        //Maybe not needed
+        //TempT+=" "+Units;
+        //HumidityT+="%";
+        for (i=SiteT.length();i<20;i++) SiteT+=" ";
+        for (i=City.length();i<50;i++) City+=" ";
+        for (i=TempT.length();i<10;i++) TempT+=" ";
+        for (i=HumidityT.length();i<10;i++) HumidityT+=" ";
+        for (i=WeatherConT.length();i<100;i++) WeatherConT+=" ";
+
+        //Units="C"; //TMP
+
+        HistoryData[HistoryPos]=new HistoryDataClass();
+        HistoryData[HistoryPos].Site=Site1;
+        HistoryData[HistoryPos].City=City;
+        HistoryData[HistoryPos].Date=CurrentDate;
+        HistoryData[HistoryPos].Temperature=Float.valueOf(Temp1);
+        HistoryData[HistoryPos].Humidity=Float.valueOf(Humidity1);
+        HistoryData[HistoryPos].WeatherCon=WeatherCon1;
+        HistoryData[HistoryPos].Units=Units;
+
+        UnitsT=Units;
+        //TempF=Float.valueOf(Temp);
+        //HumF=Float.valueOf(Humidity);
+
+
+
+
+        int strlen;
+
+        String datapath;
+        datapath=getApplicationInfo().dataDir+"/Weatherdat.txt";
+        File fileSc = new File(datapath);
+
+
+        try {
+
+
+            //fileSc.createNewFile();
+
+            FileWriter fileWriter = new FileWriter(fileSc,true); //Append File
+            //FileWriter fileWriter = new FileWriter(fileSc); //New File
+
+            fileWriter.write(SiteT, 0, 20);
+            fileWriter.write(City, 0, 50);
+            fileWriter.write(CurrentDate, 0, 29);
+            fileWriter.write(TempT,0,10);
+            fileWriter.write(HumidityT,0,10);
+            fileWriter.write(WeatherConT,0,100);
+            fileWriter.write(UnitsT,0,1);
+
+            fileWriter.flush();
+            fileWriter.close();
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        //mTextView.setText(String.valueOf(fileSc.length()));
+        //mTextView.setText(HistoryData[HistoryPos].Date);
+        HistoryPos++;
+
+        TempT=PrevTemp;
+        HumidityT=PrevHum;
+        WeatherConT=PrevCon;
+
+        return;
+    }
     private class Content extends AsyncTask<Void,Void,Void>
     {
         @Override
@@ -652,6 +923,19 @@ public class FullscreenActivity extends AppCompatActivity {
                         CallCode=jsonObj.getString("cod"); //404 = City not found
                         Coords="Latitude:"+obj2.getString("lat");
                         Coords+="\n"+"Longitude:"+obj2.getString("lon");
+
+
+
+                        //Save History
+                        TempT="Temperature:"+obj3.getString("temp")+" "+Units;
+                        HumidityT="Humidity:"+obj3.getString("humidity")+"%";
+                        Temp1=obj3.getString("temp");
+                        Humidity1=obj3.getString("humidity");
+                        WeatherCon1=json2.getString("main");
+                        Site1="Open Weather Map";
+                        SaveHistory();
+
+
                         Temp="Temperature:"+obj3.getString("temp")+" "+Units;
                         HumidityTxt="Humidity:"+obj3.getString("humidity")+"%";
 
@@ -815,6 +1099,12 @@ public class FullscreenActivity extends AppCompatActivity {
                     Humidity=Float.valueOf(jsonObj.getString("RelativeHumidity"));
 
                     WeatherCon=jsonObj.getString("WeatherText");
+
+                    Temp1=obj3.getString("Value");
+                    Humidity1=jsonObj.getString("RelativeHumidity");
+                    WeatherCon1=jsonObj.getString("WeatherText");
+                    Site1="AccuWeather";
+                    SaveHistory();
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -1052,6 +1342,14 @@ public class FullscreenActivity extends AppCompatActivity {
                         WeatherCon=obj2.getString("summary");
                         WeatherConIcon=obj2.getString("icon");
 
+                        Temp1=obj2.getString("temperature");
+                        Humidity1=String.valueOf(Float.valueOf(obj2.getString("humidity"))*100);
+                        WeatherCon1=obj2.getString("summary");
+                        Site1="Dark Sky";
+                        SaveHistory();
+
+
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -1266,6 +1564,13 @@ public class FullscreenActivity extends AppCompatActivity {
 
                         WeatherCon=obj2.getString("description");
 
+                        Temp1=json2.getString("temp");
+                        Humidity1=json2.getString("rh");
+                        WeatherCon1=obj2.getString("description");
+                        Site1="Weatherbit.io";
+                        SaveHistory();
+
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -1326,6 +1631,13 @@ public class FullscreenActivity extends AppCompatActivity {
                         Humidity=Float.valueOf(obj3.getString("humidity"));
                         WeatherCon=obj3.getString("weather_descriptions");
                         WeatherCon=WeatherCon.substring(2,WeatherCon.length()-2);
+
+                        Temp1=obj3.getString("temperature");
+                        Humidity1=obj3.getString("humidity");
+                        WeatherCon1=obj3.getString("weather_descriptions");
+                        WeatherCon1=WeatherCon1.substring(2,WeatherCon1.length()-2);
+                        Site1="Weather Stacks";
+                        SaveHistory();
 
 
                     } catch (JSONException e) {

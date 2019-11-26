@@ -39,7 +39,7 @@
         <TextView
             android:id="@+id/textData"
             android:layout_width="match_parent"
-            android:layout_height="592dp"
+            android:layout_height="536dp"
             android:layout_marginTop="80dp"
             android:text="TextView"
             android:textColor="#FFFF"

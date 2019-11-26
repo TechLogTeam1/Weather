@@ -108,6 +108,13 @@ public class WeatherDetails extends AppCompatActivity {
 
         }
 
+        if (Period==10)
+        {
+            //ArrayList<WeatherRecord> recList = (ArrayList<WeatherRecord>) bundle.getSerializable("WeatherRec");
+            mTitleText.setText("History");
+            mDataTxt.setText(Contents);
+
+        }
 
     }
 
