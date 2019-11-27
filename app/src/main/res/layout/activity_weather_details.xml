@@ -39,11 +39,28 @@
         <TextView
             android:id="@+id/textData"
             android:layout_width="match_parent"
-            android:layout_height="536dp"
+            android:layout_height="453dp"
             android:layout_marginTop="80dp"
             android:text="TextView"
             android:textColor="#FFFF"
             android:textSize="24sp" />
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="300dp"
+            android:layout_marginTop="550dp"
+            android:text="COMMIT" />
+
+        <EditText
+            android:id="@+id/editCommit"
+            android:layout_width="284dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="550dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:textColor="#FFFF" />
 
     </FrameLayout>
 
