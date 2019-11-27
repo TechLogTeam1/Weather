@@ -32,6 +32,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -49,7 +50,9 @@ import static org.jsoup.nodes.Entities.EscapeMode.base;
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
+//First
 public class FullscreenActivity extends AppCompatActivity {
+//public class FullscreenActivity extends AppCompatActivity implements Serializable{
 
     //private View mContentView;
     private TextView mTextView;
@@ -69,6 +72,7 @@ public class FullscreenActivity extends AppCompatActivity {
     private String OutText;
     private Button mButton1;
     private Button mButton2;
+    private Button mButton3;
     private EditText mCity,mCode;
     private RadioButton mRadio1;
     private RadioButton mRadio2;
@@ -124,6 +128,10 @@ public class FullscreenActivity extends AppCompatActivity {
     private String Longitude,Latitude;
     private String jsonSTR;
     private long DateUnix;
+    private String SearchCity;
+    private boolean SearchCityOn,ContinueRec;
+
+    //class HistoryDataClass implements Serializable
 
     class HistoryDataClass
     {
@@ -134,12 +142,12 @@ public class FullscreenActivity extends AppCompatActivity {
         float Humidity;
         String Units;
         String WeatherCon;
-
+        String Comment;
     }
 
     HistoryDataClass HistoryData[]=new HistoryDataClass[10000];
     private int HistoryPos;
-    private String TempT,HumidityT,UnitsT,SiteT;
+    private String TempT,HumidityT,UnitsT,SiteT,CommentT;
     private String Temp1;
     private String Humidity1;
     private String Site1;
@@ -173,6 +181,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
         mButton1= (Button) findViewById(R.id.button);
         mButton2= (Button) findViewById(R.id.buttonHistory);
+        mButton3= (Button) findViewById(R.id.buttonHistory2);
         mCity=(EditText) findViewById(R.id.editText);
         //mCode=(EditText) findViewById(R.id.editText2);
         mRadio1= (RadioButton) findViewById(R.id.radioButton);
@@ -222,7 +231,20 @@ public class FullscreenActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+           SearchCityOn=false;
            ReadHistory();
+
+            }
+        });
+
+        mButton3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //City=mCity.getText().toString();
+                SearchCity=mCity.getText().toString();
+                SearchCityOn=true;
+                ReadHistory();
 
             }
         });
@@ -397,7 +419,8 @@ public class FullscreenActivity extends AppCompatActivity {
         Intent intent=new Intent(this,WeatherDetails.class);
         intent.putExtra("Period",Period);
         intent.putExtra("Contents",Contents);
-        startActivity(intent);
+        //intent.putExtra("ClassArray",HistoryData);
+         startActivity(intent);
     }
 
     public void ReadHistory()
@@ -430,10 +453,10 @@ public class FullscreenActivity extends AppCompatActivity {
             OutText="";
             //PREV
 
-            ArraySize=(int)(fileSc.length()-1)/220;
-            for (i=0;i<=(fileSc.length()-1)/220;i++)
-            {
-                TempT="";HumidityT="";WeatherConT="";SiteT="";
+            ArraySize=(int)(fileSc.length()-1)/320;
+            for (i=0;i<=(fileSc.length()-1)/320;i++)
+               {
+                TempT="";HumidityT="";WeatherConT="";SiteT="";CommentT="";
 
                 fileReader.read(charArray6);
                 stringBuffer.append(charArray6, 0, 20);
@@ -470,6 +493,10 @@ public class FullscreenActivity extends AppCompatActivity {
                 UnitsT = stringBuffer.toString();
                 stringBuffer.delete(0, 1);
 
+                fileReader.read(charArray5);
+                stringBuffer.append(charArray5, 0, 100);
+                CommentT = stringBuffer.toString();
+                stringBuffer.delete(0, 100);
 
 
 
@@ -492,15 +519,27 @@ public class FullscreenActivity extends AppCompatActivity {
                 HistoryData[HistoryPos].Humidity=Float.valueOf(HumidityT);
                 HistoryData[HistoryPos].WeatherCon=WeatherConT; //CHECK
                 HistoryData[HistoryPos].Units=UnitsT;
+                HistoryData[HistoryPos].Comment=CommentT;
 
-                HistoryPos++;
 
+                   HistoryPos++;
+
+                   ContinueRec=false;
+
+                   if (SearchCityOn)
+                   if (HistoryData[HistoryPos-1].City.contains(SearchCity)) ContinueRec=true;
+
+
+                   if (!SearchCityOn) ContinueRec=true;
+
+                   if (ContinueRec)
                 OutText+="Site:"+HistoryData[HistoryPos-1].Site+"\n"+
                         "City:"+HistoryData[HistoryPos-1].City+"\n"
                         +"Date:"+HistoryData[HistoryPos-1].Date+"\n"+
                         "Temp:"+HistoryData[HistoryPos-1].Temperature+" "+HistoryData[HistoryPos-1].Units+"\n"+
                         "Humidity:"+HistoryData[HistoryPos-1].Humidity+"%\n"
-                        +"Conditions:"+HistoryData[HistoryPos-1].WeatherCon+"\n";
+                        +"Conditions:"+HistoryData[HistoryPos-1].WeatherCon+"\n"
+                        +"Comment:"+HistoryData[HistoryPos-1].Comment+"\n";
 
             }
             //tempf=fileReader.read();
@@ -561,14 +600,14 @@ public class FullscreenActivity extends AppCompatActivity {
         HumidityT=Humidity1;
         WeatherConT=WeatherCon1;
         SiteT=Site1;
-        //Maybe not needed
-        //TempT+=" "+Units;
-        //HumidityT+="%";
+        CommentT="None";
+
         for (i=SiteT.length();i<20;i++) SiteT+=" ";
         for (i=City.length();i<50;i++) City+=" ";
         for (i=TempT.length();i<10;i++) TempT+=" ";
         for (i=HumidityT.length();i<10;i++) HumidityT+=" ";
         for (i=WeatherConT.length();i<100;i++) WeatherConT+=" ";
+        for (i=CommentT.length();i<100;i++) CommentT+=" ";
 
         //Units="C"; //TMP
 
@@ -580,6 +619,7 @@ public class FullscreenActivity extends AppCompatActivity {
         HistoryData[HistoryPos].Humidity=Float.valueOf(Humidity1);
         HistoryData[HistoryPos].WeatherCon=WeatherCon1;
         HistoryData[HistoryPos].Units=Units;
+        HistoryData[HistoryPos].Comment="None";
 
         UnitsT=Units;
         //TempF=Float.valueOf(Temp);
@@ -610,6 +650,7 @@ public class FullscreenActivity extends AppCompatActivity {
             fileWriter.write(HumidityT,0,10);
             fileWriter.write(WeatherConT,0,100);
             fileWriter.write(UnitsT,0,1);
+            fileWriter.write(CommentT,0,100);
 
             fileWriter.flush();
             fileWriter.close();
