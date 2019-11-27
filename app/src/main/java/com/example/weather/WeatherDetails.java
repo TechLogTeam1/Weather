@@ -2,6 +2,7 @@ package com.example.weather;
 
 import android.annotation.SuppressLint;
 
+import androidx.annotation.RestrictTo;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -11,7 +12,9 @@ import android.os.Handler;
 import android.text.method.ScrollingMovementMethod;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import java.time.Period;
 import java.util.ArrayList;
@@ -61,6 +64,10 @@ public class WeatherDetails extends AppCompatActivity {
 
     private TextView mTitleText;
     private TextView mDataTxt;
+    private Button mCommit;
+    private EditText mEditCommit;
+
+    private int ScrollY,ScrollPos,ScrollId;
 
     class WeatherRecord{
         private String DateTxt;
@@ -70,6 +77,24 @@ public class WeatherDetails extends AppCompatActivity {
 
     WeatherRecord[] WeatherRec=new WeatherDetails.WeatherRecord[1000];
     private String dateArray[]=new String[1000];
+
+    class HistoryDataClass
+    {
+        String Site;
+        String City;
+        String Date;
+        float Temperature;
+        float Humidity;
+        String Units;
+        String WeatherCon;
+        String Comment;
+    }
+
+    FullscreenActivity.HistoryDataClass[] HistoryData =new FullscreenActivity.HistoryDataClass[10000];
+    //FullscreenActivity.HistoryDataClass[] HistoryData = (FullscreenActivity.HistoryDataClass[]) getIntent().getSerializableExtra("ClassArray");
+
+    //Bundle extras=getIntent().getExtras();
+
     private int i;
     private String Contents;
 
@@ -89,16 +114,32 @@ public class WeatherDetails extends AppCompatActivity {
         mContentView = findViewById(R.id.fullscreen_content);
         mTitleText=findViewById(R.id.textTitle);
         mDataTxt=findViewById(R.id.textData);
+        mCommit=(Button) findViewById(R.id.button2);
+        mEditCommit=(EditText) findViewById(R.id.editCommit);
 
         Intent intent = getIntent();
         Period=intent.getIntExtra("Period",0);
         Contents=intent.getStringExtra("Contents");
-
+        // HistoryData= (FullscreenActivity.HistoryDataClass[]) intent.getSerializableExtra("ClassArray");
         mDataTxt.setMovementMethod(new ScrollingMovementMethod());
+
+        mCommit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                ScrollY=mDataTxt.getScrollY();
+                ScrollPos=ScrollY/mDataTxt.getLineHeight();
+                ScrollId=ScrollPos/7;
+                mEditCommit.setText(String.valueOf(ScrollId));
+                //mEditCommit.setText(HistoryData[1].City);
+
+            }
+        });
 
         if (Period==2) {
             mTitleText.setText("Next 24 hours");
             mDataTxt.setText(Contents);
+
         }
         if (Period==3)
         {
@@ -119,7 +160,4 @@ public class WeatherDetails extends AppCompatActivity {
     }
 
 
-
-
-    //@SuppressLint("InlinedApi")
-    }
+}
