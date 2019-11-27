@@ -72,6 +72,7 @@ public class FullscreenActivity extends AppCompatActivity {
     private String OutText;
     private Button mButton1;
     private Button mButton2;
+    private Button mButton3;
     private EditText mCity,mCode;
     private RadioButton mRadio1;
     private RadioButton mRadio2;
@@ -127,6 +128,8 @@ public class FullscreenActivity extends AppCompatActivity {
     private String Longitude,Latitude;
     private String jsonSTR;
     private long DateUnix;
+    private String SearchCity;
+    private boolean SearchCityOn,ContinueRec;
 
     //class HistoryDataClass implements Serializable
 
@@ -143,11 +146,18 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
     HistoryDataClass HistoryData[]=new HistoryDataClass[10000];
+
+    public static class Global1 {
+        public static HistoryDataClass HistoryData[] = new HistoryDataClass[10000];
+        public static int ArraySize;
+    }
+
     private int HistoryPos;
     private String TempT,HumidityT,UnitsT,SiteT,CommentT;
     private String Temp1;
     private String Humidity1;
     private String Site1;
+    private String Comment1;
 
 
 
@@ -178,6 +188,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
         mButton1= (Button) findViewById(R.id.button);
         mButton2= (Button) findViewById(R.id.buttonHistory);
+        mButton3= (Button) findViewById(R.id.buttonHistory2);
         mCity=(EditText) findViewById(R.id.editText);
         //mCode=(EditText) findViewById(R.id.editText2);
         mRadio1= (RadioButton) findViewById(R.id.radioButton);
@@ -227,7 +238,21 @@ public class FullscreenActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                SearchCityOn=false;
                 ReadHistory();
+
+            }
+        });
+
+        mButton3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //City=mCity.getText().toString();
+                SearchCity=mCity.getText().toString();
+                SearchCityOn=true;
+                ReadHistory();
+                //SaveHistory(); //NEW //CHECK
 
             }
         });
@@ -399,6 +424,9 @@ public class FullscreenActivity extends AppCompatActivity {
     {
         //for (i=0;i<5;i++) dateList.add(WeatherRec[i].DateTxt);
 
+        //Global1.HistoryData2[0]=new HistoryDataClass();
+        //Global1.HistoryData2[0].City="Nigrita";
+
         Intent intent=new Intent(this,WeatherDetails.class);
         intent.putExtra("Period",Period);
         intent.putExtra("Contents",Contents);
@@ -437,6 +465,7 @@ public class FullscreenActivity extends AppCompatActivity {
             //PREV
 
             ArraySize=(int)(fileSc.length()-1)/320;
+            Global1.ArraySize=ArraySize;
             for (i=0;i<=(fileSc.length()-1)/320;i++)
             {
                 TempT="";HumidityT="";WeatherConT="";SiteT="";CommentT="";
@@ -494,25 +523,35 @@ public class FullscreenActivity extends AppCompatActivity {
                 */
 
 
-                HistoryData[HistoryPos]=new HistoryDataClass();
-                HistoryData[HistoryPos].Site=SiteT;
-                HistoryData[HistoryPos].City=City;
-                HistoryData[HistoryPos].Date=Date;
-                HistoryData[HistoryPos].Temperature=Float.valueOf(TempT);
-                HistoryData[HistoryPos].Humidity=Float.valueOf(HumidityT);
-                HistoryData[HistoryPos].WeatherCon=WeatherConT; //CHECK
-                HistoryData[HistoryPos].Units=UnitsT;
-                HistoryData[HistoryPos].Comment=CommentT;
+                Global1.HistoryData[HistoryPos]=new HistoryDataClass();
+                Global1.HistoryData[HistoryPos].Site=SiteT;
+                Global1.HistoryData[HistoryPos].City=City;
+                Global1.HistoryData[HistoryPos].Date=Date;
+                Global1.HistoryData[HistoryPos].Temperature=Float.valueOf(TempT);
+                Global1.HistoryData[HistoryPos].Humidity=Float.valueOf(HumidityT);
+                Global1.HistoryData[HistoryPos].WeatherCon=WeatherConT; //CHECK
+                Global1.HistoryData[HistoryPos].Units=UnitsT;
+                Global1.HistoryData[HistoryPos].Comment=CommentT;
+
 
                 HistoryPos++;
 
-                OutText+="Site:"+HistoryData[HistoryPos-1].Site+"\n"+
-                        "City:"+HistoryData[HistoryPos-1].City+"\n"
-                        +"Date:"+HistoryData[HistoryPos-1].Date+"\n"+
-                        "Temp:"+HistoryData[HistoryPos-1].Temperature+" "+HistoryData[HistoryPos-1].Units+"\n"+
-                        "Humidity:"+HistoryData[HistoryPos-1].Humidity+"%\n"
-                        +"Conditions:"+HistoryData[HistoryPos-1].WeatherCon+"\n"
-                        +"Comment:"+HistoryData[HistoryPos-1].Comment+"\n";
+                ContinueRec=false;
+
+                if (SearchCityOn)
+                    if (Global1.HistoryData[HistoryPos-1].City.contains(SearchCity)) ContinueRec=true;
+
+
+                if (!SearchCityOn) ContinueRec=true;
+
+                if (ContinueRec)
+                    OutText+="Site:"+Global1.HistoryData[HistoryPos-1].Site+"\n"+
+                            "City:"+Global1.HistoryData[HistoryPos-1].City+"\n"
+                            +"Date:"+Global1.HistoryData[HistoryPos-1].Date+"\n"+
+                            "Temp:"+Global1.HistoryData[HistoryPos-1].Temperature+" "+ Global1.HistoryData[HistoryPos-1].Units+"\n"+
+                            "Humidity:"+Global1.HistoryData[HistoryPos-1].Humidity+"%\n"
+                            +"Conditions:"+Global1.HistoryData[HistoryPos-1].WeatherCon+"\n"
+                            +"Comment:"+Global1.HistoryData[HistoryPos-1].Comment+"\n";
 
             }
             //tempf=fileReader.read();
@@ -533,6 +572,8 @@ public class FullscreenActivity extends AppCompatActivity {
         Contents="Records\n";
 
         Contents+=OutText;
+        for (i=1;i<=10;i++) Contents+="\n"; //Help for choosing from top line
+
 
         if (2<1)
             for (i=0;i<ArraySize;i++)
@@ -573,7 +614,7 @@ public class FullscreenActivity extends AppCompatActivity {
         HumidityT=Humidity1;
         WeatherConT=WeatherCon1;
         SiteT=Site1;
-        CommentT="None";
+        CommentT=Comment1;
 
         for (i=SiteT.length();i<20;i++) SiteT+=" ";
         for (i=City.length();i<50;i++) City+=" ";
@@ -584,15 +625,15 @@ public class FullscreenActivity extends AppCompatActivity {
 
         //Units="C"; //TMP
 
-        HistoryData[HistoryPos]=new HistoryDataClass();
-        HistoryData[HistoryPos].Site=Site1;
-        HistoryData[HistoryPos].City=City;
-        HistoryData[HistoryPos].Date=CurrentDate;
-        HistoryData[HistoryPos].Temperature=Float.valueOf(Temp1);
-        HistoryData[HistoryPos].Humidity=Float.valueOf(Humidity1);
-        HistoryData[HistoryPos].WeatherCon=WeatherCon1;
-        HistoryData[HistoryPos].Units=Units;
-        HistoryData[HistoryPos].Comment="None";
+        Global1.HistoryData[HistoryPos]=new HistoryDataClass();
+        Global1.HistoryData[HistoryPos].Site=Site1;
+        Global1.HistoryData[HistoryPos].City=City;
+        Global1.HistoryData[HistoryPos].Date=CurrentDate;
+        Global1.HistoryData[HistoryPos].Temperature=Float.valueOf(Temp1);
+        Global1.HistoryData[HistoryPos].Humidity=Float.valueOf(Humidity1);
+        Global1.HistoryData[HistoryPos].WeatherCon=WeatherCon1;
+        Global1.HistoryData[HistoryPos].Units=Units;
+        Global1.HistoryData[HistoryPos].Comment=Comment1;
 
         UnitsT=Units;
         //TempF=Float.valueOf(Temp);
@@ -947,6 +988,7 @@ public class FullscreenActivity extends AppCompatActivity {
                         Humidity1=obj3.getString("humidity");
                         WeatherCon1=json2.getString("main");
                         Site1="Open Weather Map";
+                        Comment1="None";
                         SaveHistory();
 
 
@@ -1118,6 +1160,7 @@ public class FullscreenActivity extends AppCompatActivity {
                         Humidity1=jsonObj.getString("RelativeHumidity");
                         WeatherCon1=jsonObj.getString("WeatherText");
                         Site1="AccuWeather";
+                        Comment1="None";
                         SaveHistory();
 
                     } catch (JSONException e) {
@@ -1360,6 +1403,7 @@ public class FullscreenActivity extends AppCompatActivity {
                         Humidity1=String.valueOf(Float.valueOf(obj2.getString("humidity"))*100);
                         WeatherCon1=obj2.getString("summary");
                         Site1="Dark Sky";
+                        Comment1="None";
                         SaveHistory();
 
 
@@ -1582,6 +1626,7 @@ public class FullscreenActivity extends AppCompatActivity {
                         Humidity1=json2.getString("rh");
                         WeatherCon1=obj2.getString("description");
                         Site1="Weatherbit.io";
+                        Comment1="None";
                         SaveHistory();
 
 
@@ -1651,6 +1696,7 @@ public class FullscreenActivity extends AppCompatActivity {
                         WeatherCon1=obj3.getString("weather_descriptions");
                         WeatherCon1=WeatherCon1.substring(2,WeatherCon1.length()-2);
                         Site1="Weather Stacks";
+                        Comment1="None";
                         SaveHistory();
 
 
