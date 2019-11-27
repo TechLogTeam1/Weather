@@ -63,6 +63,7 @@ public class WeatherDetails extends AppCompatActivity {
     private View mControlsView;
 
     private TextView mTitleText;
+    private TextView mTitleText2;
     private TextView mDataTxt;
     private Button mCommit;
     private EditText mEditCommit;
@@ -104,6 +105,7 @@ public class WeatherDetails extends AppCompatActivity {
      * while interacting with activity UI.
      */
 
+    @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,6 +115,8 @@ public class WeatherDetails extends AppCompatActivity {
 
         mContentView = findViewById(R.id.fullscreen_content);
         mTitleText=findViewById(R.id.textTitle);
+
+        mTitleText2=findViewById(R.id.textView3);
         mDataTxt=findViewById(R.id.textData);
         mCommit=(Button) findViewById(R.id.button2);
         mEditCommit=(EditText) findViewById(R.id.editCommit);
@@ -122,20 +126,31 @@ public class WeatherDetails extends AppCompatActivity {
         Contents=intent.getStringExtra("Contents");
         // HistoryData= (FullscreenActivity.HistoryDataClass[]) intent.getSerializableExtra("ClassArray");
         mDataTxt.setMovementMethod(new ScrollingMovementMethod());
+        mDataTxt.setOnScrollChangeListener(new View.OnScrollChangeListener() {
 
-        mCommit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                ScrollY=mDataTxt.getScrollY();
+                ScrollPos=ScrollY/mDataTxt.getLineHeight();
+                ScrollId=ScrollPos/7;
+
+                mTitleText2.setText(String.valueOf(ScrollId));
+            }
+    });
+
+      /*  mCommit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 ScrollY=mDataTxt.getScrollY();
                 ScrollPos=ScrollY/mDataTxt.getLineHeight();
                 ScrollId=ScrollPos/7;
-                mEditCommit.setText(String.valueOf(ScrollId));
+                mCommit.setText(String.valueOf(ScrollId));
                 //mEditCommit.setText(HistoryData[1].City);
 
             }
         });
-
+      */
         if (Period==2) {
             mTitleText.setText("Next 24 hours");
             mDataTxt.setText(Contents);
