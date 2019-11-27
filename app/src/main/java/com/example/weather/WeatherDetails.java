@@ -193,19 +193,37 @@ public class WeatherDetails extends AppCompatActivity {
        ScrollY=mDataTxt.getScrollY();
        ScrollPos=ScrollY/mDataTxt.getLineHeight();
        ScrollId=ScrollPos/7;
-       Global1.HistoryData[ScrollId].Comment=mEditCommit.getText().toString();
+
+       int hpos;
+       int hpos2;
+
+       //PREV
+       //Global1.HistoryData[ScrollId].Comment=mEditCommit.getText().toString();
+
+        //Global1.HistoryData[Global1.HistoryData[ScrollId].pos].Comment=mEditCommit.getText().toString();
+       //Global1.HistoryData[Global1.HistoryData[ScrollId].pos].Comment=mEditCommit.getText().toString();
+        hpos=Global1.SearchData[ScrollId].pos;
+        Global1.HistoryData[hpos].Comment=mEditCommit.getText().toString();
+        //mEditCommit.setText(String.valueOf(hpos));
 
        SaveHistory2();
             }
         });
 
         if (Period==2) {
+
+            mCommit.setVisibility(View.GONE);
+            mEditCommit.setVisibility(View.GONE);
+
             mTitleText.setText("Next 24 hours");
             mDataTxt.setText(Contents);
 
         }
         if (Period==3)
         {
+            mCommit.setVisibility(View.GONE);
+            mEditCommit.setVisibility(View.GONE);
+
             mTitleText.setText("Next 5 days");
             mDataTxt.setText(Contents);
 
@@ -213,9 +231,28 @@ public class WeatherDetails extends AppCompatActivity {
 
         if (Period==10)
         {
-            mTitleText.setText("History");
-            mDataTxt.setText(Contents);
 
+            mCommit.setVisibility(View.VISIBLE);
+            mEditCommit.setVisibility(View.VISIBLE);
+
+            mTitleText.setText("History");
+
+            Contents="";
+
+            for (i=0;i<Global1.SearchArraySize;i++)
+            {
+                Contents+="Site:"+Global1.SearchData[i].Site+"\n"+
+                        "City:"+Global1.SearchData[i].City+"\n"
+                        +"Date:"+Global1.SearchData[i].Date+"\n"+
+                        "Temp:"+Global1.SearchData[i].Temperature+" "+ Global1.SearchData[i].Units+"\n"+
+                        "Humidity:"+Global1.SearchData[i].Humidity+"%\n"
+                        +"Conditions:"+Global1.SearchData[i].WeatherCon+"\n"
+                        +"Comment:"+Global1.SearchData[i].Comment+"\n";
+
+            }
+
+            for (i=1;i<=10;i++) Contents+="\n"; //Help for choosing from top line
+            mDataTxt.setText(Contents);
         }
 
     }

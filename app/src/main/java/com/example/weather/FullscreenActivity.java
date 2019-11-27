@@ -132,6 +132,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
     class HistoryDataClass
     {
+        int pos;
         String Site;
         String City;
         String Date;
@@ -146,7 +147,9 @@ public class FullscreenActivity extends AppCompatActivity {
 
     public static class Global1 {
         public static HistoryDataClass HistoryData[] = new HistoryDataClass[10000];
+        public static HistoryDataClass SearchData[] = new HistoryDataClass[10000];
         public static int ArraySize;
+        public static int SearchArraySize;
     }
 
     private int HistoryPos;
@@ -155,7 +158,7 @@ public class FullscreenActivity extends AppCompatActivity {
     private String Humidity1;
     private String Site1;
     private String Comment1;
-
+    private int searchpos;
 
 
 
@@ -509,13 +512,14 @@ public class FullscreenActivity extends AppCompatActivity {
                 Global1.HistoryData[HistoryPos].WeatherCon=WeatherConT; //CHECK
                 Global1.HistoryData[HistoryPos].Units=UnitsT;
                 Global1.HistoryData[HistoryPos].Comment=CommentT;
+                Global1.HistoryData[HistoryPos].pos=HistoryPos;
 
-                   HistoryPos++;
+                HistoryPos++;
 
-                   ContinueRec=false;
+                ContinueRec=false;
 
-                   if (SearchCityOn)
-                   if (Global1.HistoryData[HistoryPos-1].City.contains(SearchCity)) ContinueRec=true;
+                   //if (SearchCityOn)
+                   //if (Global1.HistoryData[HistoryPos-1].City.contains(SearchCity)) ContinueRec=true;
 
 
                    if (!SearchCityOn) ContinueRec=true;
@@ -528,6 +532,8 @@ public class FullscreenActivity extends AppCompatActivity {
                         "Humidity:"+Global1.HistoryData[HistoryPos-1].Humidity+"%\n"
                         +"Conditions:"+Global1.HistoryData[HistoryPos-1].WeatherCon+"\n"
                         +"Comment:"+Global1.HistoryData[HistoryPos-1].Comment+"\n";
+                        //+"Pos:"+Global1.HistoryData[HistoryPos-1].pos+"\n";
+
 
             }
             fileReader.close();
@@ -541,8 +547,46 @@ public class FullscreenActivity extends AppCompatActivity {
         Period=10;
         Contents="Records\n";
 
-        Contents+=OutText;
-        for (i=1;i<=10;i++) Contents+="\n"; //Help for choosing from top line
+        if (!SearchCityOn)
+        {
+            searchpos = 0;
+            for (i = 0; i < HistoryPos; i++) {
+                    Global1.SearchData[searchpos]=new HistoryDataClass();
+                    Global1.SearchData[searchpos].pos = i;
+                    Global1.SearchData[searchpos].City = Global1.HistoryData[i].City;
+                    Global1.SearchData[searchpos].Temperature = Global1.HistoryData[i].Temperature;
+                    Global1.SearchData[searchpos].Humidity = Global1.HistoryData[i].Humidity;
+                    Global1.SearchData[searchpos].Comment = Global1.HistoryData[i].Comment;
+                    Global1.SearchData[searchpos].Site = Global1.HistoryData[i].Site;
+                    Global1.SearchData[searchpos].WeatherCon = Global1.HistoryData[i].WeatherCon;
+                    Global1.SearchData[searchpos].Date = Global1.HistoryData[i].Date;
+                    Global1.SearchData[searchpos].Units = Global1.HistoryData[i].Units;
+
+                    searchpos++;
+                }
+            }
+
+        if (SearchCityOn) {
+            searchpos = 0;
+            for (i = 0; i < HistoryPos; i++) {
+                if (Global1.HistoryData[i].City.toLowerCase().contains(SearchCity.toLowerCase())) {
+                    Global1.SearchData[searchpos]=new HistoryDataClass();
+                    Global1.SearchData[searchpos].pos = i;
+                    Global1.SearchData[searchpos].City = Global1.HistoryData[i].City;
+                    Global1.SearchData[searchpos].Temperature = Global1.HistoryData[i].Temperature;
+                    Global1.SearchData[searchpos].Humidity = Global1.HistoryData[i].Humidity;
+                    Global1.SearchData[searchpos].Comment = Global1.HistoryData[i].Comment;
+                    Global1.SearchData[searchpos].Site = Global1.HistoryData[i].Site;
+                    Global1.SearchData[searchpos].WeatherCon = Global1.HistoryData[i].WeatherCon;
+                    Global1.SearchData[searchpos].Date = Global1.HistoryData[i].Date;
+                    Global1.SearchData[searchpos].Units = Global1.HistoryData[i].Units;
+
+                    searchpos++;
+                }
+            }
+        }
+
+        Global1.SearchArraySize=searchpos;
 
         OpenDetailed();
 
