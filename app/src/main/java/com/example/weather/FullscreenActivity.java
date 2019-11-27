@@ -154,6 +154,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
     private int HistoryPos;
     private String TempT,HumidityT,UnitsT,SiteT,CommentT;
+    private String CurrentDateT;
     private String Temp1;
     private String Humidity1;
     private String Site1;
@@ -598,6 +599,7 @@ public class FullscreenActivity extends AppCompatActivity {
     public void SaveHistory()
     {
 
+
         //Get Current Day
         String CurrentDate;
         String Path;
@@ -621,6 +623,7 @@ public class FullscreenActivity extends AppCompatActivity {
         WeatherConT=WeatherCon1;
         SiteT=Site1;
         CommentT=Comment1;
+        CurrentDateT=CurrentDate;
 
         for (i=SiteT.length();i<20;i++) SiteT+=" ";
         for (i=City.length();i<50;i++) City+=" ";
@@ -628,6 +631,7 @@ public class FullscreenActivity extends AppCompatActivity {
         for (i=HumidityT.length();i<10;i++) HumidityT+=" ";
         for (i=WeatherConT.length();i<100;i++) WeatherConT+=" ";
         for (i=CommentT.length();i<100;i++) CommentT+=" ";
+        for (i=CurrentDateT.length();i<29;i++) CurrentDateT+=" ";
 
         Global1.HistoryData[HistoryPos]=new HistoryDataClass();
         Global1.HistoryData[HistoryPos].Site=Site1;
@@ -653,18 +657,35 @@ public class FullscreenActivity extends AppCompatActivity {
             //fileSc.createNewFile();
 
             FileWriter fileWriter = new FileWriter(fileSc,true); //Append File
+
             //FileWriter fileWriter = new FileWriter(fileSc); //New File
+
+/*
+            FileWriter fileWriter;
+
+            if (fileSc.exists()) {
+                fileWriter = new FileWriter(fileSc,true); //Append File
+            }
+            else {
+                fileWriter = new FileWriter(fileSc); //New File
+            }
+*/
+
 
             fileWriter.write(SiteT, 0, 20);
             fileWriter.write(City, 0, 50);
-            fileWriter.write(CurrentDate, 0, 29);
+            //fileWriter.write(CurrentDate, 0, 29); //HERE'S PROBLEM WITH MOBILE, DON'T RUN!!!
+            fileWriter.write(CurrentDateT, 0, 29);
             fileWriter.write(TempT,0,10);
             fileWriter.write(HumidityT,0,10);
             fileWriter.write(WeatherConT,0,100);
+
             fileWriter.write(UnitsT,0,1);
             fileWriter.write(CommentT,0,100);
 
+
             fileWriter.flush();
+
             fileWriter.close();
 
         } catch (IOException e) {
