@@ -1,7 +1,9 @@
 package com.example.weather;
 
+import com.example.weather.FullscreenActivity.Global1;
 import android.annotation.SuppressLint;
 
+import androidx.annotation.RestrictTo;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -11,10 +13,20 @@ import android.os.Handler;
 import android.text.method.ScrollingMovementMethod;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.Period;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -61,23 +73,100 @@ public class WeatherDetails extends AppCompatActivity {
 
     private TextView mTitleText;
     private TextView mDataTxt;
+    private Button mCommit;
+    private EditText mEditCommit;
 
-    class WeatherRecord{
-        private String DateTxt;
-        private float Temperature;
-        private float Humidity;
-    }
+    private int ScrollY,ScrollPos,ScrollId;
 
-    WeatherRecord[] WeatherRec=new WeatherDetails.WeatherRecord[1000];
-    private String dateArray[]=new String[1000];
-    private int i;
+    private int i,o;
     private String Contents;
+
+    private String TempT,HumidityT,UnitsT,SiteT,CommentT,CityT;
+    private String Temp1,Humidity1,Site1,Comment1;
+    private String WeatherCon1,Units1,City1,Date1;
+    private String City;
+    private String DateT,WeatherConT;
 
     /**
      * Touch listener to use for in-layout UI controls to delay hiding the
      * system UI. This is to prevent the jarring behavior of controls going away
      * while interacting with activity UI.
      */
+
+    public void SaveHistory2()
+    {
+
+        //Get Current Day
+        String CurrentDate;
+        String Path;
+        float TempF,HumF;
+        String PrevTemp,PrevHum,PrevCon,PrevSite;
+
+
+
+
+        int strlen;
+
+        String datapath;
+        datapath=getApplicationInfo().dataDir+"/Weatherdat.txt";
+        File fileSc = new File(datapath);
+
+
+        try {
+            //Global1.ArraySize=(int)(fileSc.length()-1)/320;
+            FileWriter fileWriter = new FileWriter(fileSc); //New File
+              for (o=0;o<=Global1.ArraySize;o++)
+              {
+
+
+                Site1 = Global1.HistoryData[o].Site;
+                City1 = Global1.HistoryData[o].City;
+                Date1 = Global1.HistoryData[o].Date;
+                Temp1 = String.valueOf(Global1.HistoryData[o].Temperature);
+                Humidity1 = String.valueOf(Global1.HistoryData[o].Humidity);
+                WeatherCon1 = Global1.HistoryData[o].WeatherCon;
+                Units1 = Global1.HistoryData[o].Units;
+                Comment1 = Global1.HistoryData[o].Comment;
+                TempT="";HumidityT="";WeatherConT="";SiteT="";CommentT="";CityT="";DateT="";
+
+                  TempT=Temp1;
+                  HumidityT=Humidity1;
+                  WeatherConT=WeatherCon1;
+                  SiteT=Site1;
+                  CommentT=Comment1;
+                  CityT=City1;
+                  DateT=Date1; //Check
+                  UnitsT=Units1;
+
+                  for (i=SiteT.length();i<20;i++) SiteT+=" ";
+                  for (i=CityT.length();i<50;i++) CityT+=" ";
+                  for (i=TempT.length();i<10;i++) TempT+=" ";
+                  for (i=HumidityT.length();i<10;i++) HumidityT+=" ";
+                  for (i=WeatherConT.length();i<100;i++) WeatherConT+=" ";
+                  for (i=CommentT.length();i<100;i++) CommentT+=" ";
+
+
+                fileWriter.write(SiteT, 0, 20);
+                fileWriter.write(CityT, 0, 50);
+                fileWriter.write(DateT, 0, 29);
+                fileWriter.write(TempT, 0, 10);
+                fileWriter.write(HumidityT, 0, 10);
+                fileWriter.write(WeatherConT, 0, 100);
+                fileWriter.write(UnitsT, 0, 1);
+                fileWriter.write(CommentT, 0, 100);
+
+            }
+            fileWriter.flush();
+            fileWriter.close();
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return;
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,20 +178,34 @@ public class WeatherDetails extends AppCompatActivity {
         mContentView = findViewById(R.id.fullscreen_content);
         mTitleText=findViewById(R.id.textTitle);
         mDataTxt=findViewById(R.id.textData);
+        mCommit=(Button) findViewById(R.id.button2);
+        mEditCommit=(EditText) findViewById(R.id.editCommit);
 
         Intent intent = getIntent();
         Period=intent.getIntExtra("Period",0);
         Contents=intent.getStringExtra("Contents");
+         mDataTxt.setMovementMethod(new ScrollingMovementMethod());
 
-        mDataTxt.setMovementMethod(new ScrollingMovementMethod());
+        mCommit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+       ScrollY=mDataTxt.getScrollY();
+       ScrollPos=ScrollY/mDataTxt.getLineHeight();
+       ScrollId=ScrollPos/7;
+       Global1.HistoryData[ScrollId].Comment=mEditCommit.getText().toString();
+
+       SaveHistory2();
+            }
+        });
 
         if (Period==2) {
             mTitleText.setText("Next 24 hours");
             mDataTxt.setText(Contents);
+
         }
         if (Period==3)
         {
-            //ArrayList<WeatherRecord> recList = (ArrayList<WeatherRecord>) bundle.getSerializable("WeatherRec");
             mTitleText.setText("Next 5 days");
             mDataTxt.setText(Contents);
 
@@ -110,7 +213,6 @@ public class WeatherDetails extends AppCompatActivity {
 
         if (Period==10)
         {
-            //ArrayList<WeatherRecord> recList = (ArrayList<WeatherRecord>) bundle.getSerializable("WeatherRec");
             mTitleText.setText("History");
             mDataTxt.setText(Contents);
 
@@ -119,7 +221,4 @@ public class WeatherDetails extends AppCompatActivity {
     }
 
 
-
-
-    //@SuppressLint("InlinedApi")
     }
