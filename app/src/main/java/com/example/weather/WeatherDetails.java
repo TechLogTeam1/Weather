@@ -144,7 +144,7 @@ public class WeatherDetails extends AppCompatActivity {
                   for (i=HumidityT.length();i<10;i++) HumidityT+=" ";
                   for (i=WeatherConT.length();i<100;i++) WeatherConT+=" ";
                   for (i=CommentT.length();i<100;i++) CommentT+=" ";
-
+                  for (i=DateT.length();i<29;i++) DateT+=" ";
 
                 fileWriter.write(SiteT, 0, 20);
                 fileWriter.write(CityT, 0, 50);
