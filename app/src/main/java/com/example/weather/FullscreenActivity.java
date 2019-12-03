@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ActionBar;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import org.json.JSONArray;
@@ -40,6 +42,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -122,7 +125,7 @@ public class FullscreenActivity extends AppCompatActivity {
     private String WeatherConIcon;
     private int i;
     private int Period;
-    private int PrevPeriod;
+    private int PrevPeriod,LastPeriod;
     private int ArraySize;
     private String Longitude,Latitude;
     private String jsonSTR;
@@ -130,7 +133,7 @@ public class FullscreenActivity extends AppCompatActivity {
     private String SearchCity;
     private boolean SearchCityOn,ContinueRec;
 
-    class HistoryDataClass
+    static class HistoryDataClass
     {
         int pos;
         String Site;
@@ -150,6 +153,13 @@ public class FullscreenActivity extends AppCompatActivity {
         public static HistoryDataClass SearchData[] = new HistoryDataClass[10000];
         public static int ArraySize;
         public static int SearchArraySize;
+        public static boolean ServiceRun;
+        public static String City;
+        public static Date DateFrom;
+        public static Date DateTo;
+        public static int Period;
+        public static String Contents;
+        public static boolean FullHistory;
     }
 
     private int HistoryPos;
@@ -171,14 +181,17 @@ public class FullscreenActivity extends AppCompatActivity {
     //If not runs in newer emulator (e.x. Pixel 2 API 29) simple uninstall app
     // from mobile emulator and run again
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_fullscreen);
 
+        androidx.appcompat.app.ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
+
         mControlsView = findViewById(R.id.fullscreen_content_controls);
-        //mContentView = findViewById(R.id.fullscreen_content);
         mTextView = findViewById(R.id.textView);
         mDeg = findViewById(R.id.textTemp);
         mUnits = findViewById(R.id.textUnit);
@@ -207,7 +220,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
         City="London";Code="";
         //Code="uk";
-        Units="C";Period=1;
+        Units="C";Period=1;LastPeriod=1;
         SiteUse="OpenWeather";
         mCity.setText(City);
         //mCode.setText(Code);
@@ -237,8 +250,10 @@ public class FullscreenActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-           SearchCityOn=false;
-           ReadHistory();
+
+                SearchCityOn=false;
+                Global1.FullHistory=true;
+                ReadHistory();
 
             }
         });
@@ -247,11 +262,15 @@ public class FullscreenActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                //City=mCity.getText().toString();
                 SearchCity=mCity.getText().toString();
-                SearchCityOn=true;
-                ReadHistory();
-                //SaveHistory(); //NEW //CHECK
+                //SearchCityOn=true; //PREV
+                Global1.City=SearchCity;
+                //Global1.FullHistory=true; //PREV
+                Global1.FullHistory=false;
+                SearchCityOn=false;
+
+                SearchHistory();
+                Period=LastPeriod;
 
             }
         });
@@ -294,7 +313,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 mRadio4.setChecked(true);
                 mRadio5.setChecked(false);
                 mRadio6.setChecked(false);
-                Period=1;
+                Period=1;LastPeriod=1;
             }
         });
 
@@ -305,7 +324,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 mRadio4.setChecked(false);
                 mRadio5.setChecked(true);
                 mRadio6.setChecked(false);
-                Period=2;
+                Period=2;LastPeriod=2;
             }
         });
         mRadio6.setOnClickListener(new View.OnClickListener() {
@@ -315,7 +334,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 mRadio4.setChecked(false);
                 mRadio5.setChecked(false);
                 mRadio6.setChecked(true);
-                Period=3;
+                Period=3;LastPeriod=3;
             }
         });
         mRadio7.setOnClickListener(new View.OnClickListener() {
@@ -384,6 +403,8 @@ public class FullscreenActivity extends AppCompatActivity {
 
     }
 
+
+
     public String ConvertUNIXtoDate(long unixSeconds) {
 
         //long unixSeconds = DateUnix;
@@ -423,9 +444,27 @@ public class FullscreenActivity extends AppCompatActivity {
     {
 
         Intent intent=new Intent(this,WeatherDetails.class);
-        intent.putExtra("Period",Period);
-        intent.putExtra("Contents",Contents);
+
+        Global1.Period=Period;
+        //Global1.Contents=Contents;
+        //intent.putExtra("Period",Period);
+        //intent.putExtra("Contents",Contents);
         startActivity(intent);
+    }
+
+    public void SearchHistory()
+    {
+        Period=10;Global1.Period=Period;
+        //Global1.Contents=Contents;
+
+        ReadHistory();
+
+        Period=10;Global1.Period=Period;
+
+        Intent intent=new Intent(this,Search.class);
+        startActivity(intent);
+
+
     }
 
     public void ReadHistory()
@@ -461,7 +500,7 @@ public class FullscreenActivity extends AppCompatActivity {
             ArraySize=(int)(fileSc.length()-1)/320;
             Global1.ArraySize=ArraySize;
             for (i=0;i<=(fileSc.length()-1)/320;i++)
-               {
+            {
                 TempT="";HumidityT="";WeatherConT="";SiteT="";CommentT="";
 
                 fileReader.read(charArray6);
@@ -519,21 +558,21 @@ public class FullscreenActivity extends AppCompatActivity {
 
                 ContinueRec=false;
 
-                   //if (SearchCityOn)
-                   //if (Global1.HistoryData[HistoryPos-1].City.contains(SearchCity)) ContinueRec=true;
+                //if (SearchCityOn)
+                //if (Global1.HistoryData[HistoryPos-1].City.contains(SearchCity)) ContinueRec=true;
 
 
-                   if (!SearchCityOn) ContinueRec=true;
+                //if (!SearchCityOn) ContinueRec=true;
 
-                   if (ContinueRec)
-                         OutText+="Site:"+Global1.HistoryData[HistoryPos-1].Site+"\n"+
+                //if (ContinueRec)
+                OutText+="Site:"+Global1.HistoryData[HistoryPos-1].Site+"\n"+
                         "City:"+Global1.HistoryData[HistoryPos-1].City+"\n"
                         +"Date:"+Global1.HistoryData[HistoryPos-1].Date+"\n"+
                         "Temp:"+Global1.HistoryData[HistoryPos-1].Temperature+" "+ Global1.HistoryData[HistoryPos-1].Units+"\n"+
                         "Humidity:"+Global1.HistoryData[HistoryPos-1].Humidity+"%\n"
                         +"Conditions:"+Global1.HistoryData[HistoryPos-1].WeatherCon+"\n"
                         +"Comment:"+Global1.HistoryData[HistoryPos-1].Comment+"\n";
-                        //+"Pos:"+Global1.HistoryData[HistoryPos-1].pos+"\n";
+                //+"Pos:"+Global1.HistoryData[HistoryPos-1].pos+"\n";
 
 
             }
@@ -552,20 +591,20 @@ public class FullscreenActivity extends AppCompatActivity {
         {
             searchpos = 0;
             for (i = 0; i < HistoryPos; i++) {
-                    Global1.SearchData[searchpos]=new HistoryDataClass();
-                    Global1.SearchData[searchpos].pos = i;
-                    Global1.SearchData[searchpos].City = Global1.HistoryData[i].City;
-                    Global1.SearchData[searchpos].Temperature = Global1.HistoryData[i].Temperature;
-                    Global1.SearchData[searchpos].Humidity = Global1.HistoryData[i].Humidity;
-                    Global1.SearchData[searchpos].Comment = Global1.HistoryData[i].Comment;
-                    Global1.SearchData[searchpos].Site = Global1.HistoryData[i].Site;
-                    Global1.SearchData[searchpos].WeatherCon = Global1.HistoryData[i].WeatherCon;
-                    Global1.SearchData[searchpos].Date = Global1.HistoryData[i].Date;
-                    Global1.SearchData[searchpos].Units = Global1.HistoryData[i].Units;
+                Global1.SearchData[searchpos]=new HistoryDataClass();
+                Global1.SearchData[searchpos].pos = i;
+                Global1.SearchData[searchpos].City = Global1.HistoryData[i].City;
+                Global1.SearchData[searchpos].Temperature = Global1.HistoryData[i].Temperature;
+                Global1.SearchData[searchpos].Humidity = Global1.HistoryData[i].Humidity;
+                Global1.SearchData[searchpos].Comment = Global1.HistoryData[i].Comment;
+                Global1.SearchData[searchpos].Site = Global1.HistoryData[i].Site;
+                Global1.SearchData[searchpos].WeatherCon = Global1.HistoryData[i].WeatherCon;
+                Global1.SearchData[searchpos].Date = Global1.HistoryData[i].Date;
+                Global1.SearchData[searchpos].Units = Global1.HistoryData[i].Units;
 
-                    searchpos++;
-                }
+                searchpos++;
             }
+        }
 
         if (SearchCityOn) {
             searchpos = 0;
@@ -587,9 +626,11 @@ public class FullscreenActivity extends AppCompatActivity {
             }
         }
 
+        Global1.Period=Period;
         Global1.SearchArraySize=searchpos;
+        Global1.Contents=OutText;
 
-        OpenDetailed();
+        if (Global1.FullHistory) OpenDetailed();
 
         Period=PrevPeriod;
 
@@ -657,20 +698,7 @@ public class FullscreenActivity extends AppCompatActivity {
             //fileSc.createNewFile();
 
             FileWriter fileWriter = new FileWriter(fileSc,true); //Append File
-
             //FileWriter fileWriter = new FileWriter(fileSc); //New File
-
-/*
-            FileWriter fileWriter;
-
-            if (fileSc.exists()) {
-                fileWriter = new FileWriter(fileSc,true); //Append File
-            }
-            else {
-                fileWriter = new FileWriter(fileSc); //New File
-            }
-*/
-
 
             fileWriter.write(SiteT, 0, 20);
             fileWriter.write(City, 0, 50);
@@ -716,7 +744,7 @@ public class FullscreenActivity extends AppCompatActivity {
             final float scale = getBaseContext().getResources().getDisplayMetrics().density;
 
             ret =  (int)(x * scale + 0.5f);
-        return ret;
+            return ret;
         }
 
         @Override
@@ -843,12 +871,12 @@ public class FullscreenActivity extends AppCompatActivity {
                 if (WeatherConIcon.equalsIgnoreCase("sleet")) mWIcon.setImageResource(R.drawable.rain); //Χιονόνερο
                 if (WeatherConIcon.equalsIgnoreCase("snow")) mWIcon.setImageResource(R.drawable.snow);
                 if (WeatherConIcon.equalsIgnoreCase("wind")) mWIcon.setImageResource(R.drawable.clouds);
-                
+
                 if (WeatherConIcon.equalsIgnoreCase("fog")) mWIcon.setImageResource(R.drawable.clouds); //Ομίχλη
 
                 //NEW //CHECK
                 if (WeatherCon.equalsIgnoreCase("Mostly Cloudy")) mWIcon.setImageResource(R.drawable.clouds);
-                }
+            }
 
             if (SiteUse=="Weatherbit") {
                 //check for "mist" string ret
@@ -967,7 +995,9 @@ public class FullscreenActivity extends AppCompatActivity {
             progressDialog.dismiss();
         }
 
-        void ReadFromOpen()
+        void ReadFromOpen() //PREV
+        //public void ReadFromOpen()
+
         {
             if (Units=="C") UnitsTxt="&units=metric";     //Celsius
             if (Units=="F") UnitsTxt="&units=imperial";   //Fahrenheit
@@ -1094,7 +1124,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
                 for (i=0;i<ArraySize;i++)
                 {
-                Contents+=DateTxt[i]+"\n"+"Temp:"+TemperatureData[i]+Units+"  Humidity:"+HumidityData[i]+"%"+"\n";
+                    Contents+=DateTxt[i]+"\n"+"Temp:"+TemperatureData[i]+Units+"  Humidity:"+HumidityData[i]+"%"+"\n";
                 }
 
 
@@ -1144,59 +1174,59 @@ public class FullscreenActivity extends AppCompatActivity {
 
             //Second Call
             if (Period==1)
-            try {
-                //CallUrl="http://api.openweathermap.org/data/2.5/weather?q="+City+CodeTxt+UnitsTxt+"&APPID="+API;
-                //CallUrl="http://dataservice.accuweather.com/locations/v1/cities/search?q="+City+"&apikey="+APIAccu;
-                CallUrl="http://dataservice.accuweather.com/currentconditions/v1/"+CityKey+"?apikey="+APIAccu+"&details=true";
-
-                Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
-                Contents=Contents.substring(1,Contents.length());
                 try {
-                    JSONObject jsonObj = new JSONObject(Contents);
-                    JSONObject obj2 = jsonObj.getJSONObject("Temperature");
-                    JSONObject obj3;
+                    //CallUrl="http://api.openweathermap.org/data/2.5/weather?q="+City+CodeTxt+UnitsTxt+"&APPID="+API;
+                    //CallUrl="http://dataservice.accuweather.com/locations/v1/cities/search?q="+City+"&apikey="+APIAccu;
+                    CallUrl="http://dataservice.accuweather.com/currentconditions/v1/"+CityKey+"?apikey="+APIAccu+"&details=true";
 
-                    if (Units=="C")
-                        obj3 = obj2.getJSONObject("Metric");
-                    else
-                    if (Units=="F")
-                        obj3 = obj2.getJSONObject("Imperial");
-                    else
-                        obj3 = obj2.getJSONObject("Metric");
+                    Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
+                    Contents=Contents.substring(1,Contents.length());
+                    try {
+                        JSONObject jsonObj = new JSONObject(Contents);
+                        JSONObject obj2 = jsonObj.getJSONObject("Temperature");
+                        JSONObject obj3;
 
-                    Temp="Temperature:"+obj3.getString("Value")+" "+Units;
-                    HumidityTxt="Humidity:"+jsonObj.getString("RelativeHumidity")+"%";
+                        if (Units=="C")
+                            obj3 = obj2.getJSONObject("Metric");
+                        else
+                        if (Units=="F")
+                            obj3 = obj2.getJSONObject("Imperial");
+                        else
+                            obj3 = obj2.getJSONObject("Metric");
 
-                    Temperature=Float.valueOf(obj3.getString("Value"));
-                    Humidity=Float.valueOf(jsonObj.getString("RelativeHumidity"));
+                        Temp="Temperature:"+obj3.getString("Value")+" "+Units;
+                        HumidityTxt="Humidity:"+jsonObj.getString("RelativeHumidity")+"%";
 
-                    WeatherCon=jsonObj.getString("WeatherText");
+                        Temperature=Float.valueOf(obj3.getString("Value"));
+                        Humidity=Float.valueOf(jsonObj.getString("RelativeHumidity"));
 
-                    Temp1=obj3.getString("Value");
-                    Humidity1=jsonObj.getString("RelativeHumidity");
-                    WeatherCon1=jsonObj.getString("WeatherText");
-                    Site1="AccuWeather";
-                    Comment1="None";
-                    SaveHistory();
+                        WeatherCon=jsonObj.getString("WeatherText");
 
-                } catch (JSONException e) {
+                        Temp1=obj3.getString("Value");
+                        Humidity1=jsonObj.getString("RelativeHumidity");
+                        WeatherCon1=jsonObj.getString("WeatherText");
+                        Site1="AccuWeather";
+                        Comment1="None";
+                        SaveHistory();
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    //"WeatherText"
+                    //OutText=WeatherText;
+                    //OutText=Contents;
+
+                    OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
+                            +Coords+"\n"+Temp+"\n"+HumidityTxt;
+
+                    //OutText=CityKey;
+                    //OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
+                    //      +Coords+"\n"+Temp+"\n"+Humidity;
+                    //OutText=CallUrl;
+
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
-                //"WeatherText"
-                //OutText=WeatherText;
-                //OutText=Contents;
-
-                OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
-                        +Coords+"\n"+Temp+"\n"+HumidityTxt;
-
-                //OutText=CityKey;
-                //OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
-                //      +Coords+"\n"+Temp+"\n"+Humidity;
-                //OutText=CallUrl;
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
 
 
             //CHECK Not Ready Yet
@@ -1263,14 +1293,14 @@ public class FullscreenActivity extends AppCompatActivity {
                     CallUrl="http://dataservice.accuweather.com/forecasts/v1/daily/5day/"+CityKey+"?apikey="+APIAccu+UnitsTxt;
                     Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
 
-                try {
+                    try {
 
 
 
-                    JSONObject jsonObj = new JSONObject(Contents);
-                    JSONArray baseArray=jsonObj.getJSONArray("DailyForecasts");
-                    //JSONObject obj2 = jsonObj.getJSONObject("Temperature");
-                    //JSONObject obj3;
+                        JSONObject jsonObj = new JSONObject(Contents);
+                        JSONArray baseArray=jsonObj.getJSONArray("DailyForecasts");
+                        //JSONObject obj2 = jsonObj.getJSONObject("Temperature");
+                        //JSONObject obj3;
 
                 /*
                 if (Units=="C")
@@ -1286,42 +1316,42 @@ public class FullscreenActivity extends AppCompatActivity {
                 */
 
 
-                    OutList="";
-                    ArraySize=baseArray.length();
+                        OutList="";
+                        ArraySize=baseArray.length();
 
-                    for (i = 0; i < baseArray.length(); i++) {
-                        JSONObject json2 = baseArray.getJSONObject(i);
-                        JSONObject obj2 = json2.getJSONObject("Temperature");
-                        JSONObject obj3 = obj2.getJSONObject("Maximum");
+                        for (i = 0; i < baseArray.length(); i++) {
+                            JSONObject json2 = baseArray.getJSONObject(i);
+                            JSONObject obj2 = json2.getJSONObject("Temperature");
+                            JSONObject obj3 = obj2.getJSONObject("Maximum");
 
-                        Temp = "Temp:" + obj3.getString("Value") + " " + Units;
-                        HumidityTxt="--";
-                        //Humidity = "Humidity:" + obj2.getString("humidity") + "%";
-                        //DateUnix=Long.valueOf(json2.getString("time"));
-                        //Date=ConvertUNIXtoDate(DateUnix);
-                        Date=json2.getString("Date");
+                            Temp = "Temp:" + obj3.getString("Value") + " " + Units;
+                            HumidityTxt="--";
+                            //Humidity = "Humidity:" + obj2.getString("humidity") + "%";
+                            //DateUnix=Long.valueOf(json2.getString("time"));
+                            //Date=ConvertUNIXtoDate(DateUnix);
+                            Date=json2.getString("Date");
 
 
-                        DateTxt[i]=Date;
-                        TemperatureData[i]=Float.valueOf(obj3.getString("Value"));
-                        HumidityData[i]=0;
+                            DateTxt[i]=Date;
+                            TemperatureData[i]=Float.valueOf(obj3.getString("Value"));
+                            HumidityData[i]=0;
 
-                        OutList+="---------------------------------------------\n"+"Date:"+Date+
-                                "\n---------------------------------------------\n"+
-                                Temp+"\n"+Humidity+"\n";
+                            OutList+="---------------------------------------------\n"+"Date:"+Date+
+                                    "\n---------------------------------------------\n"+
+                                    Temp+"\n"+Humidity+"\n";
 
+                        }
+
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
 
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                    //OutText=Temp;
 
-
-                //OutText=Temp;
-
-                //OutText=OutList;
-                OutText=Contents;
+                    //OutText=OutList;
+                    OutText=Contents;
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
