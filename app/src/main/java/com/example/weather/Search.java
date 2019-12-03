@@ -388,13 +388,71 @@ public class Search extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                Date date = new Date();
+                Date date2 = new Date();
+
+
+                //DateFrom
+                String strDateFormat = "dd-MM-yyyy";
+                DateFormat dateFormat = new SimpleDateFormat(strDateFormat);
+                dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Athens"));
+                try {
+                    date=dateFormat.parse(mFrom.getText().toString());
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                String formattedDate= dateFormat.format(date);
+                DateFrom=formattedDate;
+
+                //DateTo
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(date);
+                calendar.add(Calendar.WEEK_OF_YEAR, 1);
+
+                date2=calendar.getTime();
+                formattedDate= dateFormat.format(date2);
+
+                DateTo=formattedDate;
+                mFrom.setText(DateFrom);
+                mTo.setText(DateTo);
+
+                Global1.DateFrom=date;
+                Global1.DateTo=date2;
             }
         });
 
         mButtonWeekly.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Date date = new Date();
+                Date date2 = new Date();
 
+                //DateFrom
+                String strDateFormat = "dd-MM-yyyy";
+                DateFormat dateFormat = new SimpleDateFormat(strDateFormat);
+                dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Athens"));
+                try {
+                    date=dateFormat.parse(mFrom.getText().toString());
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                String formattedDate= dateFormat.format(date);
+                DateFrom=formattedDate;
+
+                //DateTo
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(date);
+                calendar.add(Calendar.WEEK_OF_YEAR, 1);
+
+                date2=calendar.getTime();
+                formattedDate= dateFormat.format(date2);
+
+                DateTo=formattedDate;
+                mFrom.setText(DateFrom);
+                mTo.setText(DateTo);
+
+                Global1.DateFrom=date;
+                Global1.DateTo=date2;
 
             }
         });
