@@ -482,6 +482,62 @@ public class Search extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                Date date = new Date();
+                Date date2 = new Date();
+
+                String formattedDate = null;
+                Calendar calendar;
+                Calendar calendar2;
+                DateFormat dateFormat;
+                String FromDate;
+                int year,month,day;
+
+
+                //DateFrom
+                String strDateFormat = "dd-MM-yyyy";
+                dateFormat = new SimpleDateFormat(strDateFormat);
+                dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Athens"));
+
+                FromDate=mFrom.getText().toString();
+
+
+                try {
+
+                    date=dateFormat.parse(FromDate);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                //String formattedDate= dateFormat.format(date);
+                //formattedDate= dateFormat.format(date);
+
+                calendar2 = Calendar.getInstance();
+                calendar2.setTime(date);
+                calendar2.set(Calendar.DAY_OF_MONTH,1);
+                date=calendar2.getTime();
+
+                dateFormat.format(date); //CHECK
+                formattedDate= dateFormat.format(date);
+                DateFrom=formattedDate;
+                //DateFrom=date.toString(); //TMP //RUNS
+
+                //DateTo
+                calendar = Calendar.getInstance();
+                calendar.setTime(date);
+                //calendar.add(Calendar.MONTH, 1);
+                calendar.set(Calendar.DAY_OF_MONTH,calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+                //calendar.set(Calendar.DAY_OF_MONTH,5);
+
+                date2=calendar.getTime();
+                formattedDate= dateFormat.format(date2);
+
+                DateTo=formattedDate;
+
+                Global1.DateFrom=date;
+                Global1.DateTo=date2;
+
+                mFrom.setText(DateFrom);
+                mTo.setText(DateTo);
+
             }
         });
 
