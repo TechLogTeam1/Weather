@@ -3,7 +3,10 @@ package com.example.weather;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ActionBar;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import org.json.JSONArray;
@@ -40,6 +44,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -122,7 +127,7 @@ public class FullscreenActivity extends AppCompatActivity {
     private String WeatherConIcon;
     private int i;
     private int Period;
-    private int PrevPeriod;
+    private int PrevPeriod,LastPeriod;
     private int ArraySize;
     private String Longitude,Latitude;
     private String jsonSTR;
@@ -130,7 +135,7 @@ public class FullscreenActivity extends AppCompatActivity {
     private String SearchCity;
     private boolean SearchCityOn,ContinueRec;
 
-    class HistoryDataClass
+    static class HistoryDataClass
     {
         int pos;
         String Site;
@@ -150,6 +155,13 @@ public class FullscreenActivity extends AppCompatActivity {
         public static HistoryDataClass SearchData[] = new HistoryDataClass[10000];
         public static int ArraySize;
         public static int SearchArraySize;
+        public static boolean ServiceRun;
+        public static String City;
+        public static Date DateFrom;
+        public static Date DateTo;
+        public static int Period;
+        public static String Contents;
+        public static boolean FullHistory;
     }
 
     private int HistoryPos;
@@ -171,14 +183,20 @@ public class FullscreenActivity extends AppCompatActivity {
     //If not runs in newer emulator (e.x. Pixel 2 API 29) simple uninstall app
     // from mobile emulator and run again
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_fullscreen);
 
+        androidx.appcompat.app.ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
+
+        Global1.ServiceRun=false;
+        //SetAlarmService();
+
         mControlsView = findViewById(R.id.fullscreen_content_controls);
-        //mContentView = findViewById(R.id.fullscreen_content);
         mTextView = findViewById(R.id.textView);
         mDeg = findViewById(R.id.textTemp);
         mUnits = findViewById(R.id.textUnit);
@@ -207,7 +225,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
         City="London";Code="";
         //Code="uk";
-        Units="C";Period=1;
+        Units="C";Period=1;LastPeriod=1;
         SiteUse="OpenWeather";
         mCity.setText(City);
         //mCode.setText(Code);
@@ -237,7 +255,9 @@ public class FullscreenActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+
            SearchCityOn=false;
+           Global1.FullHistory=true;
            ReadHistory();
 
             }
@@ -247,11 +267,15 @@ public class FullscreenActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                //City=mCity.getText().toString();
                 SearchCity=mCity.getText().toString();
-                SearchCityOn=true;
-                ReadHistory();
-                //SaveHistory(); //NEW //CHECK
+                //SearchCityOn=true; //PREV
+                Global1.City=SearchCity;
+                //Global1.FullHistory=true; //PREV
+                Global1.FullHistory=false;
+                SearchCityOn=false;
+
+                SearchHistory();
+                Period=LastPeriod;
 
             }
         });
@@ -294,7 +318,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 mRadio4.setChecked(true);
                 mRadio5.setChecked(false);
                 mRadio6.setChecked(false);
-                Period=1;
+                Period=1;LastPeriod=1;
             }
         });
 
@@ -305,7 +329,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 mRadio4.setChecked(false);
                 mRadio5.setChecked(true);
                 mRadio6.setChecked(false);
-                Period=2;
+                Period=2;LastPeriod=2;
             }
         });
         mRadio6.setOnClickListener(new View.OnClickListener() {
@@ -315,7 +339,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 mRadio4.setChecked(false);
                 mRadio5.setChecked(false);
                 mRadio6.setChecked(true);
-                Period=3;
+                Period=3;LastPeriod=3;
             }
         });
         mRadio7.setOnClickListener(new View.OnClickListener() {
@@ -384,6 +408,23 @@ public class FullscreenActivity extends AppCompatActivity {
 
     }
 
+    public void SetAlarmService()
+
+    {
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+        calendar.setTimeZone(TimeZone.getTimeZone("Europe/Athens")); //NEW
+
+        //calendar.set(Calendar.YEAR,2019);
+        //calendar.set(Calendar.MONTH,12);
+        //calendar.set(Calendar.DAY_OF_MONTH,1);
+
+        calendar.set(Calendar.HOUR_OF_DAY, 15);
+        calendar.set(Calendar.MINUTE, 24);
+        calendar.set(Calendar.SECOND, 0);
+        setAlarm(calendar.getTimeInMillis());
+
+    }
+
     public String ConvertUNIXtoDate(long unixSeconds) {
 
         //long unixSeconds = DateUnix;
@@ -419,13 +460,49 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
 
+    private void setAlarm(long time) {
+        //getting the alarm manager
+        AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+        //creating a new intent specifying the broadcast receiver
+        Intent i = new Intent(this, AlarmService.class);
+
+        //creating a pending intent using the intent
+
+        PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0); //PREV
+        //PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT); //NEW
+        //setting the repeating alarm that will be fired every day
+        am.setRepeating(AlarmManager.RTC, time, AlarmManager.INTERVAL_DAY, pi); //PREV
+        //am.setRepeating(AlarmManager.RTC_WAKEUP, time, AlarmManager.INTERVAL_DAY, pi);
+        Toast.makeText(this, "Alarm is set", Toast.LENGTH_SHORT).show();
+    }
+
+
     public void OpenDetailed()
     {
 
         Intent intent=new Intent(this,WeatherDetails.class);
-        intent.putExtra("Period",Period);
-        intent.putExtra("Contents",Contents);
+
+        Global1.Period=Period;
+        //Global1.Contents=Contents;
+        //intent.putExtra("Period",Period);
+        //intent.putExtra("Contents",Contents);
         startActivity(intent);
+    }
+
+    public void SearchHistory()
+    {
+        Period=10;Global1.Period=Period;
+        //Global1.Contents=Contents;
+
+        ReadHistory();
+
+        Period=10;Global1.Period=Period;
+
+        Intent intent=new Intent(this,Search.class);
+        startActivity(intent);
+
+
     }
 
     public void ReadHistory()
@@ -523,9 +600,9 @@ public class FullscreenActivity extends AppCompatActivity {
                    //if (Global1.HistoryData[HistoryPos-1].City.contains(SearchCity)) ContinueRec=true;
 
 
-                   if (!SearchCityOn) ContinueRec=true;
+                   //if (!SearchCityOn) ContinueRec=true;
 
-                   if (ContinueRec)
+                   //if (ContinueRec)
                          OutText+="Site:"+Global1.HistoryData[HistoryPos-1].Site+"\n"+
                         "City:"+Global1.HistoryData[HistoryPos-1].City+"\n"
                         +"Date:"+Global1.HistoryData[HistoryPos-1].Date+"\n"+
@@ -587,9 +664,11 @@ public class FullscreenActivity extends AppCompatActivity {
             }
         }
 
+        Global1.Period=Period;
         Global1.SearchArraySize=searchpos;
+        Global1.Contents=OutText;
 
-        OpenDetailed();
+        if (Global1.FullHistory) OpenDetailed();
 
         Period=PrevPeriod;
 
@@ -657,20 +736,7 @@ public class FullscreenActivity extends AppCompatActivity {
             //fileSc.createNewFile();
 
             FileWriter fileWriter = new FileWriter(fileSc,true); //Append File
-
             //FileWriter fileWriter = new FileWriter(fileSc); //New File
-
-/*
-            FileWriter fileWriter;
-
-            if (fileSc.exists()) {
-                fileWriter = new FileWriter(fileSc,true); //Append File
-            }
-            else {
-                fileWriter = new FileWriter(fileSc); //New File
-            }
-*/
-
 
             fileWriter.write(SiteT, 0, 20);
             fileWriter.write(City, 0, 50);
@@ -967,7 +1033,9 @@ public class FullscreenActivity extends AppCompatActivity {
             progressDialog.dismiss();
         }
 
-        void ReadFromOpen()
+        void ReadFromOpen() //PREV
+        //public void ReadFromOpen()
+
         {
             if (Units=="C") UnitsTxt="&units=metric";     //Celsius
             if (Units=="F") UnitsTxt="&units=imperial";   //Fahrenheit

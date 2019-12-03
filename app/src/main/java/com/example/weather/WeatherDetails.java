@@ -1,6 +1,7 @@
 package com.example.weather;
 
 import com.example.weather.FullscreenActivity.Global1;
+
 import android.annotation.SuppressLint;
 
 import androidx.annotation.RestrictTo;
@@ -22,6 +23,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Period;
 import java.util.ArrayList;
@@ -86,8 +88,12 @@ public class WeatherDetails extends AppCompatActivity {
     private String WeatherCon1,Units1,City1,Date1;
     private String City;
     private String DateT,WeatherConT;
+    private boolean cont;
+    private int searchcnt;
+    private Date DateExp,DateExp2;
+    private String DateExpSTR,DateExp2STR;
 
-    /**
+        /**
      * Touch listener to use for in-layout UI controls to delay hiding the
      * system UI. This is to prevent the jarring behavior of controls going away
      * while interacting with activity UI.
@@ -175,6 +181,9 @@ public class WeatherDetails extends AppCompatActivity {
         int Period;
         setContentView(R.layout.activity_weather_details);
 
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
+
         mContentView = findViewById(R.id.fullscreen_content);
         mTitleText=findViewById(R.id.textTitle);
         mDataTxt=findViewById(R.id.textData);
@@ -182,9 +191,13 @@ public class WeatherDetails extends AppCompatActivity {
         mEditCommit=(EditText) findViewById(R.id.editCommit);
 
         Intent intent = getIntent();
-        Period=intent.getIntExtra("Period",0);
-        Contents=intent.getStringExtra("Contents");
+        //Period=intent.getIntExtra("Period",0);
+        //Contents=intent.getStringExtra("Contents");
          mDataTxt.setMovementMethod(new ScrollingMovementMethod());
+
+         //NEW
+            Period = Global1.Period;
+            Contents=Global1.Contents;
 
         mCommit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -193,6 +206,7 @@ public class WeatherDetails extends AppCompatActivity {
        ScrollY=mDataTxt.getScrollY();
        ScrollPos=ScrollY/mDataTxt.getLineHeight();
        ScrollId=ScrollPos/7;
+
 
        int hpos;
        int hpos2;
@@ -205,6 +219,7 @@ public class WeatherDetails extends AppCompatActivity {
         hpos=Global1.SearchData[ScrollId].pos;
         Global1.HistoryData[hpos].Comment=mEditCommit.getText().toString();
         //mEditCommit.setText(String.valueOf(hpos));
+
 
        SaveHistory2();
             }
@@ -229,7 +244,7 @@ public class WeatherDetails extends AppCompatActivity {
 
         }
 
-        if (Period==10)
+        if (Period==10) //Search
         {
 
             mCommit.setVisibility(View.VISIBLE);
@@ -241,6 +256,37 @@ public class WeatherDetails extends AppCompatActivity {
 
             for (i=0;i<Global1.SearchArraySize;i++)
             {
+            cont=false;
+            searchcnt=0;
+
+
+
+
+                SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+                sdf.setTimeZone(TimeZone.getTimeZone("Europe/Athens")); //NEW
+                //String formattedDate = sdf.format(DateExp);
+                //DateExpSTR=formattedDate;
+
+
+                try {
+
+                    DateExp=sdf.parse(Global1.HistoryData[i].Date);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+
+                }
+
+/*
+            if (Global1.FullHistory) cont=true;
+
+            if (!Global1.FullHistory) {
+                if (Global1.HistoryData[i].City.toLowerCase().contains(Global1.City.toLowerCase())) searchcnt++;
+                if ((DateExp.after(Global1.DateFrom)) && (DateExp.before(Global1.DateTo))) searchcnt++;
+            }
+
+            if (searchcnt==2) cont=true;
+*/
+               //if (cont)
                 Contents+="Site:"+Global1.SearchData[i].Site+"\n"+
                         "City:"+Global1.SearchData[i].City+"\n"
                         +"Date:"+Global1.SearchData[i].Date+"\n"+
