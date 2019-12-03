@@ -402,6 +402,20 @@ public class Search extends AppCompatActivity {
         mButtonDaily.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Date date = new Date();
+                //String strDateFormat = "yyyy-MM-dd HH:mm:ss z"; //PREV
+                String strDateFormat = "dd-MM-yyyy"; //NEW
+                DateFormat dateFormat = new SimpleDateFormat(strDateFormat);
+                dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Athens"));
+                String formattedDate= dateFormat.format(date);
+                DateFrom=formattedDate;
+                DateTo=formattedDate;
+
+                mFrom.setText(DateFrom);
+                mTo.setText(DateFrom);
+
+                DateFrom1=date;
+                DateTo1=date;
 
             }
         });

@@ -403,8 +403,6 @@ public class FullscreenActivity extends AppCompatActivity {
 
     }
 
-
-
     public String ConvertUNIXtoDate(long unixSeconds) {
 
         //long unixSeconds = DateUnix;
