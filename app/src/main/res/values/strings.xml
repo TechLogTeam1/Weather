@@ -7,4 +7,6 @@
     <string name="title_activity_weather_details">WeatherDetails</string>
 
     <string name="title_activity_search">Search</string>
+
+    <string name="title_activity_adv_search">AdvSearch</string>
 </resources>

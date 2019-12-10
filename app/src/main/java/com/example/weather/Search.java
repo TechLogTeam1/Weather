@@ -46,6 +46,7 @@ public class Search extends AppCompatActivity {
     private Button mButtonWeekly;
     private Button mButtonMonthly;
     private Button mButtonSearch;
+    private Button mButtonAdvSearch;
 
     private CheckBox mCheckOpen;
     private CheckBox mCheckAccu;
@@ -267,6 +268,9 @@ public class Search extends AppCompatActivity {
                 if (CheckDark) if (HistoryData[i].Site.contains("Dark Sky")) siteCont=true;
                 if (CheckBit) if (HistoryData[i].Site.contains("Weatherbit.io")) siteCont=true;
 
+                if ((HistoryData[i].Temperature>=Global1.FromT) && (HistoryData[i].Temperature<=Global1.ToT)) siteCont=true;
+                else siteCont=false;
+
                 if (Global1.HistoryData[i].City.toLowerCase().contains(Global1.City.toLowerCase()))
                     if ((DateExp.after(DateComp2)) && (DateExp.before(DateComp)))
                     if (siteCont)
@@ -340,6 +344,7 @@ public class Search extends AppCompatActivity {
         mButtonWeekly= (Button) findViewById(R.id.buttonWeekly);
         mButtonMonthly= (Button) findViewById(R.id.buttonMonthly);
         mButtonSearch= (Button) findViewById(R.id.buttonSearch);
+        mButtonAdvSearch= (Button) findViewById(R.id.buttonSearch2);
 
         mCheckOpen=(CheckBox)findViewById(R.id.checkBox);
         mCheckAccu=(CheckBox)findViewById(R.id.checkBox2);
@@ -577,6 +582,30 @@ public class Search extends AppCompatActivity {
 
                 ReadHistory();
                 Intent intent = new Intent(Search.this, WeatherDetails.class);
+                startActivity(intent);
+
+            }
+        });
+
+
+        mButtonAdvSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Period=12;
+
+                Global1.DateFrom=DateFrom1;
+                Global1.DateTo=DateTo1;
+
+
+                if (mCheckOpen.isChecked()) CheckOpen=true; else CheckOpen=false;
+                if (mCheckAccu.isChecked()) CheckAccu=true; else CheckAccu=false;
+                if (mCheckStack.isChecked()) CheckStack=true; else CheckStack=false;
+                if (mCheckDark.isChecked()) CheckDark=true; else CheckDark=false;
+                if (mCheckBit.isChecked()) CheckBit=true; else CheckBit=false;
+                if (mCheckService.isChecked()) CheckService=true; else CheckService=false;
+
+                Intent intent = new Intent(Search.this, AdvSearch.class);
                 startActivity(intent);
 
             }

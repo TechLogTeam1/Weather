@@ -162,6 +162,7 @@ public class FullscreenActivity extends AppCompatActivity {
         public static int Period;
         public static String Contents;
         public static boolean FullHistory;
+        public static float FromT,ToT;
     }
 
     private int HistoryPos;
@@ -232,6 +233,9 @@ public class FullscreenActivity extends AppCompatActivity {
         //mTextView.setText("");
         Temperature=0;
         Humidity=0;
+
+        Global1.FromT=(float) -273.15;
+        Global1.ToT=100;
 
         mDeg.setText("--");
         mHum.setText("Humidity "+"--"+" %");

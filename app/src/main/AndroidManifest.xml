@@ -14,10 +14,15 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".AdvSearch"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_adv_search"
+            android:theme="@style/FullscreenTheme"></activity>
+        <activity
             android:name=".Search"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_search"
-            android:theme="@style/FullscreenTheme"></activity>
+            android:theme="@style/FullscreenTheme" />
         <activity
             android:name=".WeatherDetails"
             android:configChanges="orientation|keyboardHidden|screenSize"
