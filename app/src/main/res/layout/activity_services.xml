@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background">
+    tools:context=".Services">
+
+    <!-- The primary full-screen view. This can be replaced with whatever view
+         is needed to present your content, e.g. VideoView, SurfaceView,
+         TextureView, etc. -->
+
+    <!-- This FrameLayout insets its children based on system windows using
+         android:fitsSystemWindows. -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <LinearLayout
+            android:id="@+id/fullscreen_content_controls"
+            style="?metaButtonBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:background="@color/black_overlay"
+            android:orientation="horizontal"
+            tools:ignore="UselessParent"/>
+
+        <TextView
+            android:id="@+id/textView8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Services"
+            android:textColor="#FFFF"
+            android:textSize="36sp" />
+
+        <TextView
+            android:id="@+id/textView9"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="50dp"
+            android:text="City"
+            android:textColor="#FFFF"
+            android:textSize="36sp" />
+
+        <EditText
+            android:id="@+id/editText2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="100dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="London"
+            android:textColor="#FFFF" />
+
+        <RadioButton
+            android:id="@+id/radioButtonOne"
+            android:layout_width="131dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="200dp"
+            android:text="1 Time in day"
+            android:textColor="#FFFF" />
+
+        <RadioButton
+            android:id="@+id/radioButtonTwo"
+            android:layout_width="131dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="130dp"
+            android:layout_marginTop="200dp"
+            android:text="2 Times in day"
+            android:textColor="#FFFF" />
+
+        <RadioButton
+            android:id="@+id/radioButtonThree"
+            android:layout_width="131dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="260dp"
+            android:layout_marginTop="200dp"
+            android:checked="true"
+            android:text="3 Times in day"
+            android:textColor="#FFFF" />
+
+        <RadioButton
+            android:id="@+id/radioButtonFour"
+            android:layout_width="131dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="0dp"
+            android:layout_marginTop="350dp"
+            android:checked="false"
+            android:text="Custom Time"
+            android:textColor="#FFFF" />
+
+        <CheckBox
+            android:id="@+id/checkBoxOpen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="250dp"
+            android:checked="true"
+            android:text="Open Weather"
+            android:textColor="#FFFF" />
+
+        <CheckBox
+            android:id="@+id/checkBoxAccu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="130dp"
+            android:layout_marginTop="250dp"
+            android:text="AccuWeather"
+            android:textColor="#FFFF" />
+
+        <CheckBox
+            android:id="@+id/checkBoxStack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="250dp"
+            android:layout_marginTop="250dp"
+            android:text="WeatherStack"
+            android:textColor="#FFFF" />
+
+        <CheckBox
+            android:id="@+id/checkBoxDark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="0dp"
+            android:layout_marginTop="300dp"
+            android:text="Dark Sky"
+            android:textColor="#FFFF" />
+
+        <CheckBox
+            android:id="@+id/checkBoxBit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="130dp"
+            android:layout_marginTop="300dp"
+            android:text="WeatherBit"
+            android:textColor="#FFFF" />
+
+        <Button
+            android:id="@+id/buttonSetSer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="150dp"
+            android:layout_marginTop="500dp"
+            android:text="Set Service" />
+
+        <Button
+            android:id="@+id/buttonShowSer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="0dp"
+            android:layout_marginTop="500dp"
+            android:text="Show Services" />
+
+        <EditText
+            android:id="@+id/editCustom"
+            android:layout_width="117dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="150dp"
+            android:layout_marginTop="340dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="10:00"
+            android:textColor="#FFFF" />
+
+    </FrameLayout>
+
+</FrameLayout>

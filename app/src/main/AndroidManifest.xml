@@ -14,10 +14,20 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".Services"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_services"
+            android:theme="@style/FullscreenTheme"></activity>
+        <activity
+            android:name=".Coords"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_coords"
+            android:theme="@style/FullscreenTheme" />
+        <activity
             android:name=".AdvSearch"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_adv_search"
-            android:theme="@style/FullscreenTheme"></activity>
+            android:theme="@style/FullscreenTheme" />
         <activity
             android:name=".Search"
             android:configChanges="orientation|keyboardHidden|screenSize"

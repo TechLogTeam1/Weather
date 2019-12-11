@@ -80,6 +80,8 @@ public class FullscreenActivity extends AppCompatActivity {
     private Button mButton1;
     private Button mButton2;
     private Button mButton3;
+    private Button mButton4;
+    private Button mButtonCoords;
     private EditText mCity,mCode;
     private RadioButton mRadio1;
     private RadioButton mRadio2;
@@ -156,6 +158,16 @@ public class FullscreenActivity extends AppCompatActivity {
         String Comment;
     }
 
+    static class ServicesDataClass
+    {
+        String City;
+        String site;
+        int daysnum;
+        int siteId;
+        boolean hasdone;
+        long time;
+    }
+
     static class CoordsNames
     {
         String Name;
@@ -177,11 +189,16 @@ public class FullscreenActivity extends AppCompatActivity {
         public static int Period;
         public static String Contents;
         public static boolean FullHistory;
+        public static String datapath;
+        public static ProgressDialog progressDialog;
+        public static int ServiceSelDel;
+        public static int ServiceRecs;
+        public static ServicesDataClass ServiceData[]=new ServicesDataClass[10000];
+        public static String Units;
         public static float FromT,ToT;
         public static boolean Clear,Clouds,Rain,Snow,Thunder;
         public static int CoordsRecs;
         public static int NameSelDel;
-
     }
 
     private int HistoryPos;
@@ -227,6 +244,9 @@ public class FullscreenActivity extends AppCompatActivity {
         mButton1= (Button) findViewById(R.id.button);
         mButton2= (Button) findViewById(R.id.buttonHistory);
         mButton3= (Button) findViewById(R.id.buttonHistory2);
+        mButton4= (Button) findViewById(R.id.buttonService);
+        mButtonCoords= (Button) findViewById(R.id.buttonCoords);
+
         mCity=(EditText) findViewById(R.id.editText);
         mRadio1= (RadioButton) findViewById(R.id.radioButton);
         mRadio2= (RadioButton) findViewById(R.id.radioButton2);
@@ -267,6 +287,7 @@ public class FullscreenActivity extends AppCompatActivity {
         mConditions.setText("--");
 
         //ReadHistory();
+        ReadCoords();
 
         mButton1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -308,6 +329,31 @@ public class FullscreenActivity extends AppCompatActivity {
 
             }
         });
+
+        mButton4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //SetAlarmService();
+                Global1.progressDialog=new ProgressDialog(FullscreenActivity.this);
+                Global1.Units=Units;
+                Intent intent=new Intent(FullscreenActivity.this,Services.class);
+                startActivity(intent);
+            }
+        });
+
+        mButtonCoords.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent=new Intent(FullscreenActivity.this,Coords.class);
+                startActivity(intent);
+
+            }
+        });
+
+
+
         mRadio1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
@@ -796,6 +842,96 @@ public class FullscreenActivity extends AppCompatActivity {
 
         return;
     }
+
+    public void ReadCoords()
+
+    {
+        String datapath,strdata;
+        char[] scArray = new char[29];
+        datapath=getApplicationInfo().dataDir+"/Coords.txt";
+        int o;
+        int stopPos;
+
+        String SiteT;
+        String CityT;
+        String DaysT;
+        String SideIdT;
+        String TimeT;
+
+        CoordsPos=0;
+
+
+        try {
+            File fileSc = new File(datapath);
+            //fileSc.delete(); //TMP
+            //fileSc.createNewFile();//TMP
+            FileReader fileReader = new FileReader(fileSc);
+            StringBuffer stringBuffer = new StringBuffer();
+            int numCharsRead = 0; //NEW
+            char[] charArrayName = new char[50]; //PREV
+            char[] charArray1=new char[15];
+            OutText="";
+
+
+
+            if (fileSc.length()!=0) //NEW NEEDED HERE
+                for (i=0;i<=(fileSc.length()-1)/80;i++)
+                {
+                    SiteT="";CityT="";DaysT="";SideIdT="";TimeT="";
+
+
+                    fileReader.read(charArrayName);
+                    stringBuffer.append(charArrayName, 0, 50);
+                    NameT = stringBuffer.toString();
+                    stringBuffer.delete(0, 50);
+
+                    fileReader.read(charArray1);
+                    stringBuffer.append(charArray1, 0, 15);
+                    LatStrT = stringBuffer.toString();
+                    stringBuffer.delete(0, 15);
+
+                    fileReader.read(charArray1);
+                    stringBuffer.append(charArray1, 0, 15);
+                    LonStrT= stringBuffer.toString();
+                    stringBuffer.delete(0, 15);
+
+
+                    FullscreenActivity.Global1.CoordsNamesData[CoordsPos]=new FullscreenActivity.CoordsNames();
+                    FullscreenActivity.Global1.CoordsNamesData[CoordsPos].Name=NameT;
+                    FullscreenActivity.Global1.CoordsNamesData[CoordsPos].lat=Double.valueOf(LatStrT);
+                    FullscreenActivity.Global1.CoordsNamesData[CoordsPos].lon=Double.valueOf(LonStrT);
+
+                    posStr=49;
+                    for (o=49; o>0; o--) if (NameT.charAt(o)!=' ') {posStr=o+1;break;}
+                    NameT=NameT.substring(0,posStr);
+                    FullscreenActivity.Global1.CoordsNamesData[CoordsPos].Name=NameT;
+
+
+
+                    //-----------------
+                    //PREV //CHECK
+                    CoordsPos++;
+                    //-----------------
+
+                    FullscreenActivity.Global1.CoordsRecs=CoordsPos;
+
+                    OutText+="Name:"+ FullscreenActivity.Global1.CoordsNamesData[CoordsPos-1].Name+"\n"+
+                            "Latitude:"+FullscreenActivity.Global1.CoordsNamesData[CoordsPos-1].lat+"\n"+
+                            "Longitute:"+FullscreenActivity.Global1.CoordsNamesData[CoordsPos-1].lon+"\n"+
+                            "_____________________________\n";
+
+                }
+            fileReader.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        return;
+    }
+
+
     private class Content extends AsyncTask<Void,Void,Void>
     {
         int commapos;
@@ -810,7 +946,7 @@ public class FullscreenActivity extends AppCompatActivity {
             City=mCity.getText().toString(); //NEW HERE
             if (City.charAt(0)=='"') CoordsRun=true;
 
-            for (i = 0; i <=Global1.CoordsRecs-1; i++)
+                for (i = 0; i <=Global1.CoordsRecs-1; i++)
                 if (CoordsNamesData[i].Name.toLowerCase().contains(City.toLowerCase()))
                 {
                     CoordsRunRec=true;
