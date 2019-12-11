@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -69,7 +70,7 @@ public class Search extends AppCompatActivity {
     private String WeatherConT;
     private int HistoryPos;
     private String Contents,OutText;
-    private int i,searchpos,PrevPeriod;
+    private int i,o,searchpos,PrevPeriod;
     private boolean SearchCityOn,ContinueRec;
     private String Date;
 
@@ -83,8 +84,24 @@ public class Search extends AppCompatActivity {
     private boolean  CheckDark=true;
     private boolean  CheckBit=true;
     private boolean  CheckService=false;
-    private boolean siteCont,siteContW;
+    private boolean siteCont,siteContW,siteContS;
+    private int posStr;
 
+    public String ConvertLongtoDate(long unixSeconds) {
+
+
+        Date date;
+
+        date=new Date();
+        date=new Date(unixSeconds); //Not X 1000
+        String strDateFormat = "HH:mm:ss z";
+        DateFormat dateFormat = new SimpleDateFormat(strDateFormat);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Athens"));
+        String formattedDate= dateFormat.format(date);
+        return formattedDate;
+    }
+
+    //CHECK HERE FOR FILTERS !!!
     public void ReadHistory()
 
     {
@@ -97,9 +114,7 @@ public class Search extends AppCompatActivity {
         tempf=0;
         humf=0;
         HistoryPos=0;
-
-
-        try {
+            try {
             File fileSc = new File(datapath);
             FileReader fileReader = new FileReader(fileSc);
             StringBuffer stringBuffer = new StringBuffer();
@@ -182,85 +197,11 @@ public class Search extends AppCompatActivity {
 
                 //if (!SearchCityOn) ContinueRec=true;
 
-                //if (ContinueRec)
-                OutText+="Site:"+Global1.HistoryData[HistoryPos-1].Site+"\n"+
-                        "City:"+Global1.HistoryData[HistoryPos-1].City+"\n"
-                        +"Date:"+Global1.HistoryData[HistoryPos-1].Date+"\n"+
-                        "Temp:"+Global1.HistoryData[HistoryPos-1].Temperature+" "+ Global1.HistoryData[HistoryPos-1].Units+"\n"+
-                        "Humidity:"+Global1.HistoryData[HistoryPos-1].Humidity+"%\n"
-                        +"Conditions:"+Global1.HistoryData[HistoryPos-1].WeatherCon+"\n"
-                        +"Comment:"+Global1.HistoryData[HistoryPos-1].Comment+"\n";
-                //+"Pos:"+Global1.HistoryData[HistoryPos-1].pos+"\n";
+                //for (o=49; o>0; o--) if (Global1.HistoryData[HistoryPos-1].City.charAt(o)!=' ') {posStr=o;break;}
+                //Global1.HistoryData[HistoryPos-1].City.substring(0,posStr);
 
-
-            }
-            fileReader.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-        PrevPeriod=Period;
-        Period=10;
-        Contents="Records\n";
-
-
-
-            searchpos = 0;
-            for (i = 0; i < HistoryPos; i++) {
-                SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-                sdf.setTimeZone(TimeZone.getTimeZone("Europe/Athens")); //NEW
-                //String formattedDate = sdf.format(DateExp);
-                //DateExpSTR=formattedDate;
-
-
-                try {
-
-                    DateExp=sdf.parse(Global1.HistoryData[i].Date);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-
-                }
-
-                DateComp=Global1.DateFrom;
-                DateComp2=Global1.DateTo;
-
-                Calendar calendar = Calendar.getInstance();
-                //calendar.setTime(DateExp);
-                calendar.setTime(Global1.DateTo);
-                calendar.add(Calendar.DAY_OF_MONTH, 1);
-                calendar.set(Calendar.HOUR_OF_DAY,23);
-                calendar.set(Calendar.MINUTE,59);
-                calendar.set(Calendar.SECOND,59);
-                calendar.add(Calendar.HOUR_OF_DAY,-2); //GMC +2 Compbatibility
-
-                DateComp=calendar.getTime();
-                //formattedDate= dateFormat.format(date2);
-
-
-                Calendar calendar2 = Calendar.getInstance();
-                //calendar2.setTime(DateExp);
-                calendar2.setTime(Global1.DateFrom);
-                //calendar2.add(Calendar.DAY_OF_MONTH, -1); //PREV
-                calendar2.add(Calendar.DAY_OF_MONTH, 1); //NEW
-                calendar2.set(Calendar.HOUR_OF_DAY,0);
-                calendar2.set(Calendar.MINUTE,0);
-                calendar2.set(Calendar.SECOND,0);
-                calendar2.add(Calendar.HOUR_OF_DAY,-2); //GMC +2 Compbatibility
-                DateComp2=calendar2.getTime();
-
-                String formattedDate = sdf.format(DateComp);
-                   DateExpSTR=formattedDate;
-
-                String formattedDate2 = sdf.format(DateComp2);
-                DateExpSTR2=formattedDate2;
-
-                //Log.d("Date Message P","HistoryData: "+HistoryData[i].Date);
-                //Log.d("Date Message P","DateComp2: "+DateExpSTR2);
-                //Log.d("Date Message P","DateComp: "+DateExpSTR);
-
-
+                //NEW HERE !!!
+                //HERE IS NEEDED THIS CODE
                 siteCont=false;
                 if (CheckOpen) if (HistoryData[i].Site.contains("Open Weather Map")) siteCont=true;
                 if (CheckAccu) if (HistoryData[i].Site.contains("AccuWeather")) siteCont=true;
@@ -273,10 +214,12 @@ public class Search extends AppCompatActivity {
                     if (HistoryData[i].Site.contains("(s)")) siteCont = true; else siteCont=false;
                 }
 
-
                 siteContW=false;
                 if (Global1.Clear)
-                    if (HistoryData[i].WeatherCon.toLowerCase().contains("clear")) siteContW=true;
+                {
+                    if (HistoryData[i].WeatherCon.toLowerCase().contains("clear")) siteContW = true;
+                    if (HistoryData[i].WeatherCon.toLowerCase().contains("sunny")) siteContW = true;
+                }
 
                 if (Global1.Clouds)
                 {
@@ -294,33 +237,174 @@ public class Search extends AppCompatActivity {
                 if (Global1.Thunder)
                     if (HistoryData[i].WeatherCon.toLowerCase().contains("thunder")) siteContW=true;
 
+                if (!CheckService) siteContS=true;
 
+                if (CheckService)
+                {
+                    if (HistoryData[i].Site.contains("(s)")) siteContS = true; else siteContS=false;
+                }
 
+                //History 1 New
                 if ((HistoryData[i].Temperature>=Global1.FromT) && (HistoryData[i].Temperature<=Global1.ToT)) siteCont=true;
                 else siteCont=false;
 
-                if (Global1.HistoryData[i].City.toLowerCase().contains(Global1.City.toLowerCase()))
-                    if ((DateExp.after(DateComp2)) && (DateExp.before(DateComp)))
-                    if (siteCont)
-                    if (siteContW)
-                {
-                    //Log.d("Date Message","HistoryData: "+HistoryData[i].Date);
-                    //Log.d("Date Message","DateComp2: "+DateExpSTR2);
-                    //Log.d("Date Message","DateComp: "+DateExpSTR);
-                    Global1.SearchData[searchpos]=new FullscreenActivity.HistoryDataClass();
-                    Global1.SearchData[searchpos].pos = i;
-                    Global1.SearchData[searchpos].City = Global1.HistoryData[i].City;
-                    Global1.SearchData[searchpos].Temperature = Global1.HistoryData[i].Temperature;
-                    Global1.SearchData[searchpos].Humidity = Global1.HistoryData[i].Humidity;
-                    Global1.SearchData[searchpos].Comment = Global1.HistoryData[i].Comment;
-                    Global1.SearchData[searchpos].Site = Global1.HistoryData[i].Site;
-                    Global1.SearchData[searchpos].WeatherCon = Global1.HistoryData[i].WeatherCon;
-                    Global1.SearchData[searchpos].Date = Global1.HistoryData[i].Date;
-                    Global1.SearchData[searchpos].Units = Global1.HistoryData[i].Units;
+                //if (ContinueRec)
+                if (siteCont)
+                if (siteContW)
+                if (siteContS)
+                OutText+="Site:"+Global1.HistoryData[HistoryPos-1].Site+"\n"+
+                        "City:"+Global1.HistoryData[HistoryPos-1].City+"\n"
+                        +"Date:"+Global1.HistoryData[HistoryPos-1].Date+"\n"+
+                        "Temp:"+Global1.HistoryData[HistoryPos-1].Temperature+" "+ Global1.HistoryData[HistoryPos-1].Units+"\n"+
+                        "Humidity:"+Global1.HistoryData[HistoryPos-1].Humidity+"%\n"
+                        +"Conditions:"+Global1.HistoryData[HistoryPos-1].WeatherCon+"\n"
+                        +"Comment:"+Global1.HistoryData[HistoryPos-1].Comment+"\n"+
+                        "_____________________________\n";
 
-                    searchpos++;
-                }
             }
+            fileReader.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        PrevPeriod=Period;
+        Period=10;
+        Contents="Records\n";
+
+
+
+        searchpos = 0;
+        for (i = 0; i < HistoryPos; i++) {
+            SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MM-yyyy HH:mm:ss z");
+            sdf.setTimeZone(TimeZone.getTimeZone("Europe/Athens")); //NEW
+            //String formattedDate = sdf.format(DateExp);
+            //DateExpSTR=formattedDate;
+
+
+            try {
+
+                DateExp=sdf.parse(Global1.HistoryData[i].Date);
+            } catch (ParseException e) {
+                e.printStackTrace();
+
+            }
+
+            DateComp=Global1.DateFrom;
+            DateComp2=Global1.DateTo;
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(Global1.DateTo);
+            calendar.add(Calendar.DAY_OF_MONTH, 1); //CHECK //PREV
+
+            //calendar.add(Calendar.DAY_OF_MONTH, 2); //NEW
+            //Log.d("WeatherSearch:","To:"+Global1.DateTo.toString());
+
+            calendar.set(Calendar.HOUR_OF_DAY,23);
+            calendar.set(Calendar.MINUTE,59);
+            calendar.set(Calendar.SECOND,59);
+
+
+            //PREV //CHECK !!!
+            calendar.add(Calendar.HOUR_OF_DAY,-2); //GMC +2 Compbatibility
+
+            DateComp=calendar.getTime();
+
+            Log.d("WeatherSearch:","To:"+DateComp.toString());
+            Calendar calendar2 = Calendar.getInstance();
+            calendar2.setTime(Global1.DateFrom);
+
+            //Log.d("WeatherSearch:","From:"+Global1.DateFrom.toString());
+            //-------------------------------------------------
+            //PREV
+            calendar2.add(Calendar.DAY_OF_MONTH, 1); //NEW //CHECK !!!
+            //-------------------------------------------------
+
+            //calendar2.add(Calendar.DAY_OF_MONTH, -1); //NEW
+
+            calendar2.set(Calendar.HOUR_OF_DAY,0);
+            calendar2.set(Calendar.MINUTE,0);
+            calendar2.set(Calendar.SECOND,0);
+
+            //PREV //CHECK !!!
+            calendar2.add(Calendar.HOUR_OF_DAY,-2); //GMC +2 Compbatibility
+            DateComp2=calendar2.getTime();
+
+            Log.d("WeatherSearch:","From:"+DateComp2.toString());
+
+            String formattedDate = sdf.format(DateComp);
+            DateExpSTR=formattedDate;
+
+            String formattedDate2 = sdf.format(DateComp2);
+            DateExpSTR2=formattedDate2;
+
+            //Log.d("Date Message P","HistoryData: "+HistoryData[i].Date);
+            //Log.d("Date Message P","DateComp2: "+DateExpSTR2);
+            //Log.d("Date Message P","DateComp: "+DateExpSTR);
+
+            //HERE'S NOT NEEDED HERE
+            siteCont=false;
+            if (CheckOpen) if (HistoryData[i].Site.contains("Open Weather Map")) siteCont=true;
+            if (CheckAccu) if (HistoryData[i].Site.contains("AccuWeather")) siteCont=true;
+            if (CheckStack) if (HistoryData[i].Site.contains("Weather Stacks")) siteCont=true;
+            if (CheckDark) if (HistoryData[i].Site.contains("Dark Sky")) siteCont=true;
+            if (CheckBit) if (HistoryData[i].Site.contains("Weatherbit.io")) siteCont=true;
+
+            if (CheckService)
+            {
+                if (HistoryData[i].Site.contains("(s)")) siteCont = true; else siteCont=false;
+            }
+
+
+            siteContW=false;
+            if (Global1.Clear)
+                if (HistoryData[i].WeatherCon.toLowerCase().contains("clear")) siteContW=true;
+
+            if (Global1.Clouds)
+            {
+                if (HistoryData[i].WeatherCon.toLowerCase().contains("cloud")) siteContW = true;
+                if (HistoryData[i].WeatherCon.toLowerCase().contains("mist")) siteContW=true;
+            }
+            if (Global1.Rain)
+            {
+                if (HistoryData[i].WeatherCon.toLowerCase().contains("rain")) siteContW = true;
+                if (HistoryData[i].WeatherCon.toLowerCase().contains("drizzle")) siteContW = true;
+            }
+            if (Global1.Snow)
+                if (HistoryData[i].WeatherCon.toLowerCase().contains("snow")) siteContW=true;
+
+            if (Global1.Thunder)
+                if (HistoryData[i].WeatherCon.toLowerCase().contains("thunder")) siteContW=true;
+
+
+            //History 1
+            if ((HistoryData[i].Temperature>=Global1.FromT) && (HistoryData[i].Temperature<=Global1.ToT)) siteCont=true;
+            else siteCont=false;
+
+            if (Global1.HistoryData[i].City.toLowerCase().contains(Global1.City.toLowerCase()))
+                if ((DateExp.after(DateComp2)) && (DateExp.before(DateComp)))
+                    if (siteCont)
+                        if (siteContW) //NEW Weather Conditions
+
+                        {
+                            //Log.d("Date Message","HistoryData: "+HistoryData[i].Date);
+                            //Log.d("Date Message","DateComp2: "+DateExpSTR2);
+                            //Log.d("Date Message","DateComp: "+DateExpSTR);
+                            Global1.SearchData[searchpos]=new FullscreenActivity.HistoryDataClass();
+                            Global1.SearchData[searchpos].pos = i;
+                            Global1.SearchData[searchpos].City = Global1.HistoryData[i].City;
+                            Global1.SearchData[searchpos].Temperature = Global1.HistoryData[i].Temperature;
+                            Global1.SearchData[searchpos].Humidity = Global1.HistoryData[i].Humidity;
+                            Global1.SearchData[searchpos].Comment = Global1.HistoryData[i].Comment;
+                            Global1.SearchData[searchpos].Site = Global1.HistoryData[i].Site;
+                            Global1.SearchData[searchpos].WeatherCon = Global1.HistoryData[i].WeatherCon;
+                            Global1.SearchData[searchpos].Date = Global1.HistoryData[i].Date;
+                            Global1.SearchData[searchpos].Units = Global1.HistoryData[i].Units;
+
+                            searchpos++;
+                        }
+        }
 
 
         Period=Period;
@@ -374,6 +458,7 @@ public class Search extends AppCompatActivity {
         mButtonSearch= (Button) findViewById(R.id.buttonSearch);
         mButtonAdvSearch= (Button) findViewById(R.id.buttonSearch2);
 
+
         mCheckOpen=(CheckBox)findViewById(R.id.checkBox);
         mCheckAccu=(CheckBox)findViewById(R.id.checkBox2);
         mCheckStack=(CheckBox)findViewById(R.id.checkBox3);
@@ -381,7 +466,9 @@ public class Search extends AppCompatActivity {
         mCheckBit=(CheckBox)findViewById(R.id.checkBox5);
         mCheckService=(CheckBox)findViewById(R.id.checkBox6);
 
-        //if (!Global1.City.isEmpty()) mCity.setText(Global1.City);
+
+        //if (!Global1.City.isEmpty()) mCity.setText(Global1.City); //PREV
+
         mCity.setText(""); //NEW
         mButtonSel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -394,6 +481,8 @@ public class Search extends AppCompatActivity {
                 mCheckService.setChecked(true);
             }
         });
+
+
 
         mButtonDis.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -559,6 +648,7 @@ public class Search extends AppCompatActivity {
         });
 
 
+
         mButtonSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -597,9 +687,8 @@ public class Search extends AppCompatActivity {
 
                 Global1.DateFrom=DateFrom1;
                 Global1.DateTo=DateTo1;
-                Global1.DateTo=DateTo1;
 
-                if (mCheckOpen.isChecked()) CheckOpen=true; else CheckOpen=false;
+
                 if (mCheckOpen.isChecked()) CheckOpen=true; else CheckOpen=false;
                 if (mCheckAccu.isChecked()) CheckAccu=true; else CheckAccu=false;
                 if (mCheckStack.isChecked()) CheckStack=true; else CheckStack=false;
@@ -633,6 +722,8 @@ public class Search extends AppCompatActivity {
                 if (mCheckBit.isChecked()) CheckBit=true; else CheckBit=false;
                 if (mCheckService.isChecked()) CheckService=true; else CheckService=false;
 
+
+                //ReadHistory();
                 Intent intent = new Intent(Search.this, AdvSearch.class);
                 startActivity(intent);
 
@@ -643,5 +734,5 @@ public class Search extends AppCompatActivity {
 
     }
 
-    }
+}
 

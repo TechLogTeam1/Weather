@@ -266,7 +266,8 @@ public class WeatherDetails extends AppCompatActivity {
             public void onClick(View v) {
 
                 //if (Period!=11) { //PREV
-                if (Period<10) {
+                if ((Period!=11) && (Period!=12)) { //NEW
+                //if (Period<10) {
 
                     ScrollY = mDataTxt.getScrollY();
                     ScrollPos = ScrollY / mDataTxt.getLineHeight();
@@ -312,6 +313,7 @@ public class WeatherDetails extends AppCompatActivity {
             mDataTxt.setText(Contents);
 
         }
+
         if (Period==3)
         {
             mCommit.setVisibility(View.GONE);
@@ -331,6 +333,7 @@ public class WeatherDetails extends AppCompatActivity {
             mTitleText.setText("History");
 
             Contents="";
+            Contents=Global1.Contents; //NEW
 
             for (i=0;i<Global1.SearchArraySize;i++)
             {

@@ -684,8 +684,10 @@ public class FullscreenActivity extends AppCompatActivity {
                         "Temp:"+Global1.HistoryData[HistoryPos-1].Temperature+" "+ Global1.HistoryData[HistoryPos-1].Units+"\n"+
                         "Humidity:"+Global1.HistoryData[HistoryPos-1].Humidity+"%\n"
                         +"Conditions:"+Global1.HistoryData[HistoryPos-1].WeatherCon+"\n"
-                        +"Comment:"+Global1.HistoryData[HistoryPos-1].Comment+"\n";
-                        //+"Pos:"+Global1.HistoryData[HistoryPos-1].pos+"\n";
+                        +"Comment:"+Global1.HistoryData[HistoryPos-1].Comment+"\n"+
+                           "_____________________________\n";
+
+                   //
 
 
             }
@@ -1124,7 +1126,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 if (WeatherConIcon.equalsIgnoreCase("sleet")) mWIcon.setImageResource(R.drawable.rain); //Χιονόνερο
                 if (WeatherConIcon.equalsIgnoreCase("snow")) mWIcon.setImageResource(R.drawable.snow);
                 if (WeatherConIcon.equalsIgnoreCase("wind")) mWIcon.setImageResource(R.drawable.clouds);
-                
+
                 if (WeatherConIcon.equalsIgnoreCase("fog")) mWIcon.setImageResource(R.drawable.clouds); //Ομίχλη
 
                 //NEW //CHECK
