@@ -97,7 +97,7 @@ public class FullscreenActivity extends AppCompatActivity {
     private String APIAccu="GXj9XbCK7EOk5cVRnAOVN62PdDGJaTD6";
     private String APIDark="e478e283b61f95dc70771be89db8ce1c";
     private String APIBit="307702986d074885b6bdf41d74768e0c";
-    private String APIStack="516a194fae7c7db19dc99de1bfce0c6e\n";
+    private String APIStack="516a194fae7c7db19dc99de1bfce0c6e";
 
     private String City;
     private String Code;
@@ -163,6 +163,8 @@ public class FullscreenActivity extends AppCompatActivity {
         public static String Contents;
         public static boolean FullHistory;
         public static float FromT,ToT;
+        public static boolean Clear,Clouds,Rain,Snow,Thunder;
+
     }
 
     private int HistoryPos;
@@ -236,6 +238,12 @@ public class FullscreenActivity extends AppCompatActivity {
 
         Global1.FromT=(float) -273.15;
         Global1.ToT=100;
+
+        Global1.Clear=true;
+        Global1.Clouds=true;
+        Global1.Rain=true;
+        Global1.Snow=true;
+        Global1.Thunder=true;
 
         mDeg.setText("--");
         mHum.setText("Humidity "+"--"+" %");

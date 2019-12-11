@@ -83,7 +83,7 @@ public class Search extends AppCompatActivity {
     private boolean  CheckDark=true;
     private boolean  CheckBit=true;
     private boolean  CheckService=false;
-    private boolean siteCont;
+    private boolean siteCont,siteContW;
 
     public void ReadHistory()
 
@@ -268,13 +268,35 @@ public class Search extends AppCompatActivity {
                 if (CheckDark) if (HistoryData[i].Site.contains("Dark Sky")) siteCont=true;
                 if (CheckBit) if (HistoryData[i].Site.contains("Weatherbit.io")) siteCont=true;
 
+                siteContW=false;
+                if (Global1.Clear)
+                    if (HistoryData[i].WeatherCon.toLowerCase().contains("clear")) siteContW=true;
+
+                if (Global1.Clouds)
+                {
+                    if (HistoryData[i].WeatherCon.toLowerCase().contains("cloud")) siteContW = true;
+                    if (HistoryData[i].WeatherCon.toLowerCase().contains("mist")) siteContW=true;
+                }
+                if (Global1.Rain)
+                {
+                    if (HistoryData[i].WeatherCon.toLowerCase().contains("rain")) siteContW = true;
+                    if (HistoryData[i].WeatherCon.toLowerCase().contains("drizzle")) siteContW = true;
+                }
+                if (Global1.Snow)
+                    if (HistoryData[i].WeatherCon.toLowerCase().contains("snow")) siteContW=true;
+
+                if (Global1.Thunder)
+                    if (HistoryData[i].WeatherCon.toLowerCase().contains("thunder")) siteContW=true;
+
+
+
                 if ((HistoryData[i].Temperature>=Global1.FromT) && (HistoryData[i].Temperature<=Global1.ToT)) siteCont=true;
                 else siteCont=false;
 
                 if (Global1.HistoryData[i].City.toLowerCase().contains(Global1.City.toLowerCase()))
                     if ((DateExp.after(DateComp2)) && (DateExp.before(DateComp)))
                     if (siteCont)
-
+                    if (siteContW)
                 {
                     //Log.d("Date Message","HistoryData: "+HistoryData[i].Date);
                     //Log.d("Date Message","DateComp2: "+DateExpSTR2);

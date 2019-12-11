@@ -8,10 +8,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
 
@@ -69,6 +71,47 @@ public class AdvSearch extends AppCompatActivity {
         mFromTemp.setText(String.valueOf(Global1.FromT));
         mToTemp.setText(String.valueOf(Global1.ToT));
 
+        if (Global1.Clear) mCheckClear.setChecked(true); else mCheckClear.setChecked(false);
+        if (Global1.Clouds) mCheckClouds.setChecked(true); else mCheckClouds.setChecked(false);
+        if (Global1.Rain) mCheckRain.setChecked(true); else mCheckRain.setChecked(false);
+        if (Global1.Snow) mCheckSnow.setChecked(true); else mCheckSnow.setChecked(false);
+        if (Global1.Thunder) mCheckThunder.setChecked(true); else mCheckThunder.setChecked(false);
+
+        mCheckClear.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Global1.Clear=isChecked;
+            }
+        });
+
+        mCheckClouds.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Global1.Clouds=isChecked;
+            }
+        });
+
+        mCheckRain.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Global1.Rain=isChecked;
+            }
+        });
+
+        mCheckSnow.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Global1.Snow=isChecked;
+            }
+        });
+
+        mCheckThunder.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Global1.Thunder=isChecked;
+            }
+        });
+
         mButtonSel.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -95,6 +138,7 @@ public class AdvSearch extends AppCompatActivity {
         mButtonClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 mCheckClear.setChecked(true);
                 mCheckClouds.setChecked(true);
                 mCheckRain.setChecked(true);
@@ -107,21 +151,28 @@ public class AdvSearch extends AppCompatActivity {
             }
         });
 
-        mFromTemp.setOnClickListener(new View.OnClickListener() {
+        mFromTemp.setOnKeyListener(new View.OnKeyListener() {
 
             @Override
-            public void onClick(View v) {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+
                 FromT=Float.valueOf(mFromTemp.getText().toString());
                 Global1.FromT=FromT;
+
+                return false;
             }
         });
 
-        mToTemp.setOnClickListener(new View.OnClickListener() {
+
+        mToTemp.setOnKeyListener(new View.OnKeyListener() {
 
             @Override
-            public void onClick(View v) {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+
                 ToT=Float.valueOf(mToTemp.getText().toString());
                 Global1.ToT=ToT;
+
+                return false;
             }
         });
 
