@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -47,7 +48,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
-
+import static com.example.weather.FullscreenActivity.Global1.CoordsNamesData;
 import static org.jsoup.nodes.Entities.EscapeMode.base;
 
 
@@ -78,6 +79,8 @@ public class FullscreenActivity extends AppCompatActivity {
     private Button mButton1;
     private Button mButton2;
     private Button mButton3;
+    private Button mButton4;
+    private Button mButtonCoords;
     private EditText mCity,mCode;
     private RadioButton mRadio1;
     private RadioButton mRadio2;
@@ -201,7 +204,8 @@ public class FullscreenActivity extends AppCompatActivity {
     private String Site1;
     private String Comment1;
     private int searchpos;
-
+    private boolean CoordsRun,CoordsRunRec;
+    private double Lat,Lon;
 
 
 
@@ -236,6 +240,8 @@ public class FullscreenActivity extends AppCompatActivity {
         mButton1= (Button) findViewById(R.id.button);
         mButton2= (Button) findViewById(R.id.buttonHistory);
         mButton3= (Button) findViewById(R.id.buttonHistory2);
+        mButton4= (Button) findViewById(R.id.buttonService);
+        mButtonCoords= (Button) findViewById(R.id.buttonCoords);
         mCity=(EditText) findViewById(R.id.editText);
         mRadio1= (RadioButton) findViewById(R.id.radioButton);
         mRadio2= (RadioButton) findViewById(R.id.radioButton2);
@@ -317,6 +323,29 @@ public class FullscreenActivity extends AppCompatActivity {
 
             }
         });
+
+        mButton4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //SetAlarmService();
+                Global1.progressDialog=new ProgressDialog(FullscreenActivity.this);
+                Global1.Units=Units;
+                Intent intent=new Intent(FullscreenActivity.this,Services.class);
+                startActivity(intent);
+            }
+        });
+
+        mButtonCoords.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent=new Intent(FullscreenActivity.this,Coords.class);
+                startActivity(intent);
+
+            }
+        });
+
         mRadio1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
@@ -809,9 +838,58 @@ public class FullscreenActivity extends AppCompatActivity {
     }
     private class Content extends AsyncTask<Void,Void,Void>
     {
+        int commapos;
+        String LatStr,LonStr;
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+
+            CoordsRun=false;
+            CoordsRunRec=false;
+
+            City=mCity.getText().toString(); //NEW HERE
+            if (City.charAt(0)=='"') CoordsRun=true;
+
+            for (i = 0; i <=Global1.CoordsRecs-1; i++)
+                if (CoordsNamesData[i].Name.toLowerCase().contains(City.toLowerCase()))
+                {
+                    CoordsRunRec=true;
+                    LatStr=String.valueOf(CoordsNamesData[i].lat);
+                    LonStr=String.valueOf(CoordsNamesData[i].lon);
+                    break;
+                }
+
+            Log.d("Coords:","City:"+City);
+            Log.d("Coords:",LatStr+","+LonStr);
+
+            if (CoordsRunRec)
+            {
+
+                LatStr = String.valueOf(CoordsNamesData[i].lat);
+                LonStr = String.valueOf(CoordsNamesData[i].lon);
+                Lat = Double.valueOf(LatStr);
+                Lon = Double.valueOf(LonStr);
+            }
+
+            if (!CoordsRunRec) //NEW
+                if (CoordsRun)
+                {
+                    for (i = 0; i <= City.length(); i++)
+                        if (City.charAt(i) == ',')
+                        {
+                            commapos = i;
+                            break;
+                        }
+
+                    LatStr = City.substring(1, commapos);
+                    LonStr = City.substring(commapos + 1, City.length() - 1);
+                    Lat = Double.valueOf(LatStr);
+                    Lon = Double.valueOf(LonStr);
+                }
+
+            if (CoordsRunRec) CoordsRun=true;
+
             progressDialog=new ProgressDialog(FullscreenActivity.this);
             progressDialog.show();
         }
@@ -822,7 +900,7 @@ public class FullscreenActivity extends AppCompatActivity {
             final float scale = getBaseContext().getResources().getDisplayMetrics().density;
 
             ret =  (int)(x * scale + 0.5f);
-        return ret;
+            return ret;
         }
 
         @Override
@@ -954,7 +1032,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
                 //NEW //CHECK
                 if (WeatherCon.equalsIgnoreCase("Mostly Cloudy")) mWIcon.setImageResource(R.drawable.clouds);
-                }
+            }
 
             if (SiteUse=="Weatherbit") {
                 //check for "mist" string ret
@@ -1085,7 +1163,14 @@ public class FullscreenActivity extends AppCompatActivity {
 
             if (Period==1)
                 try {
-                    CallUrl="http://api.openweathermap.org/data/2.5/weather?q="+City+CodeTxt+UnitsTxt+"&APPID="+APIOpen;
+
+                    if (!CoordsRun)
+                        CallUrl="http://api.openweathermap.org/data/2.5/weather?q="+City+CodeTxt+UnitsTxt+"&APPID="+APIOpen;
+
+                    if (CoordsRun)
+                        CallUrl="http://api.openweathermap.org/data/2.5/weather?lat="+LatStr+"&lon="+LonStr+UnitsTxt+"&APPID="+APIOpen;
+
+
                     //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
                     Contents="";
                     Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
@@ -1136,10 +1221,15 @@ public class FullscreenActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-
             if (Period==3)
                 try {
-                    CallUrl="http://api.openweathermap.org/data/2.5/forecast?q="+City+CodeTxt+UnitsTxt+"&APPID="+APIOpen;
+
+                    if (!CoordsRun)
+                        CallUrl="http://api.openweathermap.org/data/2.5/forecast?q="+City+CodeTxt+UnitsTxt+"&APPID="+APIOpen;
+
+                    if (CoordsRun)
+                        CallUrl="http://api.openweathermap.org/data/2.5/forecast?lat="+LatStr+"&lon="+LonStr+UnitsTxt+"&APPID="+APIOpen;
+
                     //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
                     Contents="";
                     Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
@@ -1202,9 +1292,10 @@ public class FullscreenActivity extends AppCompatActivity {
 
                 for (i=0;i<ArraySize;i++)
                 {
-                Contents+=DateTxt[i]+"\n"+"Temp:"+TemperatureData[i]+Units+"  Humidity:"+HumidityData[i]+"%"+"\n";
+                    Contents+=DateTxt[i]+"\n"+"Temp:"+TemperatureData[i]+Units+"  Humidity:"+HumidityData[i]+"%"+"\n";
                 }
 
+                Global1.Contents=Contents;
 
                 OpenDetailed();
             }
@@ -1227,7 +1318,15 @@ public class FullscreenActivity extends AppCompatActivity {
 
             //First Call
             try {
-                CallUrl="http://dataservice.accuweather.com/locations/v1/cities/search?q="+City+"&apikey="+APIAccu;
+
+                if (!CoordsRun)
+                    CallUrl="http://dataservice.accuweather.com/locations/v1/cities/search?q="+City+"&apikey="+APIAccu;
+
+                if (CoordsRun)
+                    CallUrl="http://dataservice.accuweather.com/locations/v1/cities/geoposition/search?q="+LatStr+","+LonStr+"&apikey="+APIAccu;
+
+                if (CoordsRun) return; //CHECK !!!
+
                 Contents="";
                 Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
                 Contents=Contents.substring(1,Contents.length());
@@ -1252,59 +1351,59 @@ public class FullscreenActivity extends AppCompatActivity {
 
             //Second Call
             if (Period==1)
-            try {
-                //CallUrl="http://api.openweathermap.org/data/2.5/weather?q="+City+CodeTxt+UnitsTxt+"&APPID="+API;
-                //CallUrl="http://dataservice.accuweather.com/locations/v1/cities/search?q="+City+"&apikey="+APIAccu;
-                CallUrl="http://dataservice.accuweather.com/currentconditions/v1/"+CityKey+"?apikey="+APIAccu+"&details=true";
-
-                Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
-                Contents=Contents.substring(1,Contents.length());
                 try {
-                    JSONObject jsonObj = new JSONObject(Contents);
-                    JSONObject obj2 = jsonObj.getJSONObject("Temperature");
-                    JSONObject obj3;
+                    //CallUrl="http://api.openweathermap.org/data/2.5/weather?q="+City+CodeTxt+UnitsTxt+"&APPID="+API;
+                    //CallUrl="http://dataservice.accuweather.com/locations/v1/cities/search?q="+City+"&apikey="+APIAccu;
+                    CallUrl="http://dataservice.accuweather.com/currentconditions/v1/"+CityKey+"?apikey="+APIAccu+"&details=true";
 
-                    if (Units=="C")
-                        obj3 = obj2.getJSONObject("Metric");
-                    else
-                    if (Units=="F")
-                        obj3 = obj2.getJSONObject("Imperial");
-                    else
-                        obj3 = obj2.getJSONObject("Metric");
+                    Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
+                    Contents=Contents.substring(1,Contents.length());
+                    try {
+                        JSONObject jsonObj = new JSONObject(Contents);
+                        JSONObject obj2 = jsonObj.getJSONObject("Temperature");
+                        JSONObject obj3;
 
-                    Temp="Temperature:"+obj3.getString("Value")+" "+Units;
-                    HumidityTxt="Humidity:"+jsonObj.getString("RelativeHumidity")+"%";
+                        if (Units=="C")
+                            obj3 = obj2.getJSONObject("Metric");
+                        else
+                        if (Units=="F")
+                            obj3 = obj2.getJSONObject("Imperial");
+                        else
+                            obj3 = obj2.getJSONObject("Metric");
 
-                    Temperature=Float.valueOf(obj3.getString("Value"));
-                    Humidity=Float.valueOf(jsonObj.getString("RelativeHumidity"));
+                        Temp="Temperature:"+obj3.getString("Value")+" "+Units;
+                        HumidityTxt="Humidity:"+jsonObj.getString("RelativeHumidity")+"%";
 
-                    WeatherCon=jsonObj.getString("WeatherText");
+                        Temperature=Float.valueOf(obj3.getString("Value"));
+                        Humidity=Float.valueOf(jsonObj.getString("RelativeHumidity"));
 
-                    Temp1=obj3.getString("Value");
-                    Humidity1=jsonObj.getString("RelativeHumidity");
-                    WeatherCon1=jsonObj.getString("WeatherText");
-                    Site1="AccuWeather";
-                    Comment1="None";
-                    SaveHistory();
+                        WeatherCon=jsonObj.getString("WeatherText");
 
-                } catch (JSONException e) {
+                        Temp1=obj3.getString("Value");
+                        Humidity1=jsonObj.getString("RelativeHumidity");
+                        WeatherCon1=jsonObj.getString("WeatherText");
+                        Site1="AccuWeather";
+                        Comment1="None";
+                        SaveHistory();
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    //"WeatherText"
+                    //OutText=WeatherText;
+                    //OutText=Contents;
+
+                    OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
+                            +Coords+"\n"+Temp+"\n"+HumidityTxt;
+
+                    //OutText=CityKey;
+                    //OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
+                    //      +Coords+"\n"+Temp+"\n"+Humidity;
+                    //OutText=CallUrl;
+
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
-                //"WeatherText"
-                //OutText=WeatherText;
-                //OutText=Contents;
-
-                OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
-                        +Coords+"\n"+Temp+"\n"+HumidityTxt;
-
-                //OutText=CityKey;
-                //OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
-                //      +Coords+"\n"+Temp+"\n"+Humidity;
-                //OutText=CallUrl;
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
 
 
             //CHECK Not Ready Yet
@@ -1371,14 +1470,14 @@ public class FullscreenActivity extends AppCompatActivity {
                     CallUrl="http://dataservice.accuweather.com/forecasts/v1/daily/5day/"+CityKey+"?apikey="+APIAccu+UnitsTxt;
                     Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
 
-                try {
+                    try {
 
 
 
-                    JSONObject jsonObj = new JSONObject(Contents);
-                    JSONArray baseArray=jsonObj.getJSONArray("DailyForecasts");
-                    //JSONObject obj2 = jsonObj.getJSONObject("Temperature");
-                    //JSONObject obj3;
+                        JSONObject jsonObj = new JSONObject(Contents);
+                        JSONArray baseArray=jsonObj.getJSONArray("DailyForecasts");
+                        //JSONObject obj2 = jsonObj.getJSONObject("Temperature");
+                        //JSONObject obj3;
 
                 /*
                 if (Units=="C")
@@ -1394,42 +1493,42 @@ public class FullscreenActivity extends AppCompatActivity {
                 */
 
 
-                    OutList="";
-                    ArraySize=baseArray.length();
+                        OutList="";
+                        ArraySize=baseArray.length();
 
-                    for (i = 0; i < baseArray.length(); i++) {
-                        JSONObject json2 = baseArray.getJSONObject(i);
-                        JSONObject obj2 = json2.getJSONObject("Temperature");
-                        JSONObject obj3 = obj2.getJSONObject("Maximum");
+                        for (i = 0; i < baseArray.length(); i++) {
+                            JSONObject json2 = baseArray.getJSONObject(i);
+                            JSONObject obj2 = json2.getJSONObject("Temperature");
+                            JSONObject obj3 = obj2.getJSONObject("Maximum");
 
-                        Temp = "Temp:" + obj3.getString("Value") + " " + Units;
-                        HumidityTxt="--";
-                        //Humidity = "Humidity:" + obj2.getString("humidity") + "%";
-                        //DateUnix=Long.valueOf(json2.getString("time"));
-                        //Date=ConvertUNIXtoDate(DateUnix);
-                        Date=json2.getString("Date");
+                            Temp = "Temp:" + obj3.getString("Value") + " " + Units;
+                            HumidityTxt="--";
+                            //Humidity = "Humidity:" + obj2.getString("humidity") + "%";
+                            //DateUnix=Long.valueOf(json2.getString("time"));
+                            //Date=ConvertUNIXtoDate(DateUnix);
+                            Date=json2.getString("Date");
 
 
-                        DateTxt[i]=Date;
-                        TemperatureData[i]=Float.valueOf(obj3.getString("Value"));
-                        HumidityData[i]=0;
+                            DateTxt[i]=Date;
+                            TemperatureData[i]=Float.valueOf(obj3.getString("Value"));
+                            HumidityData[i]=0;
 
-                        OutList+="---------------------------------------------\n"+"Date:"+Date+
-                                "\n---------------------------------------------\n"+
-                                Temp+"\n"+Humidity+"\n";
+                            OutList+="---------------------------------------------\n"+"Date:"+Date+
+                                    "\n---------------------------------------------\n"+
+                                    Temp+"\n"+Humidity+"\n";
 
+                        }
+
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
 
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                    //OutText=Temp;
 
-
-                //OutText=Temp;
-
-                //OutText=OutList;
-                OutText=Contents;
+                    //OutText=OutList;
+                    OutText=Contents;
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -1447,7 +1546,7 @@ public class FullscreenActivity extends AppCompatActivity {
                     Contents+=DateTxt[i]+"\n"+"Temp:"+TemperatureData[i]+Units+"  Humidity:"+HumidityData[i]+"%"+"\n";
                 }
 
-
+                Global1.Contents=Contents;
                 OpenDetailed();
             }
 
@@ -1468,35 +1567,42 @@ public class FullscreenActivity extends AppCompatActivity {
             float HumFloat;
             //First Call (Get Coords)
 
-            try {
-                CallUrl="http://api.openweathermap.org/data/2.5/weather?q="+City+CodeTxt+"&APPID="+APIOpen;
-                //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
-                Contents="";
-                Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
+            if (!CoordsRun) {
+
 
                 try {
-                    JSONObject jsonObj = new JSONObject(Contents);
-                    JSONObject obj2=jsonObj.getJSONObject("coord");
-                    CallCode=jsonObj.getString("cod"); //404 = City not found
-                    Latitude=obj2.getString("lat");
-                    Longitude=obj2.getString("lon");
+                    CallUrl = "http://api.openweathermap.org/data/2.5/weather?q=" + City + CodeTxt + "&APPID=" + APIOpen;
+                    //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
+                    Contents = "";
+                    Contents = Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
+
+                    try {
+                        JSONObject jsonObj = new JSONObject(Contents);
+                        JSONObject obj2 = jsonObj.getJSONObject("coord");
+                        CallCode = jsonObj.getString("cod"); //404 = City not found
+                        Latitude = obj2.getString("lat");
+                        Longitude = obj2.getString("lon");
 
 
-                } catch (JSONException e) {
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    //OutText=Contents;
+                    OutText = Latitude + "," + Longitude;
+                    //OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
+                    //      +Coords+"\n"+Temp+"\n"+Humidity;
+                    //OutText=CallUrl;
+
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
 
-                //OutText=Contents;
-                OutText=Latitude+","+Longitude;
-                //OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
-                //      +Coords+"\n"+Temp+"\n"+Humidity;
-                //OutText=CallUrl;
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            } //!CoordsRun if
 
 
+            if (CoordsRun) {Latitude=LatStr;Longitude=LonStr;}
             //Second call (Call DarkSky)
             //Contents=loadJSONFromAsset("DarkSky.json");
             //if (2<1)
@@ -1685,6 +1791,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 }
 
 
+                Global1.Contents=Contents;
                 OpenDetailed();
             }
 
@@ -1700,6 +1807,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 }
 
 
+                Global1.Contents=Contents;
                 OpenDetailed();
             }
 
@@ -1721,7 +1829,11 @@ public class FullscreenActivity extends AppCompatActivity {
             if (Period==1)
                 try {
 
-                    CallUrl="https://api.weatherbit.io/v2.0/current?city="+City+"&key="+APIBit+UnitsTxt;
+                    if (!CoordsRun)
+                        CallUrl="https://api.weatherbit.io/v2.0/current?city="+City+"&key="+APIBit+UnitsTxt;
+
+                    if (CoordsRun)
+                        CallUrl="https://api.weatherbit.io/v2.0/current?lat="+LatStr+"&lon="+LonStr+"&key="+APIBit+UnitsTxt;
 
                     Contents="";
                     Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
@@ -1789,8 +1901,11 @@ public class FullscreenActivity extends AppCompatActivity {
                     //CallUrl="http://api.openweathermap.org/data/2.5/weather?q="+City+CodeTxt+UnitsTxt+"&APPID="+APIOpen;
                     //CallUrl="http://api.weatherstack.com/current?access_key=e4c1390e4110c5a78e89c99f56b94b08&query=London";
 
+                    if (!CoordsRun)
+                        CallUrl="http://api.weatherstack.com/current?access_key="+APIStack+"&query="+City+UnitsTxt;
 
-                    CallUrl="http://api.weatherstack.com/current?access_key="+APIStack+"&query="+City+UnitsTxt;
+                    if (CoordsRun)
+                        CallUrl="http://api.weatherstack.com/current?access_key="+APIStack+"&query="+LatStr+","+LonStr+UnitsTxt;
 
 
                     //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
@@ -1842,6 +1957,9 @@ public class FullscreenActivity extends AppCompatActivity {
 
             if (Period==3)
                 try {
+
+
+                    //WRONG //CHECK !!!!!!!!
                     CallUrl="http://api.openweathermap.org/data/2.5/forecast?q="+City+CodeTxt+UnitsTxt+"&APPID="+APIOpen;
                     //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
                     Contents="";
