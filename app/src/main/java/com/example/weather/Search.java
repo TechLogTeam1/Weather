@@ -268,6 +268,12 @@ public class Search extends AppCompatActivity {
                 if (CheckDark) if (HistoryData[i].Site.contains("Dark Sky")) siteCont=true;
                 if (CheckBit) if (HistoryData[i].Site.contains("Weatherbit.io")) siteCont=true;
 
+                if (CheckService)
+                {
+                    if (HistoryData[i].Site.contains("(s)")) siteCont = true; else siteCont=false;
+                }
+
+
                 siteContW=false;
                 if (Global1.Clear)
                     if (HistoryData[i].WeatherCon.toLowerCase().contains("clear")) siteContW=true;
@@ -375,7 +381,8 @@ public class Search extends AppCompatActivity {
         mCheckBit=(CheckBox)findViewById(R.id.checkBox5);
         mCheckService=(CheckBox)findViewById(R.id.checkBox6);
 
-        if (!Global1.City.isEmpty()) mCity.setText(Global1.City);
+        //if (!Global1.City.isEmpty()) mCity.setText(Global1.City);
+        mCity.setText(""); //NEW
         mButtonSel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -387,8 +394,6 @@ public class Search extends AppCompatActivity {
                 mCheckService.setChecked(true);
             }
         });
-
-
 
         mButtonDis.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -592,8 +597,9 @@ public class Search extends AppCompatActivity {
 
                 Global1.DateFrom=DateFrom1;
                 Global1.DateTo=DateTo1;
+                Global1.DateTo=DateTo1;
 
-
+                if (mCheckOpen.isChecked()) CheckOpen=true; else CheckOpen=false;
                 if (mCheckOpen.isChecked()) CheckOpen=true; else CheckOpen=false;
                 if (mCheckAccu.isChecked()) CheckAccu=true; else CheckAccu=false;
                 if (mCheckStack.isChecked()) CheckStack=true; else CheckStack=false;

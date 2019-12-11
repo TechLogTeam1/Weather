@@ -9,4 +9,8 @@
     <string name="title_activity_search">Search</string>
 
     <string name="title_activity_adv_search">AdvSearch</string>
+
+    <string name="title_activity_coords">Coords</string>
+
+    <string name="title_activity_services">Services</string>
 </resources>
