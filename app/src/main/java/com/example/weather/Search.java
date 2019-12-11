@@ -84,7 +84,7 @@ public class Search extends AppCompatActivity {
     private boolean  CheckDark=true;
     private boolean  CheckBit=true;
     private boolean  CheckService=false;
-    private boolean siteCont,siteContW,siteContS;
+    private boolean siteCont,siteContW,siteContS,siteContSt;
     private int posStr;
 
     public String ConvertLongtoDate(long unixSeconds) {
@@ -202,12 +202,75 @@ public class Search extends AppCompatActivity {
 
                 //NEW HERE !!!
                 //HERE IS NEEDED THIS CODE
-                siteCont=false;
-                if (CheckOpen) if (HistoryData[i].Site.contains("Open Weather Map")) siteCont=true;
-                if (CheckAccu) if (HistoryData[i].Site.contains("AccuWeather")) siteCont=true;
-                if (CheckStack) if (HistoryData[i].Site.contains("Weather Stacks")) siteCont=true;
-                if (CheckDark) if (HistoryData[i].Site.contains("Dark Sky")) siteCont=true;
-                if (CheckBit) if (HistoryData[i].Site.contains("Weatherbit.io")) siteCont=true;
+
+                SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MM-yyyy HH:mm:ss z");
+                sdf.setTimeZone(TimeZone.getTimeZone("Europe/Athens")); //NEW
+                //String formattedDate = sdf.format(DateExp);
+                //DateExpSTR=formattedDate;
+
+
+                try {
+
+                    DateExp=sdf.parse(Global1.HistoryData[i].Date);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+
+                }
+
+                DateComp=Global1.DateFrom;
+                DateComp2=Global1.DateTo;
+
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(Global1.DateTo);
+                calendar.add(Calendar.DAY_OF_MONTH, 1); //CHECK //PREV
+
+                //calendar.add(Calendar.DAY_OF_MONTH, 2); //NEW
+                //Log.d("WeatherSearch:","To:"+Global1.DateTo.toString());
+
+                calendar.set(Calendar.HOUR_OF_DAY,23);
+                calendar.set(Calendar.MINUTE,59);
+                calendar.set(Calendar.SECOND,59);
+
+
+                //PREV //CHECK !!!
+                calendar.add(Calendar.HOUR_OF_DAY,-2); //GMC +2 Compbatibility
+
+                DateComp=calendar.getTime();
+
+                Log.d("WeatherSearch:","To:"+DateComp.toString());
+                Calendar calendar2 = Calendar.getInstance();
+                calendar2.setTime(Global1.DateFrom);
+
+                //Log.d("WeatherSearch:","From:"+Global1.DateFrom.toString());
+                //-------------------------------------------------
+                //PREV
+                calendar2.add(Calendar.DAY_OF_MONTH, 1); //NEW //CHECK !!!
+                //-------------------------------------------------
+
+                //calendar2.add(Calendar.DAY_OF_MONTH, -1); //NEW
+
+                calendar2.set(Calendar.HOUR_OF_DAY,0);
+                calendar2.set(Calendar.MINUTE,0);
+                calendar2.set(Calendar.SECOND,0);
+
+                //PREV //CHECK !!!
+                calendar2.add(Calendar.HOUR_OF_DAY,-2); //GMC +2 Compbatibility
+                DateComp2=calendar2.getTime();
+
+                Log.d("WeatherSearch:","From:"+DateComp2.toString());
+
+                String formattedDate = sdf.format(DateComp);
+                DateExpSTR=formattedDate;
+
+                String formattedDate2 = sdf.format(DateComp2);
+                DateExpSTR2=formattedDate2;
+
+                siteContSt=false;
+                if (CheckOpen) if (HistoryData[i].Site.contains("Open Weather Map")) siteContSt=true;
+                if (CheckAccu) if (HistoryData[i].Site.contains("AccuWeather")) siteContSt=true;
+                if (CheckStack) if (HistoryData[i].Site.contains("Weather Stacks")) siteContSt=true;
+                if (CheckDark) if (HistoryData[i].Site.contains("Dark Sky")) siteContSt=true;
+                if (CheckBit) if (HistoryData[i].Site.contains("Weatherbit.io")) siteContSt=true;
 
                 if (CheckService)
                 {
@@ -248,10 +311,13 @@ public class Search extends AppCompatActivity {
                 if ((HistoryData[i].Temperature>=Global1.FromT) && (HistoryData[i].Temperature<=Global1.ToT)) siteCont=true;
                 else siteCont=false;
 
+                if (Global1.HistoryData[i].City.toLowerCase().contains(Global1.City.toLowerCase()))
+                //if ((DateExp.after(DateComp2)) && (DateExp.before(DateComp)))
                 //if (ContinueRec)
                 if (siteCont)
                 if (siteContW)
                 if (siteContS)
+                    if (siteContSt)
                 OutText+="Site:"+Global1.HistoryData[HistoryPos-1].Site+"\n"+
                         "City:"+Global1.HistoryData[HistoryPos-1].City+"\n"
                         +"Date:"+Global1.HistoryData[HistoryPos-1].Date+"\n"+
@@ -344,6 +410,7 @@ public class Search extends AppCompatActivity {
             //Log.d("Date Message P","DateComp: "+DateExpSTR);
 
             //HERE'S NOT NEEDED HERE
+
             siteCont=false;
             if (CheckOpen) if (HistoryData[i].Site.contains("Open Weather Map")) siteCont=true;
             if (CheckAccu) if (HistoryData[i].Site.contains("AccuWeather")) siteCont=true;

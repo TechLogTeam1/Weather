@@ -148,11 +148,29 @@ public class FullscreenActivity extends AppCompatActivity {
         String Comment;
     }
 
+    static class ServicesDataClass
+    {
+        String City;
+        String site;
+        int daysnum;
+        int siteId;
+        boolean hasdone;
+        long time;
+    }
+
+    static class CoordsNames
+    {
+        String Name;
+        double lat,lon;
+    }
+
+
     HistoryDataClass HistoryData[]=new HistoryDataClass[10000];
 
     public static class Global1 {
         public static HistoryDataClass HistoryData[] = new HistoryDataClass[10000];
         public static HistoryDataClass SearchData[] = new HistoryDataClass[10000];
+        public static CoordsNames CoordsNamesData[]=new CoordsNames[1000];
         public static int ArraySize;
         public static int SearchArraySize;
         public static boolean ServiceRun;
@@ -162,10 +180,18 @@ public class FullscreenActivity extends AppCompatActivity {
         public static int Period;
         public static String Contents;
         public static boolean FullHistory;
+        public static String datapath;
+        public static ProgressDialog progressDialog;
+        public static int ServiceSelDel;
+        public static int ServiceRecs;
+        public static ServicesDataClass ServiceData[]=new ServicesDataClass[10000];
+        public static String Units;
         public static float FromT,ToT;
         public static boolean Clear,Clouds,Rain,Snow,Thunder;
-
+        public static int CoordsRecs;
+        public static int NameSelDel;
     }
+
 
     private int HistoryPos;
     private String TempT,HumidityT,UnitsT,SiteT,CommentT;
