@@ -495,6 +495,17 @@ public class Services extends AppCompatActivity {
             calendar.set(Calendar.SECOND, 0);
             if (!HasSame(1,calendar)) NewRec(1,calendar); else sameone=true;
 
+            date = new Date();
+            strDateFormat = "dd-MM-yyyy HH:mm:ss z";
+            dateFormat = new SimpleDateFormat(strDateFormat);
+            dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Athens"));
+            formattedDate= dateFormat.format(date);
+            CurrentDate=formattedDate;
+
+            year=date.getYear();
+            month=date.getMonth();
+            day=date.getDay();
+
             //Night
             calendar.set(Calendar.YEAR, year);
             calendar.set(Calendar.MONTH, month);
@@ -531,6 +542,17 @@ public class Services extends AppCompatActivity {
             calendar.set(Calendar.SECOND, 0);
             if (!HasSame(1,calendar)) NewRec(1,calendar); else sameone=true;
 
+            date = new Date();
+            strDateFormat = "dd-MM-yyyy HH:mm:ss z";
+            dateFormat = new SimpleDateFormat(strDateFormat);
+            dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Athens"));
+            formattedDate= dateFormat.format(date);
+            CurrentDate=formattedDate;
+
+            year=date.getYear();
+            month=date.getMonth();
+            day=date.getDay();
+
             //Afternoon
             calendar.set(Calendar.YEAR, year);
             calendar.set(Calendar.MONTH, month);
@@ -539,6 +561,17 @@ public class Services extends AppCompatActivity {
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
             if (!HasSame(1,calendar)) NewRec(1,calendar); else sameone=true;
+
+            date = new Date();
+            strDateFormat = "dd-MM-yyyy HH:mm:ss z";
+            dateFormat = new SimpleDateFormat(strDateFormat);
+            dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Athens"));
+            formattedDate= dateFormat.format(date);
+            CurrentDate=formattedDate;
+
+            year=date.getYear();
+            month=date.getMonth();
+            day=date.getDay();
 
             //Night
             calendar.set(Calendar.YEAR, year);

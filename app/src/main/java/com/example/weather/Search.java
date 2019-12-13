@@ -86,6 +86,7 @@ public class Search extends AppCompatActivity {
     private boolean  CheckService=false;
     private boolean siteCont,siteContW,siteContS,siteContSt;
     private int posStr;
+    private String CityT,DateT;
 
     public String ConvertLongtoDate(long unixSeconds) {
 
@@ -135,6 +136,7 @@ public class Search extends AppCompatActivity {
             for (i=0;i<=(fileSc.length()-1)/320;i++)
             {
                 TempT="";HumidityT="";WeatherConT="";SiteT="";CommentT="";
+                CityT="";DateT="";
 
                 fileReader.read(charArray6);
                 stringBuffer.append(charArray6, 0, 20);
@@ -143,12 +145,12 @@ public class Search extends AppCompatActivity {
 
                 fileReader.read(charArrayCity);
                 stringBuffer.append(charArrayCity, 0, 50);
-                City = stringBuffer.toString();
+                CityT = stringBuffer.toString();
                 stringBuffer.delete(0, 50);
 
                 fileReader.read(charArray);
                 stringBuffer.append(charArray, 0, 29);
-                Date = stringBuffer.toString();
+                DateT = stringBuffer.toString();
                 stringBuffer.delete(0, 29);
 
                 fileReader.read(charArray2);
@@ -175,6 +177,22 @@ public class Search extends AppCompatActivity {
                 stringBuffer.append(charArray5, 0, 100);
                 CommentT = stringBuffer.toString();
                 stringBuffer.delete(0, 100);
+
+
+
+                posStr=49;
+                for (o=49; o>0; o--) if (CityT.charAt(o)!=' ') {posStr=o+1;break;}
+                CityT=CityT.substring(0,posStr);
+
+                posStr=99;
+                for (o=99; o>0; o--) if (WeatherConT.charAt(o)!=' ') {posStr=o+1;break;}
+                WeatherConT=WeatherConT.substring(0,posStr);
+
+                posStr=99;
+                for (o=99; o>0; o--) if (CommentT.charAt(o)!=' ') {posStr=o+1;break;}
+                CommentT=CommentT.substring(0,posStr);
+
+                City=CityT;Date=DateT;
 
                 Global1.HistoryData[HistoryPos]=new FullscreenActivity.HistoryDataClass();
                 Global1.HistoryData[HistoryPos].Site=SiteT;
@@ -342,6 +360,7 @@ public class Search extends AppCompatActivity {
 
 
         searchpos = 0;
+        if (2<1) //MAYBE NOT NEEDED (DOUBLICATES CONTEXT)
         for (i = 0; i < HistoryPos; i++) {
             SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MM-yyyy HH:mm:ss z");
             sdf.setTimeZone(TimeZone.getTimeZone("Europe/Athens")); //NEW

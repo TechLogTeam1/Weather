@@ -92,6 +92,7 @@ public class WeatherDetails extends AppCompatActivity {
     private String Contents,ContentsTmp;
 
     private String TempT,HumidityT,UnitsT,SiteT,CommentT,CityT;
+    private String SiteIdT,DaysT;
     private String Temp1,Humidity1,Site1,Comment1;
     private String WeatherCon1,Units1,City1,Date1;
     private String City;
@@ -265,6 +266,7 @@ public class WeatherDetails extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                Log.d("Services:","Period:"+String.valueOf(Period));
                 //if (Period!=11) { //PREV
                 if ((Period!=11) && (Period!=12)) { //NEW
                 //if (Period<10) {
@@ -290,6 +292,20 @@ public class WeatherDetails extends AppCompatActivity {
 
                 }
 
+
+                //Services
+                //NEW
+                if (Period==11) {
+
+                    ScrollY = mDataTxt.getScrollY();
+                    ScrollPos = ScrollY / mDataTxt.getLineHeight();
+                    ScrollId=ScrollPos/3;
+                    Global1.ServiceSelDel=ScrollId;
+                    DeleteService(); //NEW //CHECK
+                    mDataTxt.setScrollY(ScrollY); //NEW
+                }
+
+                //Names Coordinates
                 if (Period==12) {
 
                     ScrollY = mDataTxt.getScrollY();
@@ -425,139 +441,17 @@ public class WeatherDetails extends AppCompatActivity {
 
     }
 
-    public void recRefresh()
-    {
-        int searchpos;
-        int HistoryPos;
-
-        Date DateComp,DateComp2;
-        String DateExpSTR,DateExpSTR2;
-        boolean siteCont;
-
-
-        HistoryPos=Global1.ArraySize;
-
-        Contents="Records\n";
-
-
-
-        searchpos = 0;
-
-        for (i = 0; i < HistoryPos; i++) {
-            SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MM-yyyy HH:mm:ss z");
-            sdf.setTimeZone(TimeZone.getTimeZone("Europe/Athens")); //NEW
-            //String formattedDate = sdf.format(DateExp);
-            //DateExpSTR=formattedDate;
-
-
-            try {
-
-                DateExp=sdf.parse(Global1.HistoryData[i].Date);
-            } catch (ParseException e) {
-                e.printStackTrace();
-
-            }
-
-            DateComp=Global1.DateFrom;
-            DateComp2=Global1.DateTo;
-
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(Global1.DateTo);
-            calendar.add(Calendar.DAY_OF_MONTH, 1); //CHECK //PREV
-
-            calendar.set(Calendar.HOUR_OF_DAY,23);
-            calendar.set(Calendar.MINUTE,59);
-            calendar.set(Calendar.SECOND,59);
-
-            calendar.add(Calendar.HOUR_OF_DAY,-2); //GMC +2 Compbatibility
-
-            DateComp=calendar.getTime();
-
-            Calendar calendar2 = Calendar.getInstance();
-            calendar2.setTime(Global1.DateFrom);
-
-            //-------------------------------------------------
-            calendar2.add(Calendar.DAY_OF_MONTH, 1); //NEW //CHECK !!!
-            //-------------------------------------------------
-
-            calendar2.set(Calendar.HOUR_OF_DAY,0);
-            calendar2.set(Calendar.MINUTE,0);
-            calendar2.set(Calendar.SECOND,0);
-
-            calendar2.add(Calendar.HOUR_OF_DAY,-2); //GMC +2 Compbatibility
-            DateComp2=calendar2.getTime();
-
-            String formattedDate = sdf.format(DateComp);
-            DateExpSTR=formattedDate;
-
-            String formattedDate2 = sdf.format(DateComp2);
-            DateExpSTR2=formattedDate2;
-
-            //Log.d("Date Message P","HistoryData: "+HistoryData[i].Date);
-            //Log.d("Date Message P","DateComp2: "+DateExpSTR2);
-            //Log.d("Date Message P","DateComp: "+DateExpSTR);
-
-
-            /*
-            siteCont=false;
-            if (CheckOpen) if (HistoryData[i].Site.contains("Open Weather Map")) siteCont=true;
-            if (CheckAccu) if (HistoryData[i].Site.contains("AccuWeather")) siteCont=true;
-            if (CheckStack) if (HistoryData[i].Site.contains("Weather Stacks")) siteCont=true;
-            if (CheckDark) if (HistoryData[i].Site.contains("Dark Sky")) siteCont=true;
-            if (CheckBit) if (HistoryData[i].Site.contains("Weatherbit.io")) siteCont=true;
-
-            if (CheckService)
-            {
-                if (HistoryData[i].Site.contains("(s)")) siteCont = true; else siteCont=false;
-            }
-            */
-            siteCont=true; //TMP
-            if (Global1.HistoryData[i].City.toLowerCase().contains(Global1.City.toLowerCase()))
-                if ((DateExp.after(DateComp2)) && (DateExp.before(DateComp)))
-                    if (siteCont)
-
-                    {
-                        //Log.d("Date Message","HistoryData: "+HistoryData[i].Date);
-                        //Log.d("Date Message","DateComp2: "+DateExpSTR2);
-                        //Log.d("Date Message","DateComp: "+DateExpSTR);
-                        Global1.SearchData[searchpos]=new FullscreenActivity.HistoryDataClass();
-                        Global1.SearchData[searchpos].pos = i;
-                        Global1.SearchData[searchpos].City = Global1.HistoryData[i].City;
-                        Global1.SearchData[searchpos].Temperature = Global1.HistoryData[i].Temperature;
-                        Global1.SearchData[searchpos].Humidity = Global1.HistoryData[i].Humidity;
-                        Global1.SearchData[searchpos].Comment = Global1.HistoryData[i].Comment;
-                        Global1.SearchData[searchpos].Site = Global1.HistoryData[i].Site;
-                        Global1.SearchData[searchpos].WeatherCon = Global1.HistoryData[i].WeatherCon;
-                        Global1.SearchData[searchpos].Date = Global1.HistoryData[i].Date;
-                        Global1.SearchData[searchpos].Units = Global1.HistoryData[i].Units;
-
-                        Contents+="Site:"+Global1.SearchData[i].Site+"\n"+
-                                "City:"+Global1.SearchData[i].City+"\n"
-                                +"Date:"+Global1.SearchData[i].Date+"\n"+
-                                "Temp:"+Global1.SearchData[i].Temperature+" "+ Global1.SearchData[i].Units+"\n"+
-                                "Humidity:"+Global1.SearchData[i].Humidity+"%\n"
-                                +"Conditions:"+Global1.SearchData[i].WeatherCon+"\n"
-                                +"Comment:"+Global1.SearchData[i].Comment+"\n"+
-                                "_____________________________\n";
-                        searchpos++;
-                    }
-        }
-
-
-    }
-
-    public void SaveNamesAll()
+    public void SaveServicesAll()
     {
 
 
 
         String datapath;
-        datapath=getApplicationInfo().dataDir+"/Coords.txt";
+         datapath = getApplicationInfo().dataDir + "/Servicedat.txt";
         File fileSc = new File(datapath);
         long filelen;
         OutText="";
         filelen=fileSc.length();
-
 
 
         int strlen;
@@ -566,14 +460,192 @@ public class WeatherDetails extends AppCompatActivity {
 
         try {
 
+            FileWriter fileWriter = new FileWriter(fileSc); //New File //This needed here
+
+                    for (o=0;o<=(filelen-1)/92;o++)
+                        if (o!=Global1.ServiceSelDel)
+                        {
+
+
+                    SiteIdT=String.valueOf(Global1.ServiceData[o].siteId);
+                    SiteT=Global1.ServiceData[o].site;
+                    CityT=Global1.ServiceData[o].City;
+                    DaysT=String.valueOf(Global1.ServiceData[o].daysnum);
+                    TimeT=String.valueOf(Global1.ServiceData[o].time);
+
+                    for (i=SiteT.length();i<20;i++) SiteT+=" ";
+                    for (i=CityT.length();i<50;i++) CityT+=" ";
+                    for (i=TimeT.length();i<20;i++) TimeT+=" ";
+
+
+                        //fileSc.createNewFile();
+                        //FileWriter fileWriter = new FileWriter(fileSc,true); //Append File
+                        //FileWriter fileWriter = new FileWriter(fileSc); //New File //This needed here
+                        fileWriter.write(SiteT, 0, 20);
+                        fileWriter.write(CityT, 0, 50);
+                        fileWriter.write(DaysT, 0, 1);
+                        fileWriter.write(SiteIdT, 0, 1);
+                        fileWriter.write(TimeT, 0, 20);
+
+                        fileWriter.flush();
+
+                            OutText += "Site:" + Global1.ServiceData[o].site + "\n" +
+                                    "City:" + Global1.ServiceData[o].City + "\n" +
+                                    "Time:"+ ConvertLongtoDate(Global1.ServiceData[o].time)+"\n"+
+                                    "_____________________________\n";
+
+                }
+
+            fileWriter.close();
+        }
+
+        catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+
+        Contents=OutText;
+        for (i=1;i<=10;i++) Contents+="\n"; //Help for choosing from top line
+        mDataTxt.setText(Contents);
+
+        return;
+
+    }
+
+
+    public void DeleteService() {
+        String datapath, strdata;
+        char[] scArray = new char[29];
+        datapath = getApplicationInfo().dataDir + "/Servicedat.txt";
+        int o;
+        int stopPos;
+
+        String SiteT;
+        String CityT;
+        String DaysT;
+        String SiteIdT;
+
+        ServicePos = 0;
+
+
+        try {
+            File fileSc = new File(datapath);
+            FileReader fileReader = new FileReader(fileSc);
+            StringBuffer stringBuffer = new StringBuffer();
+            int numCharsRead = 0; //NEW
+            char[] charArrayCity = new char[50]; //PREV
+            char[] charArray1 = new char[20];
+            char[] charArray2 = new char[1];
+            OutText = "";
+
+
+            //ArraySize=(int)(fileSc.length()-1)/320;
+            //FullscreenActivity.Global1.ArraySize=ArraySize;
+            for (i = 0; i <= (fileSc.length() - 1) / 92; i++)
+                if (i != Global1.ServiceSelDel) {
+                    SiteT = "";
+                    CityT = "";
+                    DaysT = "";
+                    TimeT="";
+                    SiteIdT="";
+
+
+                    fileReader.read(charArray1);
+                    stringBuffer.append(charArray1, 0, 20);
+                    SiteT = stringBuffer.toString();
+                    stringBuffer.delete(0, 20);
+
+                    fileReader.read(charArrayCity);
+                    stringBuffer.append(charArrayCity, 0, 50);
+                    CityT = stringBuffer.toString();
+                    stringBuffer.delete(0, 50);
+
+                    fileReader.read(charArray2);
+                    stringBuffer.append(charArray2, 0, 1);
+                    DaysT = stringBuffer.toString();
+                    stringBuffer.delete(0, 1);
+
+                    fileReader.read(charArray2);
+                    stringBuffer.append(charArray2, 0, 1);
+                    SiteIdT = stringBuffer.toString();
+                    stringBuffer.delete(0, 1);
+
+                    fileReader.read(charArray1);
+                    stringBuffer.append(charArray1, 0, 20);
+                    TimeT = stringBuffer.toString();
+                    stringBuffer.delete(0, 20);
+
+                    posStr=19;
+                    for (o=19; o>0; o--) if (TimeT.charAt(o)!=' ') {posStr=o+1;break;}
+                    TimeT=TimeT.substring(0,posStr);
+                    //Global1.ServiceData[ServicePos].time=Long.valueOf(TimeT);
+
+                    //NEW
+                    posStr=49;
+                    for (o=49; o>0; o--) if (CityT.charAt(o)!=' ') {posStr=o+1;break;}
+                    CityT=CityT.substring(0,posStr);
+                    //Global1.ServiceData[ServicePos].City=CityT;
+
+
+                    Global1.ServiceData[ServicePos] = new FullscreenActivity.ServicesDataClass();
+                    Global1.ServiceData[ServicePos].site = SiteT;
+                    Global1.ServiceData[ServicePos].City = CityT;
+                    Global1.ServiceData[ServicePos].daysnum = Integer.valueOf(DaysT);
+                    Global1.ServiceData[ServicePos].siteId = Integer.valueOf(SiteIdT);
+                    Global1.ServiceData[ServicePos].time=Long.valueOf(TimeT); //CHECK for error
+                    Global1.ServiceData[ServicePos].hasdone=false; //NEW //Maybe not needed
+
+                    ServicePos++;
+
+
+                    OutText += "Site:" + Global1.ServiceData[ServicePos - 1].site + "\n" +
+                            "City:" + Global1.ServiceData[ServicePos - 1].City + "\n" +
+                            "Time:"+ ConvertLongtoDate(Global1.ServiceData[ServicePos-1].time)+"\n"+
+                            "_____________________________\n";
+
+
+
+                }
+            fileReader.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
+        SaveServicesAll(); //PREV
+        return;
+    }
+
+
+    public void SaveNamesAll()
+    {
+
+        String datapath;
+        datapath=getApplicationInfo().dataDir+"/Coords.txt";
+        File fileSc = new File(datapath);
+        long filelen;
+        OutText="";
+        filelen=fileSc.length();
+
+        int strlen;
+
+        try {
+
             //fileSc.createNewFile();
             //FileWriter fileWriter = new FileWriter(fileSc,true); //Append File
             FileWriter fileWriter = new FileWriter(fileSc); //New File //This Needed Here
 
+            //Clean Memory
+            Global1.CoordsNamesData[0].Name="";
 
             for (o=0;o<=(filelen-1)/80;o++)
                 if (o!=Global1.NameSelDel)
                 {
+
+                    NameT="";
 
                     NameT = Global1.CoordsNamesData[o].Name;
                     LatStrT = String.valueOf(Global1.CoordsNamesData[o].lat);
@@ -637,6 +709,11 @@ public class WeatherDetails extends AppCompatActivity {
             char[] charArrayName = new char[50]; //PREV
             char[] charArray1 = new char[15];
             OutText = "";
+
+
+            //For 1 entry only delete, clean memory
+                FullscreenActivity.Global1.CoordsNamesData[0].Name="";
+
 
             for (i = 0; i <= (fileSc.length() - 1) / 80; i++)
                 if (i != Global1.NameSelDel) {

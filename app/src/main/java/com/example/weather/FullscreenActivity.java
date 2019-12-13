@@ -288,6 +288,14 @@ public class FullscreenActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 City=mCity.getText().toString();
+                if (City.isEmpty()) {
+                    mDeg.setText("--");
+                    mHum.setText("Humidity " + "--" + " %");
+                    mConditions.setText("--");
+
+                    return;
+                }
+
                 //Code=mCode.getText().toString();
                 Content content=new Content();
                 content.execute();
@@ -496,7 +504,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
         //long unixSeconds = DateUnix;
         java.util.Date date = new java.util.Date(unixSeconds * 1000L);
-        SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MM-yyyy HH:mm:ss z");
         sdf.setTimeZone(TimeZone.getTimeZone("Europe/Athens")); //NEW
         String formattedDate = sdf.format(date);
         Date = formattedDate;
@@ -551,7 +559,7 @@ public class FullscreenActivity extends AppCompatActivity {
         Intent intent=new Intent(this,WeatherDetails.class);
 
         Global1.Period=Period;
-        //Global1.Contents=Contents;
+        Global1.Contents=Contents; //NEEDED HERE, ELSE DOUBLICATES CONTEXT
         //intent.putExtra("Period",Period);
         //intent.putExtra("Contents",Contents);
         startActivity(intent);
@@ -565,7 +573,7 @@ public class FullscreenActivity extends AppCompatActivity {
         ReadHistory();
 
         Period=10;Global1.Period=Period;
-
+        Global1.Contents=Contents;
         Intent intent=new Intent(this,Search.class);
         startActivity(intent);
 
@@ -584,7 +592,8 @@ public class FullscreenActivity extends AppCompatActivity {
         tempf=0;
         humf=0;
         HistoryPos=0;
-
+        Contents="";
+        OutText="";
 
         try {
             File fileSc = new File(datapath);
@@ -667,6 +676,7 @@ public class FullscreenActivity extends AppCompatActivity {
                    //if (Global1.HistoryData[HistoryPos-1].City.contains(SearchCity)) ContinueRec=true;
 
 
+                     //Log.d("Sites:","Saves");
                    //if (!SearchCityOn) ContinueRec=true;
 
                    //if (ContinueRec)
@@ -694,11 +704,12 @@ public class FullscreenActivity extends AppCompatActivity {
         Period=10;
         Contents="Records\n";
 
+        //This runned only
         if (!SearchCityOn)
         {
             searchpos = 0;
             for (i = 0; i < HistoryPos; i++) {
-                    Global1.SearchData[searchpos]=new HistoryDataClass();
+            Global1.SearchData[searchpos]=new HistoryDataClass();
                     Global1.SearchData[searchpos].pos = i;
                     Global1.SearchData[searchpos].City = Global1.HistoryData[i].City;
                     Global1.SearchData[searchpos].Temperature = Global1.HistoryData[i].Temperature;
@@ -709,7 +720,7 @@ public class FullscreenActivity extends AppCompatActivity {
                     Global1.SearchData[searchpos].Date = Global1.HistoryData[i].Date;
                     Global1.SearchData[searchpos].Units = Global1.HistoryData[i].Units;
 
-                    searchpos++;
+                searchpos++;
                 }
             }
 
@@ -727,6 +738,7 @@ public class FullscreenActivity extends AppCompatActivity {
                     Global1.SearchData[searchpos].WeatherCon = Global1.HistoryData[i].WeatherCon;
                     Global1.SearchData[searchpos].Date = Global1.HistoryData[i].Date;
                     Global1.SearchData[searchpos].Units = Global1.HistoryData[i].Units;
+                    //Log.d("Sites:","Saves");
 
                     searchpos++;
                 }
@@ -755,7 +767,7 @@ public class FullscreenActivity extends AppCompatActivity {
         String PrevTemp,PrevHum,PrevCon,PrevSite;
 
         Date date = new Date();
-        String strDateFormat = "yyyy-MM-dd HH:mm:ss z";
+        String strDateFormat = "dd-MM-yyyy HH:mm:ss z";
         DateFormat dateFormat = new SimpleDateFormat(strDateFormat);
         dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Athens"));
         String formattedDate= dateFormat.format(date);
@@ -834,6 +846,7 @@ public class FullscreenActivity extends AppCompatActivity {
         HumidityT=PrevHum;
         WeatherConT=PrevCon;
 
+        //Log.d("Sites:","Saves");
         return;
     }
     private class Content extends AsyncTask<Void,Void,Void>
@@ -890,6 +903,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
             if (CoordsRunRec) CoordsRun=true;
 
+
             progressDialog=new ProgressDialog(FullscreenActivity.this);
             progressDialog.show();
         }
@@ -907,7 +921,15 @@ public class FullscreenActivity extends AppCompatActivity {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
-            if (OutText=="")
+            boolean nulldata;
+
+            nulldata=false;
+            if (OutText=="") nulldata=true;
+
+            if (Period==1) //TMP HERE THIS LINE
+            if ((Temperature==0) && (Humidity==0)) nulldata=true;
+
+            if (nulldata)
             {
                 mDeg.setText("--");
                 mHum.setText("Humidity "+"--"+" %");
@@ -1587,6 +1609,8 @@ public class FullscreenActivity extends AppCompatActivity {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+
+                    if (CallCode=="404") {OutText="";return;}
 
                     //OutText=Contents;
                     OutText = Latitude + "," + Longitude;
