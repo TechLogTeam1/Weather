@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.method.DialerKeyListener;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -284,7 +285,7 @@ public class WeatherDetails extends AppCompatActivity {
                     Global1.SearchData[hpos].Comment = mEditCommit.getText().toString(); //NEW //CHECK
 
                     SaveHistory2(); //if for all
-                    for (i=1;i<=10;i++) Contents+="\n"; //Help for choosing from top line
+                    for (i=1;i<=15;i++) Contents+="\n"; //Help for choosing from top line
                     //if (Period==10) recRefresh();
 
                     mDataTxt.setText(Contents); //NEW
@@ -301,7 +302,11 @@ public class WeatherDetails extends AppCompatActivity {
                     ScrollPos = ScrollY / mDataTxt.getLineHeight();
                     ScrollId=ScrollPos/3;
                     Global1.ServiceSelDel=ScrollId;
+
+                    //Log.d("AlarmService","Service Num Off(0):"+String.valueOf(Global1.ServiceSelDel));
+                    //Log.d("AlarmService","Service Num Off(0):"+Global1.ServiceData[Global1.ServiceSelDel].AlarmId);
                     DeleteService(); //NEW //CHECK
+                    ReadService();
                     mDataTxt.setScrollY(ScrollY); //NEW
                 }
 
@@ -409,7 +414,7 @@ public class WeatherDetails extends AppCompatActivity {
 
             }
 
-            for (i=1;i<=10;i++) Contents+="\n"; //Help for choosing from top line
+            for (i=1;i<=15;i++) Contents+="\n"; //Help for choosing from top line
             mDataTxt.setText(Contents);
             mDataTxt.setScrollY(ScrollY); //NEW
 
@@ -443,13 +448,12 @@ public class WeatherDetails extends AppCompatActivity {
 
     public void SaveServicesAll()
     {
-
-
-
         String datapath;
-         datapath = getApplicationInfo().dataDir + "/Servicedat.txt";
+        datapath = getApplicationInfo().dataDir + "/Servicedat.txt";
         File fileSc = new File(datapath);
         long filelen;
+        String AlarmT;
+
         OutText="";
         filelen=fileSc.length();
 
@@ -462,7 +466,7 @@ public class WeatherDetails extends AppCompatActivity {
 
             FileWriter fileWriter = new FileWriter(fileSc); //New File //This needed here
 
-                    for (o=0;o<=(filelen-1)/92;o++)
+                    for (o=0;o<=(filelen-1)/112;o++)
                         if (o!=Global1.ServiceSelDel)
                         {
 
@@ -472,10 +476,12 @@ public class WeatherDetails extends AppCompatActivity {
                     CityT=Global1.ServiceData[o].City;
                     DaysT=String.valueOf(Global1.ServiceData[o].daysnum);
                     TimeT=String.valueOf(Global1.ServiceData[o].time);
+                    AlarmT=String.valueOf(Global1.ServiceData[o].AlarmId);
 
                     for (i=SiteT.length();i<20;i++) SiteT+=" ";
                     for (i=CityT.length();i<50;i++) CityT+=" ";
                     for (i=TimeT.length();i<20;i++) TimeT+=" ";
+                    for (i=AlarmT.length();i<20;i++) AlarmT+=" ";
 
 
                         //fileSc.createNewFile();
@@ -486,6 +492,7 @@ public class WeatherDetails extends AppCompatActivity {
                         fileWriter.write(DaysT, 0, 1);
                         fileWriter.write(SiteIdT, 0, 1);
                         fileWriter.write(TimeT, 0, 20);
+                        fileWriter.write(AlarmT, 0, 20);
 
                         fileWriter.flush();
 
@@ -506,11 +513,209 @@ public class WeatherDetails extends AppCompatActivity {
 
 
         Contents=OutText;
-        for (i=1;i<=10;i++) Contents+="\n"; //Help for choosing from top line
+        for (i=1;i<=15;i++) Contents+="\n"; //Help for choosing from top line
         mDataTxt.setText(Contents);
 
         return;
 
+    }
+
+
+    public void DisableAlarm(long time)
+
+    {
+        AlarmManager am=Global1.am;
+        Intent i=Global1.i;
+        int AlarmIdSel;
+
+        AlarmIdSel=Global1.ServiceData[Global1.ServiceSelDel].AlarmId;;
+        PendingIntent pi = PendingIntent.getBroadcast(this, AlarmIdSel, i, PendingIntent.FLAG_CANCEL_CURRENT); //NEW
+        Log.d("AlarmService","Service Num Off:"+String.valueOf(AlarmIdSel));
+        am.cancel(pi);
+
+    }
+
+    public void DisableAlarmPrev2(long time)
+
+    {
+        AlarmManager am=Global1.am;
+        //AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+        //Intent i = new Intent(this, AlarmService.class);
+        Intent i=Global1.i;
+
+        //PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT); //PREV
+
+        //PendingIntent pi = PendingIntent.getBroadcast(this, Global1.ServiceSelDel, i, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pi = PendingIntent.getBroadcast(this, Global1.ServiceSelDel, i, PendingIntent.FLAG_CANCEL_CURRENT); //NEW
+        //PendingIntent pi = PendingIntent.getBroadcast(getBaseContext(), Global1.ServiceSelDel, i, PendingIntent.FLAG_CANCEL_CURRENT); //NEW
+        //PendingIntent pi = PendingIntent.getBroadcast(getBaseContext(), Global1.ServiceSelDel, i, PendingIntent.FLAG_UPDATE_CURRENT); //NEW
+        //PendingIntent pi = PendingIntent.getBroadcast(this, Global1.ServiceSelDel, i, 0);
+        Log.d("AlarmService","Service Num Off:"+String.valueOf(Global1.ServiceSelDel));
+        //am.setRepeating(AlarmManager.RTC, time, AlarmManager.INTERVAL_DAY, pi); //PREV
+
+        //am.setRepeating(AlarmManager.RTC_WAKEUP, time, AlarmManager.INTERVAL_DAY, pi); //PREV
+
+
+        am.cancel(pi);
+
+    }
+
+
+
+    public void DisableAlarmPrev(long time)
+
+    {
+        AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        //Intent i = new Intent(this, AlarmService.class); //PREV
+        Intent i = new Intent(this, AlarmService.class);
+        //PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT); //PREV
+
+
+
+        //PREV
+        //PendingIntent pi = PendingIntent.getBroadcast(this, Global1.ServiceSelDel, i, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        //NEW
+        //PendingIntent pi = PendingIntent.getBroadcast(this, Global1.ServiceSelDel, i, 0);
+
+        PendingIntent pi = PendingIntent.getBroadcast(this, Global1.ServiceSelDel, i, PendingIntent.FLAG_CANCEL_CURRENT); //NEW
+        //PendingIntent pi = PendingIntent.getBroadcast(this, Global1.ServiceSelDel, i, 0);
+        Log.d("AlarmService","Service Num Off:"+String.valueOf(ServicePos));
+        //am.setRepeating(AlarmManager.RTC, time, AlarmManager.INTERVAL_DAY, pi); //PREV
+
+
+        //am.setRepeating(AlarmManager.RTC_WAKEUP, time, AlarmManager.INTERVAL_DAY, pi); //PREV
+        am.cancel(pi);
+
+    }
+
+    //NEW
+    public void ReadService()
+
+    {
+        String datapath,strdata;
+        char[] scArray = new char[29];
+        datapath=getApplicationInfo().dataDir+"/Servicedat.txt";
+        int o;
+        int stopPos;
+
+        String SiteT;
+        String CityT;
+        String DaysT;
+        String SideIdT;
+        String TimeT;
+        String AlarmT;
+
+        ServicePos=0;
+
+
+        try {
+            File fileSc = new File(datapath);
+            //fileSc.delete(); //TMP
+            //fileSc.createNewFile();//TMP
+            FileReader fileReader = new FileReader(fileSc);
+            StringBuffer stringBuffer = new StringBuffer();
+            int numCharsRead = 0; //NEW
+            char[] charArrayCity = new char[50]; //PREV
+            char[] charArray1=new char[20];
+            char[] charArray2=new char[1];
+            OutText="";
+
+
+            //ArraySize=(int)(fileSc.length()-1)/320;
+            //FullscreenActivity.Global1.ArraySize=ArraySize;
+            if (fileSc.length()!=0) //NEW NEEDED HERE
+                for (i=0;i<=(fileSc.length()-1)/112;i++)
+                {
+                    SiteT="";CityT="";DaysT="";SideIdT="";TimeT="";AlarmT="";
+
+
+                    fileReader.read(charArray1);
+                    stringBuffer.append(charArray1, 0, 20);
+                    SiteT = stringBuffer.toString();
+                    stringBuffer.delete(0, 20);
+
+                    fileReader.read(charArrayCity);
+                    stringBuffer.append(charArrayCity, 0, 50);
+                    CityT = stringBuffer.toString();
+                    stringBuffer.delete(0, 50);
+
+                    fileReader.read(charArray2);
+                    stringBuffer.append(charArray2, 0, 1);
+                    DaysT = stringBuffer.toString();
+                    stringBuffer.delete(0, 1);
+
+                    fileReader.read(charArray2);
+                    stringBuffer.append(charArray2, 0, 1);
+                    SideIdT = stringBuffer.toString();
+                    stringBuffer.delete(0, 1);
+
+                    fileReader.read(charArray1);
+                    stringBuffer.append(charArray1, 0, 20);
+                    TimeT = stringBuffer.toString();
+                    stringBuffer.delete(0, 20);
+
+                    fileReader.read(charArray1);
+                    stringBuffer.append(charArray1, 0, 20);
+                    AlarmT = stringBuffer.toString();
+                    stringBuffer.delete(0, 20);
+
+
+                    Global1.ServiceData[ServicePos]=new FullscreenActivity.ServicesDataClass();
+                    Global1.ServiceData[ServicePos].site=SiteT;
+                    Global1.ServiceData[ServicePos].City=CityT;
+                    Global1.ServiceData[ServicePos].daysnum=Integer.valueOf(DaysT);
+                    Global1.ServiceData[ServicePos].siteId=Integer.valueOf(SideIdT);
+                    Global1.ServiceData[ServicePos].hasdone=false; //NEW
+
+                    posStr=19;
+                    for (o=19; o>0; o--) if (TimeT.charAt(o)!=' ') {posStr=o+1;break;}
+                    TimeT=TimeT.substring(0,posStr);
+                    Global1.ServiceData[ServicePos].time=Long.valueOf(TimeT);
+
+                    //NEW
+                    posStr=49;
+                    for (o=49; o>0; o--) if (CityT.charAt(o)!=' ') {posStr=o+1;break;}
+                    CityT=CityT.substring(0,posStr);
+                    Global1.ServiceData[ServicePos].City=CityT;
+
+                    posStr=19;
+                    for (o=19; o>=0; o--) if (AlarmT.charAt(o)!=' ') {posStr=o+1;break;} //CHECK >=0 NEEDED HERE
+                    AlarmT=AlarmT.substring(0,posStr);
+                    Global1.ServiceData[ServicePos].AlarmId=Integer.valueOf(AlarmT);
+
+
+
+                    //-----------------
+                    //PREV //CHECK
+                    ServicePos++;
+                    //-----------------
+
+                    //NEW ///CCHECK
+                    Global1.ServiceRecs=ServicePos;
+
+                    //if (2<1) //PREV
+                    OutText+="Site:"+ Global1.ServiceData[ServicePos-1].site+"\n"+
+                            "City:"+ Global1.ServiceData[ServicePos-1].City+"\n"+
+                            "Time:"+ ConvertLongtoDate(Global1.ServiceData[ServicePos-1].time)+"\n"+
+                            "_____________________________\n";
+
+                    if (2<1) //NEW
+                        OutText+="Site:"+ Global1.ServiceData[ServicePos].site+"\n"+
+                                "City:"+ Global1.ServiceData[ServicePos].City+"\n"+
+                                "Time:"+ ConvertLongtoDate(Global1.ServiceData[ServicePos].time)+"\n"+
+                                "_____________________________\n";
+
+                }
+            fileReader.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        return;
     }
 
 
@@ -525,6 +730,8 @@ public class WeatherDetails extends AppCompatActivity {
         String CityT;
         String DaysT;
         String SiteIdT;
+        String AlarmT;
+
 
         ServicePos = 0;
 
@@ -539,17 +746,19 @@ public class WeatherDetails extends AppCompatActivity {
             char[] charArray2 = new char[1];
             OutText = "";
 
+            //NEW //CHECK
+            DisableAlarm(Global1.ServiceData[Global1.ServiceSelDel].time);
 
             //ArraySize=(int)(fileSc.length()-1)/320;
             //FullscreenActivity.Global1.ArraySize=ArraySize;
-            for (i = 0; i <= (fileSc.length() - 1) / 92; i++)
+            for (i = 0; i <= (fileSc.length() - 1) / 112; i++)
                 if (i != Global1.ServiceSelDel) {
                     SiteT = "";
                     CityT = "";
                     DaysT = "";
                     TimeT="";
                     SiteIdT="";
-
+                    AlarmT="";
 
                     fileReader.read(charArray1);
                     stringBuffer.append(charArray1, 0, 20);
@@ -576,10 +785,20 @@ public class WeatherDetails extends AppCompatActivity {
                     TimeT = stringBuffer.toString();
                     stringBuffer.delete(0, 20);
 
+                    fileReader.read(charArray1);
+                    stringBuffer.append(charArray1, 0, 20);
+                    AlarmT = stringBuffer.toString();
+                    stringBuffer.delete(0, 20);
+
+
                     posStr=19;
                     for (o=19; o>0; o--) if (TimeT.charAt(o)!=' ') {posStr=o+1;break;}
                     TimeT=TimeT.substring(0,posStr);
                     //Global1.ServiceData[ServicePos].time=Long.valueOf(TimeT);
+
+                    posStr=19;
+                    for (o=19; o>=0; o--) if (AlarmT.charAt(o)!=' ') {posStr=o+1;break;}
+                    AlarmT=AlarmT.substring(0,posStr);
 
                     //NEW
                     posStr=49;
@@ -594,6 +813,7 @@ public class WeatherDetails extends AppCompatActivity {
                     Global1.ServiceData[ServicePos].daysnum = Integer.valueOf(DaysT);
                     Global1.ServiceData[ServicePos].siteId = Integer.valueOf(SiteIdT);
                     Global1.ServiceData[ServicePos].time=Long.valueOf(TimeT); //CHECK for error
+                    Global1.ServiceData[ServicePos].AlarmId=Integer.valueOf(AlarmT);
                     Global1.ServiceData[ServicePos].hasdone=false; //NEW //Maybe not needed
 
                     ServicePos++;
@@ -616,6 +836,7 @@ public class WeatherDetails extends AppCompatActivity {
 
 
         SaveServicesAll(); //PREV
+
         return;
     }
 
@@ -639,7 +860,10 @@ public class WeatherDetails extends AppCompatActivity {
             FileWriter fileWriter = new FileWriter(fileSc); //New File //This Needed Here
 
             //Clean Memory
-            Global1.CoordsNamesData[0].Name="";
+            //Global1.CoordsNamesData[0].Name=""; //PREV
+
+            //Clear Memory of previous Name
+            //Global1.CoordsNamesData[Global1.NameSelDel].Name="";
 
             for (o=0;o<=(filelen-1)/80;o++)
                 if (o!=Global1.NameSelDel)
@@ -680,7 +904,7 @@ public class WeatherDetails extends AppCompatActivity {
         }
 
         Contents=OutText;
-        for (i=1;i<=10;i++) Contents+="\n"; //Help for choosing from top line
+        for (i=1;i<=15;i++) Contents+="\n"; //Help for choosing from top line
         mDataTxt.setText(Contents);
 
         return;
@@ -715,7 +939,11 @@ public class WeatherDetails extends AppCompatActivity {
                 FullscreenActivity.Global1.CoordsNamesData[0].Name="";
 
 
-            for (i = 0; i <= (fileSc.length() - 1) / 80; i++)
+                //Clear Memory of previous Name
+            //if (Global1.NameSelDel!=0)
+               FullscreenActivity.Global1.CoordsNamesData[Global1.NameSelDel].Name=""; //PREV //CHECK
+
+                for (i = 0; i <= (fileSc.length() - 1) / 80; i++)
                 if (i != Global1.NameSelDel) {
                     NameT = "";
                     LatStrT="";

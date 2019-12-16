@@ -1,5 +1,6 @@
 package com.example.weather;
 
+import androidx.annotation.RequiresPermission;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileReader;
@@ -172,8 +174,22 @@ public class Coords extends AppCompatActivity {
     public void SaveName()
     {
         int commapos;
+        boolean samename;
 
         Name1=mName.getText().toString();
+
+        ReadCoords(); //NEW //CHECK
+
+
+        samename=false;
+        for (i=0;i<CoordsPos;i++)
+            if (FullscreenActivity.Global1.CoordsNamesData[i].Name.toLowerCase().equalsIgnoreCase(Name1)) samename=true;
+
+        if (samename) {
+            Toast.makeText(this, "This name already exists !", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         CoordsStr=mCoords.getText().toString();
 
         commapos=0;
@@ -233,7 +249,7 @@ public class Coords extends AppCompatActivity {
 
         CoordsPos++;
 
-
+        Toast.makeText(this, "New Coordinates Name Saved", Toast.LENGTH_SHORT).show();
         return;
     }
 

@@ -159,6 +159,7 @@ public class FullscreenActivity extends AppCompatActivity {
         int siteId;
         boolean hasdone;
         long time;
+        int AlarmId;
     }
 
     static class CoordsNames
@@ -193,6 +194,9 @@ public class FullscreenActivity extends AppCompatActivity {
         public static boolean Clear,Clouds,Rain,Snow,Thunder;
         public static int CoordsRecs;
         public static int NameSelDel;
+        public static long DateFromM,DateToM;
+        public static AlarmManager am;
+        public static Intent i;
     }
 
 
@@ -228,6 +232,9 @@ public class FullscreenActivity extends AppCompatActivity {
 
         Global1.ServiceRun=false;
         //SetAlarmService();
+
+        Global1.am=(AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Global1.i = new Intent(this, AlarmService.class); //PREV
 
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mTextView = findViewById(R.id.textView);

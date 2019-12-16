@@ -83,6 +83,9 @@ public class Services extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
 
+        //Intent i = new Intent(this, AlarmService.class); //PREV
+        //Global1.i=i;
+
         ReadService(); //PREV
 
         mControlsView = findViewById(R.id.fullscreen_content_controls);
@@ -237,42 +240,87 @@ public class Services extends AppCompatActivity {
     public void DisableAlarm(long time)
 
     {
-        AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        AlarmManager am=Global1.am;
+        //AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent i = new Intent(this, AlarmService.class);
         //PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT); //PREV
-        PendingIntent pi = PendingIntent.getBroadcast(this, Global1.ServiceSelDel, i, PendingIntent.FLAG_UPDATE_CURRENT);
-        //PendingIntent pi = PendingIntent.getBroadcast(this, Global1.ServiceSelDel, i, PendingIntent.FLAG_CANCEL_CURRENT); //NEW
+
+        //PendingIntent pi = PendingIntent.getBroadcast(this, Global1.ServiceSelDel, i, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pi = PendingIntent.getBroadcast(this, Global1.ServiceSelDel, i, PendingIntent.FLAG_CANCEL_CURRENT); //NEW
+        //PendingIntent pi = PendingIntent.getBroadcast(getBaseContext(), Global1.ServiceSelDel, i, PendingIntent.FLAG_CANCEL_CURRENT); //NEW
+        //PendingIntent pi = PendingIntent.getBroadcast(getBaseContext(), Global1.ServiceSelDel, i, PendingIntent.FLAG_UPDATE_CURRENT); //NEW
         //PendingIntent pi = PendingIntent.getBroadcast(this, Global1.ServiceSelDel, i, 0);
         Log.d("AlarmService","Service Num Off:"+String.valueOf(ServicePos));
         //am.setRepeating(AlarmManager.RTC, time, AlarmManager.INTERVAL_DAY, pi); //PREV
-        am.setRepeating(AlarmManager.RTC_WAKEUP, time, AlarmManager.INTERVAL_DAY, pi);
+
+        //am.setRepeating(AlarmManager.RTC_WAKEUP, time, AlarmManager.INTERVAL_DAY, pi); //PREV
+
+
         am.cancel(pi);
 
     }
 
     private void setAlarm(long time) {
 
-        AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        int o,s;
+        int recvalue;
+        boolean notcont;
+        //AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
-        Intent i = new Intent(this, AlarmService.class); //PREV
-        i.setAction(String.valueOf(ServicePos));
+
+        AlarmManager am=Global1.am;
+
+        //Intent i = new Intent(this, AlarmService.class); //PREV
+        //Global1.i=i;
+
+        //Global1.ServiceData[ServicePos].AlarmId=-1; //Init Value
+
+        notcont=false;
+/*        //Find empty Alarm Id
+        for (o=0;o<=10000;o++)
+        if (o!=ServicePos)
+        {
+            if (Global1.ServiceData[o].AlarmId==Global1.ServiceData[ServicePos].AlarmId)
+            notcont=true;
+        }
+*/
+
+
+
+
+
+            //Find empty Alarm Id
+        for (recvalue=0;recvalue<=10000;recvalue++) //PREV
+        //for (recvalue=1;recvalue<=10000;recvalue++) //CHECK
+        {
+        notcont=false;
+            for (o = 0; o <= ServicePos; o++)
+                if (o != ServicePos) {
+                    if (Global1.ServiceData[o].AlarmId == recvalue) notcont = true;
+                }
+
+            if (!notcont) {Global1.ServiceData[ServicePos].AlarmId=recvalue;break;}
+        }
+
+        Intent i=Global1.i;
+        i.setAction(String.valueOf(Global1.ServiceData[ServicePos].AlarmId));
         i.putExtra("City",City);
-        i.putExtra("ServicePos",ServicePos);
+        i.putExtra("ServicePos",Global1.ServiceData[ServicePos].AlarmId);
         i.putExtra("Site",Global1.ServiceData[ServicePos].siteId);
 
-        PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0); //PREV
-        //PendingIntent pi = PendingIntent.getBroadcast(this, ServicePos, i, PendingIntent.FLAG_UPDATE_CURRENT);
-        Log.d("AlarmService","Service Num Set:"+String.valueOf(ServicePos));
+        //PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0); //PREV
+        PendingIntent pi = PendingIntent.getBroadcast(this, ServicePos, i, PendingIntent.FLAG_UPDATE_CURRENT);
+        Log.d("AlarmService","Service Num Set:"+String.valueOf(Global1.ServiceData[ServicePos].AlarmId));
         Log.d("AlarmService","Service Time:"+ConvertLongtoDate(time));
 
         //am.setRepeating(AlarmManager.RTC, time, AlarmManager.INTERVAL_DAY, pi); //PREV
         am.setRepeating(AlarmManager.RTC_WAKEUP, time, AlarmManager.INTERVAL_DAY, pi); //NEW
         //am.setRepeating(AlarmManager.RTC_WAKEUP, time, AlarmManager.ELAPSED_REALTIME, pi); //NEW
 
-
-
-        //DisableAlarm(time);
+        //am.cancel(pi); //TMP
+        //DisableAlarm(time); //TMP
     }
+
 
     public boolean HasSame(int days,Calendar calendar)
 
@@ -331,7 +379,8 @@ public class Services extends AppCompatActivity {
             Global1.ServiceData[ServicePos].hasdone=false;
             Global1.ServiceData[ServicePos].time=calendar.getTimeInMillis();
             setAlarm(calendar.getTimeInMillis());
-            SaveService();
+            Log.d("AlarmService:","Date Service = "+ConvertLongtoDate(calendar.getTimeInMillis()));
+            SaveService(); //CHECK FOR ERROR
         }
 
         if (CheckAccu) {
@@ -389,9 +438,10 @@ public class Services extends AppCompatActivity {
 
     {
         boolean sameone;
-        int hours,minutes,day,year,month;
+        int hours,minutes,day,year,month,hoursCur,minutesCur;
         String TimeGMT;
         String DateCustomS;
+        boolean plusDay;
 
         //Maybe Not Needed Here
         //FullscreenActivity.Global1.progressDialog=new ProgressDialog(FullscreenActivity.this);
@@ -414,11 +464,22 @@ public class Services extends AppCompatActivity {
             year=date.getYear();
             month=date.getMonth();
             day=date.getDay();
+            hoursCur=date.getHours();
+            minutesCur=date.getMinutes();
+
+            hours=14;minutes=0;
+            calendar.setTimeInMillis(System.currentTimeMillis()); //NEW
+
+            plusDay=false;
+            if (hours<hoursCur) plusDay=true;
+            if ((hours==hoursCur) && (minutes<minutesCur)) plusDay=true;
+
+            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1); //NEW //CHECK
 
             //Afternoon
-            calendar.set(Calendar.YEAR, year);
-            calendar.set(Calendar.MONTH, month);
-            calendar.set(Calendar.DAY_OF_MONTH, day);
+            //calendar.set(Calendar.YEAR, year);
+            //calendar.set(Calendar.MONTH, month);
+            //calendar.set(Calendar.DAY_OF_MONTH, day);
             calendar.set(Calendar.HOUR_OF_DAY, 14);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
@@ -434,7 +495,6 @@ public class Services extends AppCompatActivity {
 
         }
 
-
         //Custom
         if (ServiceTimes==10) {
 
@@ -448,21 +508,60 @@ public class Services extends AppCompatActivity {
             year=date.getYear();
             month=date.getMonth();
             day=date.getDay();
+            hoursCur=date.getHours();
+            minutesCur=date.getMinutes();
+
 
             DateCustomS=mTime.getText().toString();
             hours=Integer.valueOf(DateCustomS.substring(0,2));
             minutes=Integer.valueOf(DateCustomS.substring(3,5));
-            //Log.d("AlarmService","Hours:"+String.valueOf(hours));
-            //Log.d("AlarmService","Minutes:"+String.valueOf(minutes));
+
+
+/*
+            Log.d("AlarmService","CurHours:"+String.valueOf(hoursCur));
+            Log.d("AlarmService","CurMinutes:"+String.valueOf(minutesCur));
+
+            Log.d("AlarmService","Hours:"+String.valueOf(hours));
+            Log.d("AlarmService","Minutes:"+String.valueOf(minutes));
+            //calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+            //calendar.setTimeZone(TimeZone.getTimeZone("Europe/Athens")); //NEW
+*/
+            calendar.setTimeInMillis(System.currentTimeMillis()); //NEW
+
+            //NEW
             //calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
             //calendar.setTimeZone(TimeZone.getTimeZone("Europe/Athens")); //NEW
 
-            calendar.set(Calendar.YEAR, year);
-            calendar.set(Calendar.MONTH, month);
-            calendar.set(Calendar.DAY_OF_MONTH, day);
+            //calendar.set(year,month,day);
+            //PREV
+            //calendar.set(Calendar.YEAR, year);
+            //calendar.set(Calendar.MONTH, month);
+            //calendar.set(Calendar.DAY_OF_MONTH, day);
+
+            plusDay=false;
+            if (hours<hoursCur) plusDay=true;
+            if ((hours==hoursCur) && (minutes<minutesCur)) plusDay=true;
+
+            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1); //NEW //CHECK
+            //if (plusDay) calendar.add(Calendar.DAY_OF_MONTH,1); //NEW //CHECK
+            //if (plusDay) calendar.add(Calendar.DATE,1); //NEW //CHECK
+
+            if (plusDay) Log.d("AlarmService","PlusDay");
+            else Log.d("AlarmService","Not PlusDay");
+
+            //hours+=2; //GMT +2 (Athens)
+            //if (hours==25) hours=1;
+            //if (hours==26) hours=2;
+
+            //if (plusDay) calendar.setTimeInMillis(System.currentTimeMillis()+(24*60*60*1000)); //NEW
             calendar.set(Calendar.HOUR_OF_DAY, hours);
             calendar.set(Calendar.MINUTE, minutes);
             calendar.set(Calendar.SECOND, 0);
+
+           //if (plusDay) calendar.setTimeInMillis(calendar.getTimeInMillis()+(24 * 60 * 60 * 1000)); //Add Day
+
+            Log.d("AlarmService","calendar time:"+String.valueOf(calendar.getTime().toString()));
+
 
             if (!HasSame(1,calendar))
             {
@@ -485,11 +584,25 @@ public class Services extends AppCompatActivity {
             year=date.getYear();
             month=date.getMonth();
             day=date.getDay();
+            hoursCur=date.getHours();
+            minutesCur=date.getMinutes();
+
+            hours=8;minutes=0;
+            calendar.setTimeInMillis(System.currentTimeMillis()); //NEW
+
+            plusDay=false;
+            if (hours<hoursCur) plusDay=true;
+            if ((hours==hoursCur) && (minutes<minutesCur)) plusDay=true;
+
+            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1); //NEW //CHECK
+
+
+            //calendar.setTimeInMillis(System.currentTimeMillis()); //NEW
 
             //Moorning
-            calendar.set(Calendar.YEAR, year);
-            calendar.set(Calendar.MONTH, month);
-            calendar.set(Calendar.DAY_OF_MONTH, day);
+            //calendar.set(Calendar.YEAR, year);
+            //calendar.set(Calendar.MONTH, month);
+            //calendar.set(Calendar.DAY_OF_MONTH, day);
             calendar.set(Calendar.HOUR_OF_DAY, 8);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
@@ -505,11 +618,25 @@ public class Services extends AppCompatActivity {
             year=date.getYear();
             month=date.getMonth();
             day=date.getDay();
+            hoursCur=date.getHours();
+            minutesCur=date.getMinutes();
+
+            hours=22;minutes=0;
+            calendar.setTimeInMillis(System.currentTimeMillis()); //NEW
+
+            plusDay=false;
+            if (hours<hoursCur) plusDay=true;
+            if ((hours==hoursCur) && (minutes<minutesCur)) plusDay=true;
+
+            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1); //NEW //CHECK
+
+
+            //calendar.setTimeInMillis(System.currentTimeMillis()); //NEW
 
             //Night
-            calendar.set(Calendar.YEAR, year);
-            calendar.set(Calendar.MONTH, month);
-            calendar.set(Calendar.DAY_OF_MONTH, day);
+            //calendar.set(Calendar.YEAR, year);
+            //calendar.set(Calendar.MONTH, month);
+            //calendar.set(Calendar.DAY_OF_MONTH, day);
             calendar.set(Calendar.HOUR_OF_DAY,22 );
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
@@ -532,11 +659,23 @@ public class Services extends AppCompatActivity {
             year=date.getYear();
             month=date.getMonth();
             day=date.getDay();
+            hoursCur=date.getHours();
+            minutesCur=date.getMinutes();
+
+            hours=8;minutes=0;
+            calendar.setTimeInMillis(System.currentTimeMillis()); //NEW
+
+            plusDay=false;
+            if (hours<hoursCur) plusDay=true;
+            if ((hours==hoursCur) && (minutes<minutesCur)) plusDay=true;
+
+            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1); //NEW //CHECK
+
 
             //Moorning
-            calendar.set(Calendar.YEAR, year);
-            calendar.set(Calendar.MONTH, month);
-            calendar.set(Calendar.DAY_OF_MONTH, day);
+            //calendar.set(Calendar.YEAR, year);
+            //calendar.set(Calendar.MONTH, month);
+            //calendar.set(Calendar.DAY_OF_MONTH, day);
             calendar.set(Calendar.HOUR_OF_DAY,8 );
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
@@ -552,11 +691,25 @@ public class Services extends AppCompatActivity {
             year=date.getYear();
             month=date.getMonth();
             day=date.getDay();
+            hoursCur=date.getHours();
+            minutesCur=date.getMinutes();
 
+            hours=14;minutes=0;
+            calendar.setTimeInMillis(System.currentTimeMillis()); //NEW
+
+            plusDay=false;
+            if (hours<hoursCur) plusDay=true;
+            if ((hours==hoursCur) && (minutes<minutesCur)) plusDay=true;
+
+            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1); //NEW //CHECK
+
+
+
+            //calendar.setTimeInMillis(System.currentTimeMillis()); //NEW
             //Afternoon
-            calendar.set(Calendar.YEAR, year);
-            calendar.set(Calendar.MONTH, month);
-            calendar.set(Calendar.DAY_OF_MONTH, day);
+            //calendar.set(Calendar.YEAR, year);
+            //calendar.set(Calendar.MONTH, month);
+            //calendar.set(Calendar.DAY_OF_MONTH, day);
             calendar.set(Calendar.HOUR_OF_DAY,14 );
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
@@ -572,11 +725,26 @@ public class Services extends AppCompatActivity {
             year=date.getYear();
             month=date.getMonth();
             day=date.getDay();
+            hoursCur=date.getHours();
+            minutesCur=date.getMinutes();
+
+            hours=22;minutes=0;
+            calendar.setTimeInMillis(System.currentTimeMillis()); //NEW
+
+            plusDay=false;
+            if (hours<hoursCur) plusDay=true;
+            if ((hours==hoursCur) && (minutes<minutesCur)) plusDay=true;
+
+            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1); //NEW //CHECK
+
+
+
+            //calendar.setTimeInMillis(System.currentTimeMillis()); //NEW
 
             //Night
-            calendar.set(Calendar.YEAR, year);
-            calendar.set(Calendar.MONTH, month);
-            calendar.set(Calendar.DAY_OF_MONTH, day);
+            //calendar.set(Calendar.YEAR, year);
+            //calendar.set(Calendar.MONTH, month);
+            //calendar.set(Calendar.DAY_OF_MONTH, day);
             calendar.set(Calendar.HOUR_OF_DAY,22 );
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
@@ -603,6 +771,7 @@ public class Services extends AppCompatActivity {
         String DaysT;
         String SideIdT;
         String TimeT;
+        String AlarmT;
 
         ServicePos=0;
 
@@ -623,9 +792,9 @@ public class Services extends AppCompatActivity {
             //ArraySize=(int)(fileSc.length()-1)/320;
             //FullscreenActivity.Global1.ArraySize=ArraySize;
             if (fileSc.length()!=0) //NEW NEEDED HERE
-                for (i=0;i<=(fileSc.length()-1)/92;i++)
+                for (i=0;i<=(fileSc.length()-1)/112;i++)
                 {
-                    SiteT="";CityT="";DaysT="";SideIdT="";TimeT="";
+                    SiteT="";CityT="";DaysT="";SideIdT="";TimeT="";AlarmT="";
 
 
                     fileReader.read(charArray1);
@@ -653,6 +822,12 @@ public class Services extends AppCompatActivity {
                     TimeT = stringBuffer.toString();
                     stringBuffer.delete(0, 20);
 
+                    fileReader.read(charArray1);
+                    stringBuffer.append(charArray1, 0, 20);
+                    AlarmT = stringBuffer.toString();
+                    stringBuffer.delete(0, 20);
+
+
                     Global1.ServiceData[ServicePos]=new FullscreenActivity.ServicesDataClass();
                     Global1.ServiceData[ServicePos].site=SiteT;
                     Global1.ServiceData[ServicePos].City=CityT;
@@ -670,6 +845,12 @@ public class Services extends AppCompatActivity {
                     for (o=49; o>0; o--) if (CityT.charAt(o)!=' ') {posStr=o+1;break;}
                     CityT=CityT.substring(0,posStr);
                     Global1.ServiceData[ServicePos].City=CityT;
+
+                    posStr=19;
+                    for (o=19; o>=0; o--) if (AlarmT.charAt(o)!=' ') {posStr=o+1;break;} //CHECK >=0 NEEDED HERE
+                    AlarmT=AlarmT.substring(0,posStr);
+                    Global1.ServiceData[ServicePos].AlarmId=Integer.valueOf(AlarmT);
+
 
 
                     //-----------------
@@ -734,7 +915,7 @@ public class Services extends AppCompatActivity {
 
             //ArraySize=(int)(fileSc.length()-1)/320;
             //FullscreenActivity.Global1.ArraySize=ArraySize;
-            for (i = 0; i <= (fileSc.length() - 1) / 92; i++)
+            for (i = 0; i <= (fileSc.length() - 1) / 112; i++)
                 if (i != Global1.ServiceSelDel) {
                     SiteT = "";
                     CityT = "";
@@ -800,6 +981,7 @@ public class Services extends AppCompatActivity {
         String DaysT;
         String SiteIdT;
         String TimeT;
+        String AlarmT;
 
         String datapath;
         datapath=getApplicationInfo().dataDir+"/Servicedat.txt";
@@ -810,10 +992,14 @@ public class Services extends AppCompatActivity {
         CityT=Global1.ServiceData[ServicePos].City;
         DaysT=String.valueOf(Global1.ServiceData[ServicePos].daysnum);
         TimeT=String.valueOf(Global1.ServiceData[ServicePos].time);
+        AlarmT=String.valueOf(Global1.ServiceData[ServicePos].AlarmId);
+
+        Log.d("AlarmService","Time Long:"+ConvertLongtoDate(Global1.ServiceData[ServicePos].time));
 
         for (i=SiteT.length();i<20;i++) SiteT+=" ";
         for (i=CityT.length();i<50;i++) CityT+=" ";
         for (i=TimeT.length();i<20;i++) TimeT+=" ";
+        for (i=AlarmT.length();i<20;i++) AlarmT+=" ";
 
 
         try {
@@ -825,6 +1011,7 @@ public class Services extends AppCompatActivity {
             fileWriter.write(DaysT, 0, 1);
             fileWriter.write(SiteIdT, 0, 1);
             fileWriter.write(TimeT, 0, 20);
+            fileWriter.write(AlarmT, 0, 20);
 
             fileWriter.flush();
 

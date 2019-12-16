@@ -27,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 //import com.example.weather.
 
 /**
@@ -88,6 +89,10 @@ public class AlarmService extends BroadcastReceiver { //PREV
     int ServiceIdPos;
     boolean isOpen,isAccu,isStack,isDark,isBit;
     int isOpen1,isAccu1,isStack1,isDark1,isBit1;
+    //private int year,month,day,hours,minutes;
+    //private long rechour;
+    //private long recminute;
+    //private Calendar calendar;
 
     public void SaveHistory() {
 
@@ -182,6 +187,27 @@ public class AlarmService extends BroadcastReceiver { //PREV
         return;
     }
 
+    /*
+    public void GetCurTime()
+
+    {
+        Date date = new Date();
+        String strDateFormat = "dd-MM-yyyy HH:mm:ss z";
+        DateFormat dateFormat = new SimpleDateFormat(strDateFormat);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Athens"));
+        String formattedDate= dateFormat.format(date);
+        CurrentDate=formattedDate;
+
+        year=date.getYear();
+        month=date.getMonth();
+        day=date.getDay();
+        hours=date.getHours();
+        minutes=date.getMinutes();
+
+    }
+*/
+
+
     @Override
     public void onReceive(Context context, Intent intent)
     {
@@ -195,20 +221,57 @@ public class AlarmService extends BroadcastReceiver { //PREV
 
         Log.d("AlarmService", "Alarm just fired"); //PREV
 
-        Action=intent.getAction();
-        content = new Content();
+        intent=Global1.i; //NEW //CHECK
 
+        Action=intent.getAction();
+
+        //GetCurTime();
+
+        //NEW
+        //calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+        //calendar.setTimeZone(TimeZone.getTimeZone("Europe/Athens"));
 
         //for (i=0;i<=Global1.ServiceRecs-1;i++) //PREV
         for (i=0;i<=Global1.ServiceRecs;i++)
-            if (Action.equals(String.valueOf(i))) {
+              if (Action.equals(String.valueOf(i))) {
                 City = intent.getStringExtra("City");
                 ServiceIdPos = intent.getIntExtra("ServicePos", 0);
                 siteId=intent.getIntExtra("Site", 0);
-                Log.d("AlarmService", "City:" + City);
-                Log.d("AlarmService", "Service Pos:"+String.valueOf(ServiceIdPos));
-                content.execute();
+
+                  //rechour=TimeUnit.MILLISECONDS.toHours(Global1.ServiceData[i].time);
+                  //recminute=TimeUnit.MILLISECONDS.toMinutes(Global1.ServiceData[i].time);
+
+                  /*
+                  calendar.setTimeInMillis(Global1.ServiceData[i].time); //Check i here
+
+                  //rechour=calendar.get(Calendar.HOUR); //12 hours format
+                  rechour=calendar.get(Calendar.HOUR_OF_DAY); //24 hours format
+                  recminute=calendar.get(Calendar.MINUTE);
+
+
+                  //GMT +2:00 Athens
+                  rechour-=2;
+                  if (rechour==-1) rechour=23;
+                  if (rechour==-2) rechour=22;
+
+                  Log.d("AlarmService", "CurHours:" +hours);
+                  Log.d("AlarmService", "Curminutes:" +minutes);
+
+                  Log.d("AlarmService", "recHours:" +rechour);
+                  Log.d("AlarmService", "recHinutes:" +recminute);
+
+                if (hours==rechour)*/
+                {
+                    Log.d("AlarmService", "City:" + City);
+                    Log.d("AlarmService", "Service Pos:" + String.valueOf(ServiceIdPos));
+                    content = new Content(); //NEW POS
+                    content.execute();
+                }
+
+
+
             }
+
     }
 
     private class Content extends AsyncTask<Void, Void, Void> {

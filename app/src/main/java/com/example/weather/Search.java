@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -75,6 +76,7 @@ public class Search extends AppCompatActivity {
     private String Date;
 
     private Date DateExp,DateExp2;
+    private Date DateExpFrom,DateExpTo;
     private Date DateComp,DateComp2;
     private String DateExpSTR,DateExpSTR2;
 
@@ -87,7 +89,7 @@ public class Search extends AppCompatActivity {
     private boolean siteCont,siteContW,siteContS,siteContSt;
     private int posStr;
     private String CityT,DateT;
-
+    private long days,daysFrom,daysTo;
     public String ConvertLongtoDate(long unixSeconds) {
 
 
@@ -102,6 +104,21 @@ public class Search extends AppCompatActivity {
         return formattedDate;
     }
 
+    public String ConvertLongtoDateFull(long unixSeconds) {
+
+
+        Date date;
+
+        date=new Date();
+        date=new Date(unixSeconds); //Not X 1000
+        String strDateFormat = "dd-MM-yyyy HH:mm:ss z";
+        DateFormat dateFormat = new SimpleDateFormat(strDateFormat);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Athens"));
+        String formattedDate= dateFormat.format(date);
+        return formattedDate;
+    }
+
+
     //CHECK HERE FOR FILTERS !!!
     public void ReadHistory()
 
@@ -112,8 +129,15 @@ public class Search extends AppCompatActivity {
         int o;
         int stopPos;
         float tempf,humf;
+        int year,month,day;
+        int yearfrom,monthfrom,dayfrom;
+        int yearto,monthto,dayto;
+        String dateSTR;
+
         tempf=0;
         humf=0;
+
+
         HistoryPos=0;
             try {
             File fileSc = new File(datapath);
@@ -226,62 +250,34 @@ public class Search extends AppCompatActivity {
                 //String formattedDate = sdf.format(DateExp);
                 //DateExpSTR=formattedDate;
 
+                dateSTR=Global1.HistoryData[i].Date;
 
-                try {
-
-                    DateExp=sdf.parse(Global1.HistoryData[i].Date);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-
-                }
-
-                DateComp=Global1.DateFrom;
-                DateComp2=Global1.DateTo;
-
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(Global1.DateTo);
-                calendar.add(Calendar.DAY_OF_MONTH, 1); //CHECK //PREV
-
-                //calendar.add(Calendar.DAY_OF_MONTH, 2); //NEW
-                //Log.d("WeatherSearch:","To:"+Global1.DateTo.toString());
-
-                calendar.set(Calendar.HOUR_OF_DAY,23);
-                calendar.set(Calendar.MINUTE,59);
-                calendar.set(Calendar.SECOND,59);
+                Log.d("WeatherSearch:","Record DateSTR:"+dateSTR);
+                day=Integer.valueOf(dateSTR.substring(0,2));
+                month=Integer.valueOf(dateSTR.substring(3,5));
+                year=Integer.valueOf(dateSTR.substring(6,10));
+                Log.d("WeatherSearch:","Date1:"+day+"/"+month+"/"+year);
+                //days=(long)(year-1970)*12*month*30*((day)*24*60*60*1000);
 
 
-                //PREV //CHECK !!!
-                calendar.add(Calendar.HOUR_OF_DAY,-2); //GMC +2 Compbatibility
+                dateSTR=ConvertLongtoDateFull(Global1.DateFromM);
 
-                DateComp=calendar.getTime();
+                dayfrom=Integer.valueOf(dateSTR.substring(0,2));
+                monthfrom=Integer.valueOf(dateSTR.substring(3,5));
+                yearfrom=Integer.valueOf(dateSTR.substring(6,10));
 
-                Log.d("WeatherSearch:","To:"+DateComp.toString());
-                Calendar calendar2 = Calendar.getInstance();
-                calendar2.setTime(Global1.DateFrom);
+                //dateSTR=ConvertLongtoDateFull(Global1.DateTo.getTime());
+                dateSTR=ConvertLongtoDateFull(Global1.DateToM);
 
-                //Log.d("WeatherSearch:","From:"+Global1.DateFrom.toString());
-                //-------------------------------------------------
-                //PREV
-                calendar2.add(Calendar.DAY_OF_MONTH, 1); //NEW //CHECK !!!
-                //-------------------------------------------------
+                dayto=Integer.valueOf(dateSTR.substring(0,2));
+                monthto=Integer.valueOf(dateSTR.substring(3,5));
+                yearto=Integer.valueOf(dateSTR.substring(6,10));
 
-                //calendar2.add(Calendar.DAY_OF_MONTH, -1); //NEW
 
-                calendar2.set(Calendar.HOUR_OF_DAY,0);
-                calendar2.set(Calendar.MINUTE,0);
-                calendar2.set(Calendar.SECOND,0);
+                  days=(long)(year-1970)*356+(month*30)+day;
+                  daysFrom=Global1.DateFromM;
+                  daysTo=Global1.DateToM;
 
-                //PREV //CHECK !!!
-                calendar2.add(Calendar.HOUR_OF_DAY,-2); //GMC +2 Compbatibility
-                DateComp2=calendar2.getTime();
-
-                Log.d("WeatherSearch:","From:"+DateComp2.toString());
-
-                String formattedDate = sdf.format(DateComp);
-                DateExpSTR=formattedDate;
-
-                String formattedDate2 = sdf.format(DateComp2);
-                DateExpSTR2=formattedDate2;
 
                 siteContSt=false;
                 if (CheckOpen) if (HistoryData[i].Site.contains("Open Weather Map")) siteContSt=true;
@@ -329,9 +325,14 @@ public class Search extends AppCompatActivity {
                 if ((HistoryData[i].Temperature>=Global1.FromT) && (HistoryData[i].Temperature<=Global1.ToT)) siteCont=true;
                 else siteCont=false;
 
+
+                //Log.d("WeatherSearch:","days:"+String.valueOf(days));
+                //Log.d("WeatherSearch:","days From:"+String.valueOf(daysFrom));
+                //Log.d("WeatherSearch:","days To:"+String.valueOf(daysTo));
+
+                //CHECK 5/2/18-5/2/20
                 if (Global1.HistoryData[i].City.toLowerCase().contains(Global1.City.toLowerCase()))
-                //if ((DateExp.after(DateComp2)) && (DateExp.before(DateComp)))
-                //if (ContinueRec)
+                if ((days>=daysFrom) && (days<=daysTo))
                 if (siteCont)
                 if (siteContW)
                 if (siteContS)
@@ -742,38 +743,40 @@ public class Search extends AppCompatActivity {
                 Date date = new Date();
                 Date date2 = new Date();
 
+                int year,month,day;
+                int yearfrom,monthfrom,dayfrom;
+                int yearto,monthto,dayto;
+                String dateSTR;
 
                 Period=10;
 
                 Global1.City=mCity.getText().toString(); //CHECK
 
+                dateSTR=mFrom.getText().toString();
 
-                //DateFrom
-                String strDateFormat = "dd-MM-yyyy";
-                DateFormat dateFormat = new SimpleDateFormat(strDateFormat);
-                dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Athens"));
-                try {
-                    date=dateFormat.parse(mFrom.getText().toString());
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                //String formattedDate= dateFormat.format(date);
-                DateFrom1=date;
+                dayfrom=Integer.valueOf(dateSTR.substring(0,2));
+                monthfrom=Integer.valueOf(dateSTR.substring(3,5));
+                yearfrom=Integer.valueOf(dateSTR.substring(6,10));
 
-                //DateTo
-                dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Athens"));
-                try {
-                    date2=dateFormat.parse(mTo.getText().toString());
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                //String formattedDate= dateFormat.format(date);
-                DateTo1=date2;
+                dateSTR=mTo.getText().toString();
+
+                dayto=Integer.valueOf(dateSTR.substring(0,2));
+                monthto=Integer.valueOf(dateSTR.substring(3,5));
+                yearto=Integer.valueOf(dateSTR.substring(6,10));
+
+                daysFrom=(long)(yearfrom-1970)*356+(monthfrom*30)+dayfrom;
+                daysTo=(long)(yearto-1970)*356+(monthto*30)+dayto;
+
+                //Problem
+                //1-12-19 -> 5-12-20
+
+                //NEW //CHECK
+                Global1.DateFromM=daysFrom;
+                Global1.DateToM=daysTo;
 
 
-                Global1.DateFrom=DateFrom1;
-                Global1.DateTo=DateTo1;
-
+                Log.d("WeatherSearch","From1:"+dayfrom+"/"+monthfrom+"/"+yearfrom);
+                Log.d("WeatherSearch","To1:"+dayto+"/"+monthto+"/"+yearto);
 
                 if (mCheckOpen.isChecked()) CheckOpen=true; else CheckOpen=false;
                 if (mCheckAccu.isChecked()) CheckAccu=true; else CheckAccu=false;
