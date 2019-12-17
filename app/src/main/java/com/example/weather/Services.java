@@ -35,10 +35,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- */
 public class Services extends AppCompatActivity {
     private View mControlsView;
 
@@ -83,10 +79,8 @@ public class Services extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
 
-        //Intent i = new Intent(this, AlarmService.class); //PREV
-        //Global1.i=i;
-
-        ReadService(); //PREV
+        //Διαβάζει τις καταχωρήσεις των υπηρεσιών
+        ReadService();
 
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mRadio1= (RadioButton) findViewById(R.id.radioButtonOne);
@@ -105,6 +99,14 @@ public class Services extends AppCompatActivity {
         mCheckBit= (CheckBox) findViewById(R.id.checkBoxBit);
 
         ServiceTimes=3; //Default
+
+        //Ελένχει τα radio button για τα services
+        //@param ServiceTimes
+        //Παίρνει την τιμή για τις υπηρεσίες services
+        //Παίρνει 1 για μια φορά στις 14:00
+        //Παίρνει 2 για δυό φορες την ημέρα στις 08:00 και 22:00
+        //Παίρνει 3 για δυό φορες την ημέρα στις 08:00,14:00 και 22:00
+        //Πάιρνει 10 για custom ώρα στην ημέρα
 
         mRadio1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,12 +156,20 @@ public class Services extends AppCompatActivity {
             }
         });
 
+        //Προχωραέι στο να δημιουργήσει το alarm
         mSetService.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 City=mCity.getText().toString();
                 TimeSTR=mTime.getText().toString();
+
+                if (!checktime(TimeSTR))
+                {
+                    Toast.makeText(Services.this, "Service time is wrong", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
 
                 if (mCheckOpen.isChecked()) CheckOpen=true; else CheckOpen=false;
                 if (mCheckAccu.isChecked()) CheckAccu=true; else CheckAccu=false;
@@ -173,7 +183,7 @@ public class Services extends AppCompatActivity {
         });
 
 
-
+        //Ξεκινάει την εμφάνιση της λίστας των services
         mShowSer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
@@ -185,8 +195,6 @@ public class Services extends AppCompatActivity {
                 Intent intent = new Intent(Services.this, WeatherDetails.class);
                 startActivity(intent);
 
-                //Log.d("Service Message",String.valueOf(FullscreenActivity.Global1.ServiceSelDel));
-                //if (FullscreenActivity.Global1.ServiceSelDel!=-1) DeleteService();
             }
 
         });
@@ -195,22 +203,12 @@ public class Services extends AppCompatActivity {
 
     }
 
+    //Μετατροπή Unix χρόνου σε String ημερομηνία
     public String ConvertLongtoDate(long unixSeconds) {
 
 
         Date date;
         int hours;
-
-        /*
-        date=new Date();
-        date=new Date(unixSeconds); //Not X 1000
-        hours=date.getHours();
-        hours-=2; //NEW GTM+2:00 Athens
-        if (hours==-1) hours=23;
-        if (hours==-2) hours=22;
-
-*/
-
 
         Calendar calendar;
 
@@ -218,10 +216,6 @@ public class Services extends AppCompatActivity {
         //if (hours==25) hours=1;
         //if (hours==26) hours=2;
 
-        //NEW //CHECK
-        //TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
-
-        //NEW HERE
         calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         calendar.setTimeZone(TimeZone.getTimeZone("Europe/Athens")); //NEW
         calendar.setTimeInMillis(unixSeconds);
@@ -230,68 +224,24 @@ public class Services extends AppCompatActivity {
 
         String strDateFormat = "HH:mm:ss z";
         DateFormat dateFormat = new SimpleDateFormat(strDateFormat);
-        //dateFormat.setTimeZone(TimeZone.getTimeZone("GMT")); //NEW
         dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Athens"));
         String formattedDate= dateFormat.format(date);
         return formattedDate;
     }
 
-    //MAYBE NOT NEEDED HERE
-    public void DisableAlarm(long time)
-
-    {
-        AlarmManager am=Global1.am;
-        //AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent i = new Intent(this, AlarmService.class);
-        //PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT); //PREV
-
-        //PendingIntent pi = PendingIntent.getBroadcast(this, Global1.ServiceSelDel, i, PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent pi = PendingIntent.getBroadcast(this, Global1.ServiceSelDel, i, PendingIntent.FLAG_CANCEL_CURRENT); //NEW
-        //PendingIntent pi = PendingIntent.getBroadcast(getBaseContext(), Global1.ServiceSelDel, i, PendingIntent.FLAG_CANCEL_CURRENT); //NEW
-        //PendingIntent pi = PendingIntent.getBroadcast(getBaseContext(), Global1.ServiceSelDel, i, PendingIntent.FLAG_UPDATE_CURRENT); //NEW
-        //PendingIntent pi = PendingIntent.getBroadcast(this, Global1.ServiceSelDel, i, 0);
-        Log.d("AlarmService","Service Num Off:"+String.valueOf(ServicePos));
-        //am.setRepeating(AlarmManager.RTC, time, AlarmManager.INTERVAL_DAY, pi); //PREV
-
-        //am.setRepeating(AlarmManager.RTC_WAKEUP, time, AlarmManager.INTERVAL_DAY, pi); //PREV
-
-
-        am.cancel(pi);
-
-    }
-
+    //Θέτει το alarm service
     private void setAlarm(long time) {
 
         int o,s;
         int recvalue;
         boolean notcont;
-        //AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
 
         AlarmManager am=Global1.am;
 
-        //Intent i = new Intent(this, AlarmService.class); //PREV
-        //Global1.i=i;
-
-        //Global1.ServiceData[ServicePos].AlarmId=-1; //Init Value
-
         notcont=false;
-/*        //Find empty Alarm Id
-        for (o=0;o<=10000;o++)
-        if (o!=ServicePos)
-        {
-            if (Global1.ServiceData[o].AlarmId==Global1.ServiceData[ServicePos].AlarmId)
-            notcont=true;
-        }
-*/
 
-
-
-
-
-            //Find empty Alarm Id
+        //Ψάχνει μια αδεία θέση για Id στο alarm
         for (recvalue=0;recvalue<=10000;recvalue++) //PREV
-        //for (recvalue=1;recvalue<=10000;recvalue++) //CHECK
         {
         notcont=false;
             for (o = 0; o <= ServicePos; o++)
@@ -303,25 +253,25 @@ public class Services extends AppCompatActivity {
         }
 
         Intent i=Global1.i;
+        //Θέτει το id της κλήσης.Είναι ενας αυξοντας string αριθμός π.χ "0","1","2","3"...
         i.setAction(String.valueOf(Global1.ServiceData[ServicePos].AlarmId));
+
+        //Μεταφέριε στο action την πολή,την τοποθεσία service και το site καιρού της κλήσης
         i.putExtra("City",City);
         i.putExtra("ServicePos",Global1.ServiceData[ServicePos].AlarmId);
         i.putExtra("Site",Global1.ServiceData[ServicePos].siteId);
 
-        //PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0); //PREV
+        //PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
         PendingIntent pi = PendingIntent.getBroadcast(this, ServicePos, i, PendingIntent.FLAG_UPDATE_CURRENT);
         Log.d("AlarmService","Service Num Set:"+String.valueOf(Global1.ServiceData[ServicePos].AlarmId));
         Log.d("AlarmService","Service Time:"+ConvertLongtoDate(time));
-
         //am.setRepeating(AlarmManager.RTC, time, AlarmManager.INTERVAL_DAY, pi); //PREV
-        am.setRepeating(AlarmManager.RTC_WAKEUP, time, AlarmManager.INTERVAL_DAY, pi); //NEW
-        //am.setRepeating(AlarmManager.RTC_WAKEUP, time, AlarmManager.ELAPSED_REALTIME, pi); //NEW
+        am.setRepeating(AlarmManager.RTC_WAKEUP, time, AlarmManager.INTERVAL_DAY, pi);
 
-        //am.cancel(pi); //TMP
-        //DisableAlarm(time); //TMP
     }
 
 
+    //Έλενχει αν υπάρχει εγγραφή με την ίδια ώρα και πολή και site
     public boolean HasSame(int days,Calendar calendar)
 
     {
@@ -353,6 +303,7 @@ public class Services extends AppCompatActivity {
         return false;
     }
 
+    //Καταχωρεί μια νέα υπηρεσία alarm
     public void NewRec(int days,Calendar calendar)
 
     {
@@ -363,12 +314,6 @@ public class Services extends AppCompatActivity {
         if (mCheckStack.isChecked()) CheckStack=true; else CheckStack=false;
         if (mCheckDark.isChecked()) CheckDark=true; else CheckDark=false;
         if (mCheckBit.isChecked()) CheckBit=true; else CheckBit=false;
-
-        //-----------------------
-        //ServicePos++; //CHECK
-        //-----------------------
-
-        //City=mCity.getText().toString(); //NEW
 
         if (CheckOpen) {
             Global1.ServiceData[ServicePos]=new FullscreenActivity.ServicesDataClass();
@@ -434,6 +379,8 @@ public class Services extends AppCompatActivity {
 
     }
 
+
+    //Θέτει τις ώρες του alarm service και το ίδιο το sevice μέσο της setAlarm
     public void SetAlarmService()
 
     {
@@ -443,15 +390,15 @@ public class Services extends AppCompatActivity {
         String DateCustomS;
         boolean plusDay;
 
-        //Maybe Not Needed Here
-        //FullscreenActivity.Global1.progressDialog=new ProgressDialog(FullscreenActivity.this);
-
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-        //Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+2:00")); //NEW
         calendar.setTimeZone(TimeZone.getTimeZone("Europe/Athens")); //NEW
         Global1.datapath=getApplicationInfo().dataDir+"/Weatherdat.txt";
 
         sameone=false;
+
+        ReadService(); //NEW
+
+        //Κλήση στις 14:00
         if (ServiceTimes==1) {
 
             Date date = new Date();
@@ -470,20 +417,18 @@ public class Services extends AppCompatActivity {
             hours=14;minutes=0;
             calendar.setTimeInMillis(System.currentTimeMillis()); //NEW
 
+            //Eδώ χρησιμοποιείται η plusDay για να την περίωπτωση που η alarm service ειναι πριν απο την δεδομένη ώρα
+            //Δηλαδή την επόμενη μέρα
             plusDay=false;
             if (hours<hoursCur) plusDay=true;
             if ((hours==hoursCur) && (minutes<minutesCur)) plusDay=true;
 
-            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1); //NEW //CHECK
+            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1);
 
-            //Afternoon
-            //calendar.set(Calendar.YEAR, year);
-            //calendar.set(Calendar.MONTH, month);
-            //calendar.set(Calendar.DAY_OF_MONTH, day);
+            //Alarm Mεσημέρι 14:00
             calendar.set(Calendar.HOUR_OF_DAY, 14);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
-
 
             if (!HasSame(1,calendar))
             {
@@ -516,35 +461,13 @@ public class Services extends AppCompatActivity {
             hours=Integer.valueOf(DateCustomS.substring(0,2));
             minutes=Integer.valueOf(DateCustomS.substring(3,5));
 
-
-/*
-            Log.d("AlarmService","CurHours:"+String.valueOf(hoursCur));
-            Log.d("AlarmService","CurMinutes:"+String.valueOf(minutesCur));
-
-            Log.d("AlarmService","Hours:"+String.valueOf(hours));
-            Log.d("AlarmService","Minutes:"+String.valueOf(minutes));
-            //calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-            //calendar.setTimeZone(TimeZone.getTimeZone("Europe/Athens")); //NEW
-*/
             calendar.setTimeInMillis(System.currentTimeMillis()); //NEW
-
-            //NEW
-            //calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-            //calendar.setTimeZone(TimeZone.getTimeZone("Europe/Athens")); //NEW
-
-            //calendar.set(year,month,day);
-            //PREV
-            //calendar.set(Calendar.YEAR, year);
-            //calendar.set(Calendar.MONTH, month);
-            //calendar.set(Calendar.DAY_OF_MONTH, day);
 
             plusDay=false;
             if (hours<hoursCur) plusDay=true;
             if ((hours==hoursCur) && (minutes<minutesCur)) plusDay=true;
 
-            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1); //NEW //CHECK
-            //if (plusDay) calendar.add(Calendar.DAY_OF_MONTH,1); //NEW //CHECK
-            //if (plusDay) calendar.add(Calendar.DATE,1); //NEW //CHECK
+            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1);
 
             if (plusDay) Log.d("AlarmService","PlusDay");
             else Log.d("AlarmService","Not PlusDay");
@@ -552,15 +475,12 @@ public class Services extends AppCompatActivity {
             //hours+=2; //GMT +2 (Athens)
             //if (hours==25) hours=1;
             //if (hours==26) hours=2;
-
-            //if (plusDay) calendar.setTimeInMillis(System.currentTimeMillis()+(24*60*60*1000)); //NEW
+            //Alarm Custom ώρα
             calendar.set(Calendar.HOUR_OF_DAY, hours);
             calendar.set(Calendar.MINUTE, minutes);
             calendar.set(Calendar.SECOND, 0);
 
-           //if (plusDay) calendar.setTimeInMillis(calendar.getTimeInMillis()+(24 * 60 * 60 * 1000)); //Add Day
-
-            Log.d("AlarmService","calendar time:"+String.valueOf(calendar.getTime().toString()));
+           Log.d("AlarmService","calendar time:"+String.valueOf(calendar.getTime().toString()));
 
 
             if (!HasSame(1,calendar))
@@ -571,6 +491,7 @@ public class Services extends AppCompatActivity {
             else Toast.makeText(this, "Service is exists", Toast.LENGTH_SHORT).show();
         }
 
+        //Κλήση στις 08:00 και 22:00
         if (ServiceTimes==2)
         {
 
@@ -596,13 +517,7 @@ public class Services extends AppCompatActivity {
 
             if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1); //NEW //CHECK
 
-
-            //calendar.setTimeInMillis(System.currentTimeMillis()); //NEW
-
-            //Moorning
-            //calendar.set(Calendar.YEAR, year);
-            //calendar.set(Calendar.MONTH, month);
-            //calendar.set(Calendar.DAY_OF_MONTH, day);
+            //Alarm Πρωί 8:00
             calendar.set(Calendar.HOUR_OF_DAY, 8);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
@@ -628,15 +543,9 @@ public class Services extends AppCompatActivity {
             if (hours<hoursCur) plusDay=true;
             if ((hours==hoursCur) && (minutes<minutesCur)) plusDay=true;
 
-            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1); //NEW //CHECK
+            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1);
 
-
-            //calendar.setTimeInMillis(System.currentTimeMillis()); //NEW
-
-            //Night
-            //calendar.set(Calendar.YEAR, year);
-            //calendar.set(Calendar.MONTH, month);
-            //calendar.set(Calendar.DAY_OF_MONTH, day);
+            //Alarm βράδυ 22:00
             calendar.set(Calendar.HOUR_OF_DAY,22 );
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
@@ -647,6 +556,7 @@ public class Services extends AppCompatActivity {
 
         }
 
+        //Κλήση στις 08:00,14:00,22:00
         if (ServiceTimes==3) {
 
             Date date = new Date();
@@ -672,10 +582,7 @@ public class Services extends AppCompatActivity {
             if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1); //NEW //CHECK
 
 
-            //Moorning
-            //calendar.set(Calendar.YEAR, year);
-            //calendar.set(Calendar.MONTH, month);
-            //calendar.set(Calendar.DAY_OF_MONTH, day);
+            //Alarm Πρωί 8:00
             calendar.set(Calendar.HOUR_OF_DAY,8 );
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
@@ -701,15 +608,9 @@ public class Services extends AppCompatActivity {
             if (hours<hoursCur) plusDay=true;
             if ((hours==hoursCur) && (minutes<minutesCur)) plusDay=true;
 
-            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1); //NEW //CHECK
+            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1);
 
-
-
-            //calendar.setTimeInMillis(System.currentTimeMillis()); //NEW
-            //Afternoon
-            //calendar.set(Calendar.YEAR, year);
-            //calendar.set(Calendar.MONTH, month);
-            //calendar.set(Calendar.DAY_OF_MONTH, day);
+            //Alarm Μεσημέρι 14:00
             calendar.set(Calendar.HOUR_OF_DAY,14 );
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
@@ -737,14 +638,7 @@ public class Services extends AppCompatActivity {
 
             if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1); //NEW //CHECK
 
-
-
-            //calendar.setTimeInMillis(System.currentTimeMillis()); //NEW
-
-            //Night
-            //calendar.set(Calendar.YEAR, year);
-            //calendar.set(Calendar.MONTH, month);
-            //calendar.set(Calendar.DAY_OF_MONTH, day);
+            //Alarm Βράδυ 22:00
             calendar.set(Calendar.HOUR_OF_DAY,22 );
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
@@ -756,7 +650,7 @@ public class Services extends AppCompatActivity {
     }
 
 
-
+    //Διαβάζει τις εγγραφές υπηρεσιών alarms
     public void ReadService()
 
     {
@@ -851,28 +745,15 @@ public class Services extends AppCompatActivity {
                     AlarmT=AlarmT.substring(0,posStr);
                     Global1.ServiceData[ServicePos].AlarmId=Integer.valueOf(AlarmT);
 
-
-
-                    //-----------------
-                    //PREV //CHECK
                     ServicePos++;
-                    //-----------------
 
-                    //NEW ///CCHECK
                     Global1.ServiceRecs=ServicePos;
 
-                    //if (2<1) //PREV
                     OutText+="Site:"+ Global1.ServiceData[ServicePos-1].site+"\n"+
                             "City:"+ Global1.ServiceData[ServicePos-1].City+"\n"+
                             "Time:"+ ConvertLongtoDate(Global1.ServiceData[ServicePos-1].time)+"\n"+
                             "_____________________________\n";
 
-                    if (2<1) //NEW
-                        OutText+="Site:"+ Global1.ServiceData[ServicePos].site+"\n"+
-                                "City:"+ Global1.ServiceData[ServicePos].City+"\n"+
-                                "Time:"+ ConvertLongtoDate(Global1.ServiceData[ServicePos].time)+"\n"+
-                                "_____________________________\n";
-
                 }
             fileReader.close();
 
@@ -884,98 +765,28 @@ public class Services extends AppCompatActivity {
         return;
     }
 
-
-
-    //NOT USED HERE, CHECK IN WeatherDetails.java
-    public void DeleteService() {
-        String datapath, strdata;
-        char[] scArray = new char[29];
-        datapath = getApplicationInfo().dataDir + "/Servicedat.txt";
-        int o;
-        int stopPos;
-
-        String SiteT;
-        String CityT;
-        String DaysT;
-        String SiteIdT;
-
-        ServicePos = 0;
-
-
-        try {
-            File fileSc = new File(datapath);
-            FileReader fileReader = new FileReader(fileSc);
-            StringBuffer stringBuffer = new StringBuffer();
-            int numCharsRead = 0; //NEW
-            char[] charArrayCity = new char[50]; //PREV
-            char[] charArray1 = new char[20];
-            char[] charArray2 = new char[1];
-            OutText = "";
-
-
-            //ArraySize=(int)(fileSc.length()-1)/320;
-            //FullscreenActivity.Global1.ArraySize=ArraySize;
-            for (i = 0; i <= (fileSc.length() - 1) / 112; i++)
-                if (i != Global1.ServiceSelDel) {
-                    SiteT = "";
-                    CityT = "";
-                    DaysT = "";
-
-
-                    fileReader.read(charArray1);
-                    stringBuffer.append(charArray1, 0, 20);
-                    SiteT = stringBuffer.toString();
-                    stringBuffer.delete(0, 20);
-
-                    fileReader.read(charArrayCity);
-                    stringBuffer.append(charArrayCity, 0, 50);
-                    CityT = stringBuffer.toString();
-                    stringBuffer.delete(0, 50);
-
-                    fileReader.read(charArray2);
-                    stringBuffer.append(charArray2, 0, 1);
-                    DaysT = stringBuffer.toString();
-                    stringBuffer.delete(0, 1);
-
-                    fileReader.read(charArray2);
-                    stringBuffer.append(charArray2, 0, 1);
-                    SiteIdT = stringBuffer.toString();
-                    stringBuffer.delete(0, 1);
-
-                    Global1.ServiceData[ServicePos] = new FullscreenActivity.ServicesDataClass();
-                    Global1.ServiceData[ServicePos].site = SiteT;
-                    Global1.ServiceData[ServicePos].City = CityT;
-                    Global1.ServiceData[ServicePos].daysnum = Integer.valueOf(DaysT);
-                    Global1.ServiceData[ServicePos].siteId = Integer.valueOf(SiteIdT);
-                    Global1.ServiceData[ServicePos].hasdone=false; //NEW //Maybe not needed
-
-                    ServicePos++;
-
-
-                    OutText += "Site:" + Global1.ServiceData[ServicePos - 1].site + "\n" +
-                            "City:" + Global1.ServiceData[ServicePos - 1].City + "\n" +
-                            "Times in a Day:" + Global1.ServiceData[ServicePos - 1].daysnum + "\n" +
-                            "_____________________________\n";
-
-                }
-            fileReader.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-
-        SaveService();
-        return;
-    }
-
-
-
-    public void SaveService()
+    //Έλενχος για σωστή ώρα
+    public boolean checktime(String TimeS)
     {
 
+        if (TimeS=="") return false;
 
+        if (TimeS.length()==5)
+        if ((TimeS.charAt(0) >= '0') && (TimeS.charAt(0) <= '9'))
+        if ((TimeS.charAt(1) >= '0') && (TimeS.charAt(1) <= '9'))
+        if (TimeS.charAt(2) == ':')
+        if ((TimeS.charAt(3) >= '0') && (TimeS.charAt(3) <= '9'))
+        if ((TimeS.charAt(4) >= '0') && (TimeS.charAt(4) <= '9'))
+        return true;
+
+
+        return false;
+    }
+
+
+    //Προσθέτει μια εγγραφή alarm service
+    public void SaveService()
+    {
         String SiteT;
         String CityT;
         String DaysT;
@@ -996,6 +807,7 @@ public class Services extends AppCompatActivity {
 
         Log.d("AlarmService","Time Long:"+ConvertLongtoDate(Global1.ServiceData[ServicePos].time));
 
+        //Γεμίζει με κενά τις μεταβλητές για να φτάσουν το μέγεθος του string array που χρησιμοποιείται παρακάτω
         for (i=SiteT.length();i<20;i++) SiteT+=" ";
         for (i=CityT.length();i<50;i++) CityT+=" ";
         for (i=TimeT.length();i<20;i++) TimeT+=" ";

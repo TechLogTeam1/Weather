@@ -51,16 +51,8 @@ import java.util.TimeZone;
 import static com.example.weather.FullscreenActivity.Global1.CoordsNamesData;
 import static org.jsoup.nodes.Entities.EscapeMode.base;
 
-
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- */
-//First
 public class FullscreenActivity extends AppCompatActivity {
-//public class FullscreenActivity extends AppCompatActivity implements Serializable{
 
-    //private View mContentView;
     private TextView mTextView;
     private TextView mDeg;
     private TextView mUnits;
@@ -68,12 +60,6 @@ public class FullscreenActivity extends AppCompatActivity {
     private TextView mHum;
     private TextView mConditions;
     private ImageView mWIcon;
-    // Delayed removal of status and navigation bar
-
-    // Note that some of these constants are new as of API 16 (Jelly Bean)
-    // and API 19 (KitKat). It is safe to use them, as they are inlined
-    // at compile-time and do nothing on earlier devices.
-
     private View mControlsView;
     private String OutText;
     private Button mButton1;
@@ -96,6 +82,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
     ProgressDialog progressDialog;
 
+    //API κλειδιά για τα sites καιρού
     private String APIOpen="400b0e4928077be78efaf4523cd3a3b5";
     private String APIAccu="GXj9XbCK7EOk5cVRnAOVN62PdDGJaTD6";
     private String APIDark="e478e283b61f95dc70771be89db8ce1c";
@@ -171,6 +158,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
     HistoryDataClass HistoryData[]=new HistoryDataClass[10000];
 
+    //Κλάση η οποία θα είναι Global και θα μπορεί να καλείτε απο όλες τις activity
     public static class Global1 {
         public static HistoryDataClass HistoryData[] = new HistoryDataClass[10000];
         public static HistoryDataClass SearchData[] = new HistoryDataClass[10000];
@@ -211,16 +199,6 @@ public class FullscreenActivity extends AppCompatActivity {
     private boolean CoordsRun,CoordsRunRec;
     private double Lat,Lon;
 
-
-
-    //Edit AndroidManifest.xml
-    //Add <uses-permission android:name="android.permission.INTERNET" />
-    //after package command
-
-    //If not runs in newer emulator (e.x. Pixel 2 API 29) simple uninstall app
-    // from mobile emulator and run again
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -231,7 +209,6 @@ public class FullscreenActivity extends AppCompatActivity {
         actionBar.hide();
 
         Global1.ServiceRun=false;
-        //SetAlarmService();
 
         Global1.am=(AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Global1.i = new Intent(this, AlarmService.class); //PREV
@@ -265,13 +242,11 @@ public class FullscreenActivity extends AppCompatActivity {
 
         mWIcon= (ImageView) findViewById(R.id.imageView2);
 
+        //Αρχικοποίηση τιμών
         City="London";Code="";
-        //Code="uk";
         Units="C";Period=1;LastPeriod=1;
         SiteUse="OpenWeather";
         mCity.setText(City);
-        //mCode.setText(Code);
-        //mTextView.setText("");
         Temperature=0;
         Humidity=0;
 
@@ -288,8 +263,7 @@ public class FullscreenActivity extends AppCompatActivity {
         mHum.setText("Humidity "+"--"+" %");
         mConditions.setText("--");
 
-        //ReadHistory();
-
+        //Εύρεση θερμοκραρσία πόλεως
         mButton1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -303,13 +277,13 @@ public class FullscreenActivity extends AppCompatActivity {
                     return;
                 }
 
-                //Code=mCode.getText().toString();
                 Content content=new Content();
                 content.execute();
 
             }
         });
 
+        //Κλήση Πλήρους Ιστορικού
         mButton2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -322,14 +296,13 @@ public class FullscreenActivity extends AppCompatActivity {
             }
         });
 
+        //Κλήση φιτλαρισμένου Ιστορικού
         mButton3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 SearchCity=mCity.getText().toString();
-                //SearchCityOn=true; //PREV
                 Global1.City=SearchCity;
-                //Global1.FullHistory=true; //PREV
                 Global1.FullHistory=false;
                 SearchCityOn=false;
 
@@ -339,11 +312,10 @@ public class FullscreenActivity extends AppCompatActivity {
             }
         });
 
+        //Κλήση Κλήσεων συστήματος
         mButton4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                //SetAlarmService();
                 Global1.progressDialog=new ProgressDialog(FullscreenActivity.this);
                 Global1.Units=Units;
                 Intent intent=new Intent(FullscreenActivity.this,Services.class);
@@ -351,6 +323,7 @@ public class FullscreenActivity extends AppCompatActivity {
             }
         });
 
+        //Κλήση μενού συντεταγμένων
         mButtonCoords.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -361,6 +334,8 @@ public class FullscreenActivity extends AppCompatActivity {
             }
         });
 
+        //Θέτει τιμές στα radio button της θερμοκρασίας
+        //Κελσίου
         mRadio1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
@@ -372,6 +347,7 @@ public class FullscreenActivity extends AppCompatActivity {
             }
         });
 
+        //Φάρεναϊτ
         mRadio2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
@@ -382,6 +358,8 @@ public class FullscreenActivity extends AppCompatActivity {
                 Units="F";
             }
         });
+
+        //Kέλβιν
         mRadio3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
@@ -392,6 +370,17 @@ public class FullscreenActivity extends AppCompatActivity {
                 Units="K";
             }
         });
+
+        //Θέτει την περίοδο ψαξίματος
+        //@param Period Είναι η μεταβλητή που δηλώνει την περίοδο ψαξίματος. Μπορεί να πάρει τις τιμές 1-3.
+        //1 = Εύρεση τωρινής θερμοκρασίας
+        //2 = Εύρεση 24ωρης θερμοκρασίας
+        //3 = Εύρεση Εβδομαδιαίας Θερμοκρασίας
+        //Επίσης μπορεί να πάρει και τις τιμές
+        //10 = Παρουσίαση Ιστορικού
+        //11 = Εμφάνιση για Services activity
+        //12 = Εμφάνιση για Coordinates(Coords) activity
+        //@param LastPeriod Βοηθητική backup μεταβλητή
 
         mRadio4.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -424,6 +413,16 @@ public class FullscreenActivity extends AppCompatActivity {
                 Period=3;LastPeriod=3;
             }
         });
+
+        //Θέτει την ιστοσελίδα που θα κλειθεί για ψάξιμπ
+        //@param SiteUse Είναι η μεταβλητή που δηλώνει την ιστοσελίδα ψαξίματος
+        //Παίρνει τιμές
+        //OpenWeather -> Ψάξιμο με Open Weather
+        //AccuWeather -> Ψάξιμο με AccuWeather
+        //WeatherStack -> Ψάξιμο με AccuStack
+        //DarkSky -> Ψάξιμο με Dark Sky
+        //Weatherbit -> Ψάξιμο με Weatherbit
+
         mRadio7.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
@@ -490,29 +489,15 @@ public class FullscreenActivity extends AppCompatActivity {
 
     }
 
-    public void SetAlarmService()
-
-    {
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-        calendar.setTimeZone(TimeZone.getTimeZone("Europe/Athens")); //NEW
-
-        //calendar.set(Calendar.YEAR,2019);
-        //calendar.set(Calendar.MONTH,12);
-        //calendar.set(Calendar.DAY_OF_MONTH,1);
-
-        calendar.set(Calendar.HOUR_OF_DAY, 15);
-        calendar.set(Calendar.MINUTE, 24);
-        calendar.set(Calendar.SECOND, 0);
-        setAlarm(calendar.getTimeInMillis());
-
-    }
-
+    //Mετατροπή UNIX ημερομηνίας σε String ημερομηνία
+    //@param unixSeconds Τιμή σε UnixSeconds
+    //@param Date String που επιστρέφει την ημερομηνία σε String
     public String ConvertUNIXtoDate(long unixSeconds) {
 
         //long unixSeconds = DateUnix;
         java.util.Date date = new java.util.Date(unixSeconds * 1000L);
         SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MM-yyyy HH:mm:ss z");
-        sdf.setTimeZone(TimeZone.getTimeZone("Europe/Athens")); //NEW
+        sdf.setTimeZone(TimeZone.getTimeZone("Europe/Athens"));
         String formattedDate = sdf.format(date);
         Date = formattedDate;
 
@@ -541,25 +526,8 @@ public class FullscreenActivity extends AppCompatActivity {
         return jsonSTR;
     }
 
-
-    private void setAlarm(long time) {
-        //getting the alarm manager
-        AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
-        //creating a new intent specifying the broadcast receiver
-        Intent i = new Intent(this, AlarmService.class);
-
-        //creating a pending intent using the intent
-
-        PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0); //PREV
-        //PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT); //NEW
-        //setting the repeating alarm that will be fired every day
-        am.setRepeating(AlarmManager.RTC, time, AlarmManager.INTERVAL_DAY, pi); //PREV
-        //am.setRepeating(AlarmManager.RTC_WAKEUP, time, AlarmManager.INTERVAL_DAY, pi);
-        Toast.makeText(this, "Alarm is set", Toast.LENGTH_SHORT).show();
-    }
-
-
+    //Ανοίγει το activity το οποίο εμφανίζει λίστες για διάφορες περιπτώσεις
+    //π.χ του ιστορικού
     public void OpenDetailed()
     {
 
@@ -567,11 +535,11 @@ public class FullscreenActivity extends AppCompatActivity {
 
         Global1.Period=Period;
         Global1.Contents=Contents; //NEEDED HERE, ELSE DOUBLICATES CONTEXT
-        //intent.putExtra("Period",Period);
-        //intent.putExtra("Contents",Contents);
         startActivity(intent);
     }
 
+    //Κλήση ρουτίνας ιστορικού
+    //Για Period=10 σημαίνει ψάξιμο ιστορικού
     public void SearchHistory()
     {
         Period=10;Global1.Period=Period;
@@ -587,6 +555,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
     }
 
+    //Διαβάζει το ιστορικό
     public void ReadHistory()
 
     {
@@ -614,12 +583,12 @@ public class FullscreenActivity extends AppCompatActivity {
             char[] charArray4=new char[1];
             char[] charArray5=new char[100];
             char[] charArray6=new char[20];
-            //char[] charArray = new char[16];
             OutText="";
-            //PREV
 
             ArraySize=(int)(fileSc.length()-1)/320;
-            Global1.ArraySize=ArraySize;
+            Global1.ArraySize=ArraySize+1;
+            if (fileSc.length()<320) Global1.ArraySize=0;
+
             for (i=0;i<=(fileSc.length()-1)/320;i++)
                {
                 TempT="";HumidityT="";WeatherConT="";SiteT="";CommentT="";
@@ -664,6 +633,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 CommentT = stringBuffer.toString();
                 stringBuffer.delete(0, 100);
 
+                //Σωσιμο στην βάση δεδομένων του ιστορικού
                 Global1.HistoryData[HistoryPos]=new HistoryDataClass();
                 Global1.HistoryData[HistoryPos].Site=SiteT;
                 Global1.HistoryData[HistoryPos].City=City;
@@ -679,14 +649,6 @@ public class FullscreenActivity extends AppCompatActivity {
 
                 ContinueRec=false;
 
-                   //if (SearchCityOn)
-                   //if (Global1.HistoryData[HistoryPos-1].City.contains(SearchCity)) ContinueRec=true;
-
-
-                     //Log.d("Sites:","Saves");
-                   //if (!SearchCityOn) ContinueRec=true;
-
-                   //if (ContinueRec)
                          OutText+="Site:"+Global1.HistoryData[HistoryPos-1].Site+"\n"+
                         "City:"+Global1.HistoryData[HistoryPos-1].City+"\n"
                         +"Date:"+Global1.HistoryData[HistoryPos-1].Date+"\n"+
@@ -695,8 +657,6 @@ public class FullscreenActivity extends AppCompatActivity {
                         +"Conditions:"+Global1.HistoryData[HistoryPos-1].WeatherCon+"\n"
                         +"Comment:"+Global1.HistoryData[HistoryPos-1].Comment+"\n"+
                            "_____________________________\n";
-
-                   //
 
 
             }
@@ -711,7 +671,7 @@ public class FullscreenActivity extends AppCompatActivity {
         Period=10;
         Contents="Records\n";
 
-        //This runned only
+        //Δημιουργία της SearchData Κλάσης με τα αποτελέσματα του ψαξίματος
         if (!SearchCityOn)
         {
             searchpos = 0;
@@ -731,27 +691,6 @@ public class FullscreenActivity extends AppCompatActivity {
                 }
             }
 
-        if (SearchCityOn) {
-            searchpos = 0;
-            for (i = 0; i < HistoryPos; i++) {
-                if (Global1.HistoryData[i].City.toLowerCase().contains(SearchCity.toLowerCase())) {
-                    Global1.SearchData[searchpos]=new HistoryDataClass();
-                    Global1.SearchData[searchpos].pos = i;
-                    Global1.SearchData[searchpos].City = Global1.HistoryData[i].City;
-                    Global1.SearchData[searchpos].Temperature = Global1.HistoryData[i].Temperature;
-                    Global1.SearchData[searchpos].Humidity = Global1.HistoryData[i].Humidity;
-                    Global1.SearchData[searchpos].Comment = Global1.HistoryData[i].Comment;
-                    Global1.SearchData[searchpos].Site = Global1.HistoryData[i].Site;
-                    Global1.SearchData[searchpos].WeatherCon = Global1.HistoryData[i].WeatherCon;
-                    Global1.SearchData[searchpos].Date = Global1.HistoryData[i].Date;
-                    Global1.SearchData[searchpos].Units = Global1.HistoryData[i].Units;
-                    //Log.d("Sites:","Saves");
-
-                    searchpos++;
-                }
-            }
-        }
-
         Global1.Period=Period;
         Global1.SearchArraySize=searchpos;
         Global1.Contents=OutText;
@@ -763,6 +702,7 @@ public class FullscreenActivity extends AppCompatActivity {
         return;
     }
 
+    //Σώζει το ιστορικό
     public void SaveHistory()
     {
 
@@ -800,6 +740,7 @@ public class FullscreenActivity extends AppCompatActivity {
         for (i=CommentT.length();i<100;i++) CommentT+=" ";
         for (i=CurrentDateT.length();i<29;i++) CurrentDateT+=" ";
 
+        //Εγγραφή στη βάση δεδομένων του ιστορικού
         Global1.HistoryData[HistoryPos]=new HistoryDataClass();
         Global1.HistoryData[HistoryPos].Site=Site1;
         Global1.HistoryData[HistoryPos].City=City;
@@ -865,10 +806,11 @@ public class FullscreenActivity extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
 
+            //Ελένχει αν δίνονται συντεταγμένες "Lat,Lon"
             CoordsRun=false;
             CoordsRunRec=false;
 
-            City=mCity.getText().toString(); //NEW HERE
+            City=mCity.getText().toString();
             if (City.charAt(0)=='"') CoordsRun=true;
 
             for (i = 0; i <=Global1.CoordsRecs-1; i++)
@@ -956,6 +898,7 @@ public class FullscreenActivity extends AppCompatActivity {
             mHum.setText("Humidity "+String.valueOf(Humidity)+" %");
             mConditions.setText(WeatherCon);
 
+            //Παρακάτω εμφανίζει τις καιρικές συνθήκες απο την μεταβλητή WeatherCon και WeatherConIcon
             if (SiteUse=="OpenWeather")
             {
                 //check for "mist" string ret
@@ -1138,12 +1081,12 @@ public class FullscreenActivity extends AppCompatActivity {
 
             }
 
+            //Εδώ υπολογίζεται η θέση την οποία πρέπει να έχει το oC σύμβολο για παράδειγμα.
+            //σύμφωνα με τα δεδομένα του κινητού...
 
             mUnits.setText(Units);
             FrameLayout.LayoutParams params1 = new FrameLayout.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
             final float scale = getBaseContext().getResources().getDisplayMetrics().density;
-
-            // convert the DP into pixel
 
             deglen=String.valueOf(Temperature).length();
             valuex=165;valuey=490;
@@ -1154,8 +1097,6 @@ public class FullscreenActivity extends AppCompatActivity {
             mDeg.setLayoutParams(params1);
 
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
-
-            // convert the DP into pixel
 
             deglen=String.valueOf(Temperature).length();
             valuex=210;valuey=480;valuex+=deglen*10;
@@ -1180,8 +1121,9 @@ public class FullscreenActivity extends AppCompatActivity {
             progressDialog.dismiss();
         }
 
-        void ReadFromOpen() //PREV
-        //public void ReadFromOpen()
+        //Kλήση OpenWeather
+        void ReadFromOpen()
+
 
         {
             if (Units=="C") UnitsTxt="&units=metric";     //Celsius
@@ -1200,7 +1142,6 @@ public class FullscreenActivity extends AppCompatActivity {
                         CallUrl="http://api.openweathermap.org/data/2.5/weather?lat="+LatStr+"&lon="+LonStr+UnitsTxt+"&APPID="+APIOpen;
 
 
-                    //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
                     Contents="";
                     Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
 
@@ -1301,13 +1242,6 @@ public class FullscreenActivity extends AppCompatActivity {
                     OutText="City:"+City+CodeTxt+"\n"+Coords+"\n"+
                             OutList;
 
-                    //OutText=Contents;
-                    //OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
-                    //  +Temp+"\n"+Humidity;
-
-                    //OutText=CallUrl;
-
-
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -1332,7 +1266,7 @@ public class FullscreenActivity extends AppCompatActivity {
         }
 
 
-
+        //Kλήση AccuWeather
         void ReadFromAccu()
         {
             if (Units=="C") UnitsTxt="&units=metric";     //Celsius
@@ -1341,9 +1275,6 @@ public class FullscreenActivity extends AppCompatActivity {
 
             if (Code.length()<2) CodeTxt=""; else CodeTxt=","+Code;
 
-            //CityKey="328328"; //London
-            //CallUrl="http://dataservice.accuweather.com/locations/v1/cities/search?q=London&apikey=GXj9XbCK7EOk5cVRnAOVN62PdDGJaTD6";
-            //CallUrl="http://dataservice.accuweather.com/locations/v1/cities/search?q="+City+"&apikey="+APIAccu;
 
             //First Call
             try {
@@ -1381,8 +1312,6 @@ public class FullscreenActivity extends AppCompatActivity {
             //Second Call
             if (Period==1)
                 try {
-                    //CallUrl="http://api.openweathermap.org/data/2.5/weather?q="+City+CodeTxt+UnitsTxt+"&APPID="+API;
-                    //CallUrl="http://dataservice.accuweather.com/locations/v1/cities/search?q="+City+"&apikey="+APIAccu;
                     CallUrl="http://dataservice.accuweather.com/currentconditions/v1/"+CityKey+"?apikey="+APIAccu+"&details=true";
 
                     Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
@@ -1418,17 +1347,10 @@ public class FullscreenActivity extends AppCompatActivity {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    //"WeatherText"
-                    //OutText=WeatherText;
-                    //OutText=Contents;
 
                     OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
                             +Coords+"\n"+Temp+"\n"+HumidityTxt;
 
-                    //OutText=CityKey;
-                    //OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
-                    //      +Coords+"\n"+Temp+"\n"+Humidity;
-                    //OutText=CallUrl;
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -1439,9 +1361,6 @@ public class FullscreenActivity extends AppCompatActivity {
             if (Period==2)
             {
                 try {
-                    //CallUrl="http://api.openweathermap.org/data/2.5/weather?q="+City+CodeTxt+UnitsTxt+"&APPID="+API;
-                    //CallUrl="http://dataservice.accuweather.com/locations/v1/cities/search?q="+City+"&apikey="+APIAccu;
-                    //CallUrl="http://dataservice.accuweather.com/currentconditions/v1/"+CityKey+"?apikey="+APIAccu+"&details=true";
                     CallUrl="http://dataservice.accuweather.com/currentconditions/v1/"+CityKey+"/historical/24?apikey="+APIAccu;
                     Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
                     Contents=Contents.substring(1,Contents.length());
@@ -1469,17 +1388,10 @@ public class FullscreenActivity extends AppCompatActivity {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    //"WeatherText"
-                    //OutText=WeatherText;
-                    //OutText=Contents;
 
                     OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
                             +Coords+"\n"+Temp+"\n"+HumidityTxt;
 
-                    //OutText=CityKey;
-                    //OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
-                    //      +Coords+"\n"+Temp+"\n"+Humidity;
-                    //OutText=CallUrl;
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -1505,22 +1417,6 @@ public class FullscreenActivity extends AppCompatActivity {
 
                         JSONObject jsonObj = new JSONObject(Contents);
                         JSONArray baseArray=jsonObj.getJSONArray("DailyForecasts");
-                        //JSONObject obj2 = jsonObj.getJSONObject("Temperature");
-                        //JSONObject obj3;
-
-                /*
-                if (Units=="C")
-                    obj3 = obj2.getJSONObject("Metric");
-                else
-                if (Units=="F")
-                    obj3 = obj2.getJSONObject("Imperial");
-                else
-                    obj3 = obj2.getJSONObject("Metric");
-
-                Temp="Temperature:"+obj3.getString("Value")+" "+Units;
-                Humidity="Humidity:"+jsonObj.getString("RelativeHumidity")+"%";
-                */
-
 
                         OutList="";
                         ArraySize=baseArray.length();
@@ -1532,9 +1428,6 @@ public class FullscreenActivity extends AppCompatActivity {
 
                             Temp = "Temp:" + obj3.getString("Value") + " " + Units;
                             HumidityTxt="--";
-                            //Humidity = "Humidity:" + obj2.getString("humidity") + "%";
-                            //DateUnix=Long.valueOf(json2.getString("time"));
-                            //Date=ConvertUNIXtoDate(DateUnix);
                             Date=json2.getString("Date");
 
 
@@ -1583,13 +1476,12 @@ public class FullscreenActivity extends AppCompatActivity {
             return;
         }
 
+        //Kλήση Dark Sky
         void ReadFromDark()
         {
 
             if (Units=="C") UnitsTxt="?units=si";     //Celsius
             if (Units=="F") UnitsTxt="";   //Fahrenheit
-            //if (Units=="F") UnitsTxt="&units=imperial";   //Fahrenheit
-            //if (Units=="K") UnitsTxt="";                  //Kelvin
 
             if (Code.length()<2) CodeTxt=""; else CodeTxt=","+Code;
 
@@ -1640,8 +1532,6 @@ public class FullscreenActivity extends AppCompatActivity {
             if (Period==1)
                 try {
                     CallUrl="https://api.darksky.net/forecast/"+APIDark+"/"+Latitude+","+Longitude+UnitsTxt;
-                    //CallUrl="https://api.darksky.net/forecast/153f92e90eba11f8a60979ad1f5d791b/37.8267,-122.4233";
-                    //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
                     Contents="";
                     Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
 
@@ -1672,12 +1562,9 @@ public class FullscreenActivity extends AppCompatActivity {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-
-                    //OutText=Contents;
-                    //OutText=Coords+"\n"+Temp;
                     OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
                             +Coords+"\n"+Temp+"\n"+Humidity;
-                    //OutText=CallUrl;
+
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -1685,9 +1572,6 @@ public class FullscreenActivity extends AppCompatActivity {
 
             if (Period==2)
                 try {
-                    //CallUrl="http://api.openweathermap.org/data/2.5/forecast?q="+City+CodeTxt+UnitsTxt+"&APPID="+APIOpen;
-                    //CallUrl="http://api.openweathermap.org/data/2.5/forecast?q="+City+"&APPID="+APIOpen;
-                    //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
 
                     CallUrl="https://api.darksky.net/forecast/"+APIDark+"/"+Latitude+","+Longitude+UnitsTxt;
 
@@ -1734,13 +1618,6 @@ public class FullscreenActivity extends AppCompatActivity {
                     OutText="City:"+City+CodeTxt+"\n"+Coords+"\n"+
                             OutList;
 
-                    //OutText=Contents;
-                    //OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
-                    //  +Temp+"\n"+Humidity;
-
-                    //OutText=CallUrl;
-
-
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -1749,9 +1626,6 @@ public class FullscreenActivity extends AppCompatActivity {
 
             if (Period==3)
                 try {
-                    //CallUrl="http://api.openweathermap.org/data/2.5/forecast?q="+City+CodeTxt+UnitsTxt+"&APPID="+APIOpen;
-                    //CallUrl="http://api.openweathermap.org/data/2.5/forecast?q="+City+"&APPID="+APIOpen;
-                    //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
 
                     CallUrl="https://api.darksky.net/forecast/"+APIDark+"/"+Latitude+","+Longitude+UnitsTxt;
 
@@ -1798,13 +1672,6 @@ public class FullscreenActivity extends AppCompatActivity {
                     OutText="City:"+City+CodeTxt+"\n"+Coords+"\n"+
                             OutList;
 
-                    //OutText=Contents;
-                    //OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
-                    //  +Temp+"\n"+Humidity;
-
-                    //OutText=CallUrl;
-
-
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -1847,7 +1714,7 @@ public class FullscreenActivity extends AppCompatActivity {
         }
 
 
-
+        //Kλήση WeatherBit
         void ReadFromBit()
         {
             //if (Units=="C") UnitsTxt="&units=M";   //Celsius
@@ -1919,6 +1786,7 @@ public class FullscreenActivity extends AppCompatActivity {
             return;
         }
 
+        //Kλήση WeatherStack
         void ReadFromStack()
         {
             if (Units=="C") UnitsTxt="&units=m";   //Celsius
@@ -1926,11 +1794,9 @@ public class FullscreenActivity extends AppCompatActivity {
             if (Units=="K") UnitsTxt="&units=s";   //Kelvin
 
             if (Code.length()<2) CodeTxt=""; else CodeTxt=","+Code;
-            //http://api.weatherstack.com/current?access_key=e4c1390e4110c5a78e89c99f56b94b08&query=London
+
             if (Period==1)
                 try {
-                    //CallUrl="http://api.openweathermap.org/data/2.5/weather?q="+City+CodeTxt+UnitsTxt+"&APPID="+APIOpen;
-                    //CallUrl="http://api.weatherstack.com/current?access_key=e4c1390e4110c5a78e89c99f56b94b08&query=London";
 
                     if (!CoordsRun)
                         CallUrl="http://api.weatherstack.com/current?access_key="+APIStack+"&query="+City+UnitsTxt;
@@ -1938,8 +1804,6 @@ public class FullscreenActivity extends AppCompatActivity {
                     if (CoordsRun)
                         CallUrl="http://api.weatherstack.com/current?access_key="+APIStack+"&query="+LatStr+","+LonStr+UnitsTxt;
 
-
-                    //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
                     Contents="";
                     Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
 
@@ -1974,12 +1838,8 @@ public class FullscreenActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
 
-                    //OutText=Contents;
-                    //OutText=Humidity;
-
                     OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
                             +Coords+"\n"+Temp+"\n"+Humidity;
-                    //OutText=CallUrl;
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -2031,14 +1891,6 @@ public class FullscreenActivity extends AppCompatActivity {
                     OutText="City:"+City+CodeTxt+"\n"+Coords+"\n"+
                             OutList;
 
-                    //OutText=Contents;
-                    //OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
-                    //  +Temp+"\n"+Humidity;
-
-                    //OutText=CallUrl;
-
-
-
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -2057,6 +1909,7 @@ public class FullscreenActivity extends AppCompatActivity {
             OutText="";
             WeatherCon="";
 
+            //Eδω γίνονται οι κλήσεις στις ιστοσελίδες καιρού
             if (SiteUse=="OpenWeather") ReadFromOpen();
             if (SiteUse=="AccuWeather") ReadFromAccu();
             if (SiteUse=="DarkSky") ReadFromDark();

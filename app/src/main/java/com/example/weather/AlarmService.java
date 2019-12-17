@@ -30,14 +30,8 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 //import com.example.weather.
 
-/**
- * Created by Belal on 8/29/2017.
- */
-
-
 //class extending the Broadcast Receiver
-public class AlarmService extends BroadcastReceiver { //PREV
-    //public class AlarmService extends AppCompatActivity {
+public class AlarmService extends BroadcastReceiver {
     private String Units;
     private String UnitsTxt;
     private String Contents, OutText;
@@ -89,11 +83,8 @@ public class AlarmService extends BroadcastReceiver { //PREV
     int ServiceIdPos;
     boolean isOpen,isAccu,isStack,isDark,isBit;
     int isOpen1,isAccu1,isStack1,isDark1,isBit1;
-    //private int year,month,day,hours,minutes;
-    //private long rechour;
-    //private long recminute;
-    //private Calendar calendar;
 
+    //Σώσιμο των κλήσεων των υπηρεσιών στην μνήμη
     public void SaveHistory() {
 
 
@@ -130,6 +121,7 @@ public class AlarmService extends BroadcastReceiver { //PREV
         for (i = CommentT.length(); i < 100; i++) CommentT += " ";
         for (i = CurrentDateT.length(); i < 29; i++) CurrentDateT += " ";
 
+        //Νές Εγγραφή στην λίστα ιστορικού
         Global1.HistoryData[HistoryPos] = new FullscreenActivity.HistoryDataClass();
         Global1.HistoryData[HistoryPos].Site = Site1;
         Global1.HistoryData[HistoryPos].City = City;
@@ -148,15 +140,11 @@ public class AlarmService extends BroadcastReceiver { //PREV
         //datapath=getApplicationInfo().dataDir+"/Weatherdat.txt";
         datapath = Global1.datapath;
         File fileSc = new File(datapath);
-
+        //Εγγραφή καταχώρησης στο αρχείο ιστορικό
         try {
-
-
             //fileSc.createNewFile();
-
             FileWriter fileWriter = new FileWriter(fileSc, true); //Append File
             //FileWriter fileWriter = new FileWriter(fileSc); //New File
-
             fileWriter.write(SiteT, 0, 20);
             fileWriter.write(City, 0, 50);
             //fileWriter.write(CurrentDate, 0, 29); //HERE'S PROBLEM WITH MOBILE, DON'T RUN!!!
@@ -164,10 +152,8 @@ public class AlarmService extends BroadcastReceiver { //PREV
             fileWriter.write(TempT, 0, 10);
             fileWriter.write(HumidityT, 0, 10);
             fileWriter.write(WeatherConT, 0, 100);
-
             fileWriter.write(UnitsT, 0, 1);
             fileWriter.write(CommentT, 0, 100);
-
 
             fileWriter.flush();
 
@@ -187,30 +173,11 @@ public class AlarmService extends BroadcastReceiver { //PREV
         return;
     }
 
-    /*
-    public void GetCurTime()
-
-    {
-        Date date = new Date();
-        String strDateFormat = "dd-MM-yyyy HH:mm:ss z";
-        DateFormat dateFormat = new SimpleDateFormat(strDateFormat);
-        dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Athens"));
-        String formattedDate= dateFormat.format(date);
-        CurrentDate=formattedDate;
-
-        year=date.getYear();
-        month=date.getMonth();
-        day=date.getDay();
-        hours=date.getHours();
-        minutes=date.getMinutes();
-
-    }
-*/
-
-
     @Override
     public void onReceive(Context context, Intent intent)
     {
+        //Αποδοχή μυνήματος για κλήση Background Service Alarm
+
         Global1.ServiceRun = true;
         //Units = "C";
         Units=Global1.Units;
@@ -221,55 +188,21 @@ public class AlarmService extends BroadcastReceiver { //PREV
 
         Log.d("AlarmService", "Alarm just fired"); //PREV
 
-        intent=Global1.i; //NEW //CHECK
+        intent=Global1.i;
 
         Action=intent.getAction();
 
-        //GetCurTime();
-
-        //NEW
-        //calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-        //calendar.setTimeZone(TimeZone.getTimeZone("Europe/Athens"));
-
-        //for (i=0;i<=Global1.ServiceRecs-1;i++) //PREV
-        for (i=0;i<=Global1.ServiceRecs;i++)
-              if (Action.equals(String.valueOf(i))) {
+        //Ελένχει κάθε action κωδικό της service κλήσης
+        //Οι action κωδικοί παίρνουν τιμές σε αύξοντα ρυθμό π.χ "0","1","2","3" κ.τ.λ.
+                for (i=0;i<=Global1.ServiceRecs;i++)
+                if (Action.equals(String.valueOf(i))) {
                 City = intent.getStringExtra("City");
                 ServiceIdPos = intent.getIntExtra("ServicePos", 0);
                 siteId=intent.getIntExtra("Site", 0);
-
-                  //rechour=TimeUnit.MILLISECONDS.toHours(Global1.ServiceData[i].time);
-                  //recminute=TimeUnit.MILLISECONDS.toMinutes(Global1.ServiceData[i].time);
-
-                  /*
-                  calendar.setTimeInMillis(Global1.ServiceData[i].time); //Check i here
-
-                  //rechour=calendar.get(Calendar.HOUR); //12 hours format
-                  rechour=calendar.get(Calendar.HOUR_OF_DAY); //24 hours format
-                  recminute=calendar.get(Calendar.MINUTE);
-
-
-                  //GMT +2:00 Athens
-                  rechour-=2;
-                  if (rechour==-1) rechour=23;
-                  if (rechour==-2) rechour=22;
-
-                  Log.d("AlarmService", "CurHours:" +hours);
-                  Log.d("AlarmService", "Curminutes:" +minutes);
-
-                  Log.d("AlarmService", "recHours:" +rechour);
-                  Log.d("AlarmService", "recHinutes:" +recminute);
-
-                if (hours==rechour)*/
-                {
-                    Log.d("AlarmService", "City:" + City);
-                    Log.d("AlarmService", "Service Pos:" + String.valueOf(ServiceIdPos));
-                    content = new Content(); //NEW POS
-                    content.execute();
-                }
-
-
-
+                Log.d("AlarmService", "City:" + City);
+                Log.d("AlarmService", "Service Pos:" + String.valueOf(ServiceIdPos));
+                content = new Content(); //NEW POS
+                content.execute();
             }
 
     }
@@ -280,7 +213,7 @@ public class AlarmService extends BroadcastReceiver { //PREV
         @Override
         protected Void doInBackground(Void... voids) {
 
-
+            //Κλήση των ιστοσελίδων απο το alarm service
             if (siteId==1) ReadFromOpen();
             if (siteId==2) ReadFromAccu();
             if (siteId==3) ReadFromStack();
@@ -314,9 +247,7 @@ public class AlarmService extends BroadcastReceiver { //PREV
 
 
 
-        void ReadFromOpen() //PREV
-        //public void ReadFromOpen()
-
+        void ReadFromOpen()
         {
             if (Units == "C") UnitsTxt = "&units=metric";     //Celsius
             if (Units == "F") UnitsTxt = "&units=imperial";   //Fahrenheit
@@ -325,13 +256,8 @@ public class AlarmService extends BroadcastReceiver { //PREV
             if (Code.length() < 2) CodeTxt = "";
             else CodeTxt = "," + Code;
 
-            //if (Period==1)
             try {
                 CallUrl = "http://api.openweathermap.org/data/2.5/weather?q=" + City + CodeTxt + UnitsTxt + "&APPID=" + APIOpen;
-                //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
-
-                //CallUrl=""; //TMP
-
                 Contents = "";
                 Contents = Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
 
@@ -391,10 +317,6 @@ public class AlarmService extends BroadcastReceiver { //PREV
             if (Code.length() < 2) CodeTxt = "";
             else CodeTxt = "," + Code;
 
-            //CityKey="328328"; //London
-            //CallUrl="http://dataservice.accuweather.com/locations/v1/cities/search?q=London&apikey=GXj9XbCK7EOk5cVRnAOVN62PdDGJaTD6";
-            //CallUrl="http://dataservice.accuweather.com/locations/v1/cities/search?q="+City+"&apikey="+APIAccu;
-
             //First Call
             try {
                 CallUrl = "http://dataservice.accuweather.com/locations/v1/cities/search?q=" + City + "&apikey=" + APIAccu;
@@ -422,8 +344,6 @@ public class AlarmService extends BroadcastReceiver { //PREV
             //Second Call
 
             try {
-                //CallUrl="http://api.openweathermap.org/data/2.5/weather?q="+City+CodeTxt+UnitsTxt+"&APPID="+API;
-                //CallUrl="http://dataservice.accuweather.com/locations/v1/cities/search?q="+City+"&apikey="+APIAccu;
                 CallUrl = "http://dataservice.accuweather.com/currentconditions/v1/" + CityKey + "?apikey=" + APIAccu + "&details=true";
 
                 Contents = Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
@@ -458,17 +378,10 @@ public class AlarmService extends BroadcastReceiver { //PREV
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                //"WeatherText"
-                //OutText=WeatherText;
-                //OutText=Contents;
 
                 OutText = "City:" + City + CodeTxt + "\n" + "---------------------------------------------" + "\n"
                         + Coords + "\n" + Temp + "\n" + HumidityTxt;
 
-                //OutText=CityKey;
-                //OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
-                //      +Coords+"\n"+Temp+"\n"+Humidity;
-                //OutText=CallUrl;
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -483,8 +396,6 @@ public class AlarmService extends BroadcastReceiver { //PREV
 
             if (Units=="C") UnitsTxt="?units=si";     //Celsius
             if (Units=="F") UnitsTxt="";   //Fahrenheit
-            //if (Units=="F") UnitsTxt="&units=imperial";   //Fahrenheit
-            //if (Units=="K") UnitsTxt="";                  //Kelvin
 
             if (Code.length()<2) CodeTxt=""; else CodeTxt=","+Code;
 
@@ -493,7 +404,6 @@ public class AlarmService extends BroadcastReceiver { //PREV
 
             try {
                 CallUrl="http://api.openweathermap.org/data/2.5/weather?q="+City+CodeTxt+"&APPID="+APIOpen;
-                //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
                 Contents="";
                 Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
 
@@ -509,11 +419,7 @@ public class AlarmService extends BroadcastReceiver { //PREV
                     e.printStackTrace();
                 }
 
-                //OutText=Contents;
                 OutText=Latitude+","+Longitude;
-                //OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
-                //      +Coords+"\n"+Temp+"\n"+Humidity;
-                //OutText=CallUrl;
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -523,8 +429,6 @@ public class AlarmService extends BroadcastReceiver { //PREV
             //Second call (Call DarkSky)
             try {
                 CallUrl="https://api.darksky.net/forecast/"+APIDark+"/"+Latitude+","+Longitude+UnitsTxt;
-                //CallUrl="https://api.darksky.net/forecast/153f92e90eba11f8a60979ad1f5d791b/37.8267,-122.4233";
-                //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
                 Contents="";
                 Contents= Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
 
@@ -556,11 +460,8 @@ public class AlarmService extends BroadcastReceiver { //PREV
                     e.printStackTrace();
                 }
 
-                //OutText=Contents;
-                //OutText=Coords+"\n"+Temp;
                 OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
                         +Coords+"\n"+Temp+"\n"+Humidity;
-                //OutText=CallUrl;
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -577,7 +478,6 @@ public class AlarmService extends BroadcastReceiver { //PREV
 
         void ReadFromBit()
         {
-            //if (Units=="C") UnitsTxt="&units=M";   //Celsius
             if (Units=="C") UnitsTxt="";   //Celsius (Default)
             if (Units=="F") UnitsTxt="&units=I";   //Fahrenheit
             if (Units=="K") UnitsTxt="&units=S";   //Kelvin
@@ -623,20 +523,15 @@ public class AlarmService extends BroadcastReceiver { //PREV
                     e.printStackTrace();
                 }
 
-                //OutText=Contents;
-                //OutText=Temp;
                 OutText="City:"+City+CodeTxt+"\n"+"---------------------------------------------"+"\n"
                         +Coords+"\n"+Temp+"\n"+HumidityTxt;
-                //OutText=CallUrl;
+
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
 
-
-            //if (Period==2) OutText="Period: Last 24 hours";
-            //if (Period==3) OutText="Period: Last 5 days";
 
             return;
         }
@@ -650,17 +545,9 @@ public class AlarmService extends BroadcastReceiver { //PREV
 
             if (Code.length() < 2) CodeTxt = "";
             else CodeTxt = "," + Code;
-            //http://api.weatherstack.com/current?access_key=e4c1390e4110c5a78e89c99f56b94b08&query=London
 
             try {
-                //CallUrl="http://api.openweathermap.org/data/2.5/weather?q="+City+CodeTxt+UnitsTxt+"&APPID="+APIOpen;
-                //CallUrl="http://api.weatherstack.com/current?access_key=e4c1390e4110c5a78e89c99f56b94b08&query=London";
-
-
                 CallUrl = "http://api.weatherstack.com/current?access_key=" + APIStack + "&query=" + City + UnitsTxt;
-
-
-                //doc = Jsoup.connect(CallUrl).ignoreContentType(true).get();
                 Contents = "";
                 Contents = Jsoup.connect(CallUrl).ignoreContentType(true).execute().body();
 
@@ -695,12 +582,8 @@ public class AlarmService extends BroadcastReceiver { //PREV
                     e.printStackTrace();
                 }
 
-                //OutText=Contents;
-                //OutText=Humidity;
-
                 OutText = "City:" + City + CodeTxt + "\n" + "---------------------------------------------" + "\n"
                         + Coords + "\n" + Temp + "\n" + Humidity;
-                //OutText=CallUrl;
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -711,5 +594,7 @@ public class AlarmService extends BroadcastReceiver { //PREV
 
 
 
-    } //NEW
-} //NEW
+
+
+    }
+}

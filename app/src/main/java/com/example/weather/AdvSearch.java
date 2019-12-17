@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,18 +17,15 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.Toast;
 
-
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- */
 public class AdvSearch extends AppCompatActivity {
 
 
     private Button mButtonSel;
     private Button mButtonDis;
     private Button mButtonClear;
+    private Button mButtonOK;
     private EditText mFromTemp,mToTemp;
 
     private CheckBox mCheckClear;
@@ -42,6 +40,42 @@ public class AdvSearch extends AppCompatActivity {
     private String Units;
     private float FromT,ToT;
 
+
+    //Έλενχος για στωστή θερμοκρασία
+    public boolean checkTemperature(String TempS)
+    {
+
+        int i;
+        int digits;
+        boolean acceptvalue;
+
+        digits=0;
+
+        acceptvalue=false;
+        if (TempS=="") return false;
+
+        for (i=0;i<TempS.length();i++)
+        {
+
+            acceptvalue=false;
+            if (((TempS.charAt(i) >= '0') && (TempS.charAt(i) <= '9')) ||
+                    ((TempS.charAt(i) == '-') || (TempS.charAt(i) == '.')))
+            {
+                acceptvalue = true;
+                digits++;
+            }
+
+            if (!acceptvalue) return false;
+        }
+
+        if ((TempS.contains("-")) && (TempS.charAt(0)!='-')) return false;
+
+        if (digits!=TempS.length()) return false;
+
+        return true;
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +88,7 @@ public class AdvSearch extends AppCompatActivity {
         mButtonSel= (Button) findViewById(R.id.buttonSelAll1);
         mButtonDis= (Button) findViewById(R.id.buttonDisAll1);
         mButtonClear= (Button) findViewById(R.id.buttonClear);
+        mButtonOK= (Button) findViewById(R.id.buttonOK);
 
         mFromTemp= (EditText) findViewById(R.id.editTextFromT);
         mToTemp= (EditText) findViewById(R.id.editTextToT);
@@ -71,12 +106,14 @@ public class AdvSearch extends AppCompatActivity {
         mFromTemp.setText(String.valueOf(Global1.FromT));
         mToTemp.setText(String.valueOf(Global1.ToT));
 
+        //Θέτει τις τιμές των checkboxes
         if (Global1.Clear) mCheckClear.setChecked(true); else mCheckClear.setChecked(false);
         if (Global1.Clouds) mCheckClouds.setChecked(true); else mCheckClouds.setChecked(false);
         if (Global1.Rain) mCheckRain.setChecked(true); else mCheckRain.setChecked(false);
         if (Global1.Snow) mCheckSnow.setChecked(true); else mCheckSnow.setChecked(false);
         if (Global1.Thunder) mCheckThunder.setChecked(true); else mCheckThunder.setChecked(false);
 
+        //Διαβάζει και περνάει στην μνήμη τις τιμές των checkboxes όταν κάποιο/κάποια απο τα checkboxes αλλάξουν
         mCheckClear.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -112,6 +149,7 @@ public class AdvSearch extends AppCompatActivity {
             }
         });
 
+        //Ενεργοποιεί όλα τα checkboxes
         mButtonSel.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -124,6 +162,7 @@ public class AdvSearch extends AppCompatActivity {
             }
         });
 
+        //Απενεργοποιεί όλα τα checkboxes
         mButtonDis.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -135,6 +174,7 @@ public class AdvSearch extends AppCompatActivity {
             }
         });
 
+        //Θετει τις default τιμές
         mButtonClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -151,31 +191,42 @@ public class AdvSearch extends AppCompatActivity {
             }
         });
 
-        mFromTemp.setOnKeyListener(new View.OnKeyListener() {
+        //Αφού όλες οι παράμετροι είναι σωστές, βγαίνει απο το παρόν activity
+        mButtonOK.setOnClickListener(new View.OnClickListener() {
 
             @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
+            public void onClick(View v)
+            {
+
+                //Έλενχος για θερμοκρασία απο
+                if (!checkTemperature(mFromTemp.getText().toString()))
+                {
+                    Toast.makeText(AdvSearch.this, "Wrong Temperature from", Toast.LENGTH_SHORT).show();
+                    Global1.FromT=FromT;
+                    return;
+                }
 
                 FromT=Float.valueOf(mFromTemp.getText().toString());
                 Global1.FromT=FromT;
 
-                return false;
-            }
-        });
-
-
-        mToTemp.setOnKeyListener(new View.OnKeyListener() {
-
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                //Έλενχος για θερμοκρασία προς
+                if (!checkTemperature(mToTemp.getText().toString()))
+                {
+                    Toast.makeText(AdvSearch.this, "Wrong Temperature To", Toast.LENGTH_SHORT).show();
+                    Global1.ToT=ToT;
+                    return;
+                }
 
                 ToT=Float.valueOf(mToTemp.getText().toString());
                 Global1.ToT=ToT;
 
-                return false;
+               finish(); //Επιστροφή στο προηγούμενο activity
+
             }
         });
 
+
+        //Επιλέγει την μονάδα μετρήσης των βαθμών
         mRadio1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)

@@ -23,6 +23,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileReader;
@@ -39,48 +40,9 @@ import java.util.TimeZone;
 
 import static com.example.weather.FullscreenActivity.Global1.HistoryData;
 
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- */
 public class WeatherDetails extends AppCompatActivity {
-    /**
-     * Whether or not the system UI should be auto-hidden after
-     * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
-     */
-    private static final boolean AUTO_HIDE = true;
 
-    /**
-     * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
-     * user interaction before hiding the system UI.
-     */
-    private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
-
-    /**
-     * Some older devices needs a small delay between UI widget updates
-     * and a change of the status and navigation bar.
-     */
-    private static final int UI_ANIMATION_DELAY = 300;
-    private final Handler mHideHandler = new Handler();
     private View mContentView;
-    private final Runnable mHidePart2Runnable = new Runnable() {
-        @SuppressLint("InlinedApi")
-        @Override
-        public void run() {
-            // Delayed removal of status and navigation bar
-
-            // Note that some of these constants are new as of API 16 (Jelly Bean)
-            // and API 19 (KitKat). It is safe to use them, as they are inlined
-            // at compile-time and do nothing on earlier devices.
-            mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        }
-    };
-    private View mControlsView;
 
     private TextView mTitleText;
     private TextView mDataTxt;
@@ -112,13 +74,7 @@ public class WeatherDetails extends AppCompatActivity {
     private String LonStrT;
     private int CoordsPos;
 
-
-    /**
-     * Touch listener to use for in-layout UI controls to delay hiding the
-     * system UI. This is to prevent the jarring behavior of controls going away
-     * while interacting with activity UI.
-     */
-
+    //Μετατροπή milliseconds σε String ημερομηνία/ώρα
     public String ConvertLongtoDate(long unixSeconds) {
 
 
@@ -133,6 +89,7 @@ public class WeatherDetails extends AppCompatActivity {
         return formattedDate;
     }
 
+    //Εισαγωγή σχολίου σε μια εγγραφή
     public void SaveHistory2()
     {
 
@@ -152,13 +109,26 @@ public class WeatherDetails extends AppCompatActivity {
         File fileSc = new File(datapath);
         OutText="";
 
+        Global1.ArraySize=(int)(fileSc.length()-1)/320;
+
+        //Έλενχος αν η εγγραφή του ιστορικού είναι άδεια
+        if (fileSc.length()<320)
+        {
+            Toast.makeText(WeatherDetails.this, "Services Records Empty", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        //Καταχώρηση σχολίου στην εγγραφή αφου δεν είναι άδεια
+        int hpos;
+        hpos = Global1.SearchData[ScrollId].pos;
+        Global1.HistoryData[hpos].Comment = mEditCommit.getText().toString();
+        Global1.SearchData[hpos].Comment = mEditCommit.getText().toString(); //NEW //CHECK
+
         try {
-            //Global1.ArraySize=(int)(fileSc.length()-1)/320;
+
             FileWriter fileWriter = new FileWriter(fileSc); //New File
             for (o=0;o<=Global1.ArraySize;o++)
             {
-
-
                 Site1 = Global1.HistoryData[o].Site;
                 City1 = Global1.HistoryData[o].City;
                 Date1 = Global1.HistoryData[o].Date;
@@ -196,7 +166,6 @@ public class WeatherDetails extends AppCompatActivity {
                 fileWriter.write(CommentT, 0, 100);
 
 
-                //NEW //CHECK
                 posStr=HistoryData[o].City.length()-1;
                 for (s=HistoryData[o].City.length()-1; s>0; s--) if (Global1.HistoryData[o].City.charAt(s)!=' ') {posStr=s+1;break;}
                 Global1.HistoryData[o].City=Global1.HistoryData[o].City.substring(0,posStr);
@@ -255,76 +224,59 @@ public class WeatherDetails extends AppCompatActivity {
         Global1.NameSelDel=-1;
 
         Intent intent = getIntent();
-        //Period=intent.getIntExtra("Period",0);
-        //Contents=intent.getStringExtra("Contents");
         mDataTxt.setMovementMethod(new ScrollingMovementMethod());
 
         //NEW
         Period = Global1.Period;
         Contents=Global1.Contents;
 
+        //Επιλογή button σχολίου
         mCommit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 Log.d("Services:","Period:"+String.valueOf(Period));
-                //if (Period!=11) { //PREV
-                if ((Period!=11) && (Period!=12)) { //NEW
-                //if (Period<10) {
 
+                //Περίπτωση εγγραφής ιστορικού
+                if ((Period!=11) && (Period!=12))
+                {
                     ScrollY = mDataTxt.getScrollY();
                     ScrollPos = ScrollY / mDataTxt.getLineHeight();
-                    //ScrollId=ScrollPos/7; //PREV
                     ScrollId = ScrollPos / 8; //ADDED _____________________
-
-                    int hpos;
-                    int hpos2;
-
-                    hpos = Global1.SearchData[ScrollId].pos;
-                    Global1.HistoryData[hpos].Comment = mEditCommit.getText().toString();
-                    Global1.SearchData[hpos].Comment = mEditCommit.getText().toString(); //NEW //CHECK
-
-                    SaveHistory2(); //if for all
+                    SaveHistory2(); //Εισαγωγή σχολίου σε μια εγγραφή
                     for (i=1;i<=15;i++) Contents+="\n"; //Help for choosing from top line
-                    //if (Period==10) recRefresh();
-
-                    mDataTxt.setText(Contents); //NEW
-                    mDataTxt.setScrollY(ScrollY); //NEW
+                    mDataTxt.setText(Contents);
+                    mDataTxt.setScrollY(ScrollY);
 
                 }
 
-
-                //Services
-                //NEW
+                //Διαγραφή εγγραφής υπηρεσιών (Services)
                 if (Period==11) {
-
                     ScrollY = mDataTxt.getScrollY();
                     ScrollPos = ScrollY / mDataTxt.getLineHeight();
                     ScrollId=ScrollPos/3;
                     Global1.ServiceSelDel=ScrollId;
-
-                    //Log.d("AlarmService","Service Num Off(0):"+String.valueOf(Global1.ServiceSelDel));
-                    //Log.d("AlarmService","Service Num Off(0):"+Global1.ServiceData[Global1.ServiceSelDel].AlarmId);
-                    DeleteService(); //NEW //CHECK
+                    DeleteService();
                     ReadService();
-                    mDataTxt.setScrollY(ScrollY); //NEW
+                    mDataTxt.setScrollY(ScrollY);
                 }
 
-                //Names Coordinates
+                //Διαγραφή εγγραφής Συντεταγμένων (Coordinates)
                 if (Period==12) {
 
                     ScrollY = mDataTxt.getScrollY();
                     ScrollPos = ScrollY / mDataTxt.getLineHeight();
                     ScrollId=ScrollPos/3;
                     Global1.NameSelDel=ScrollId;
-                    DeleteName(); //NEW //CHECK
-                    mDataTxt.setScrollY(ScrollY); //NEW
+                    DeleteName();
+                    mDataTxt.setScrollY(ScrollY);
                 }
 
 
             }
         });
 
+        //Περίπτωση εγγραφής καιρού 24ώρου
         if (Period==2) {
 
             mCommit.setVisibility(View.GONE);
@@ -335,6 +287,7 @@ public class WeatherDetails extends AppCompatActivity {
 
         }
 
+        //Περιπτωσή εγγραφής 5ήμερου/εβδομάδας
         if (Period==3)
         {
             mCommit.setVisibility(View.GONE);
@@ -345,47 +298,20 @@ public class WeatherDetails extends AppCompatActivity {
 
         }
 
+        //Εμφάνιση δεδομένων ιστορικού
         if (Period==10) //Search
         {
 
             mCommit.setVisibility(View.VISIBLE);
             mEditCommit.setVisibility(View.VISIBLE);
-
             mTitleText.setText("History");
-
             Contents="";
-            Contents=Global1.Contents; //NEW
+            Contents=Global1.Contents;
 
             for (i=0;i<Global1.SearchArraySize;i++)
             {
                 cont=false;
                 searchcnt=0;
-
-                SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MM-yyyy HH:mm:ss z");
-                sdf.setTimeZone(TimeZone.getTimeZone("Europe/Athens")); //NEW
-                //String formattedDate = sdf.format(DateExp);
-                //DateExpSTR=formattedDate;
-
-
-                try {
-
-                    DateExp=sdf.parse(Global1.HistoryData[i].Date);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-
-                }
-
-/*
-            if (Global1.FullHistory) cont=true;
-
-            if (!Global1.FullHistory) {
-                if (Global1.HistoryData[i].City.toLowerCase().contains(Global1.City.toLowerCase())) searchcnt++;
-                if ((DateExp.after(Global1.DateFrom)) && (DateExp.before(Global1.DateTo))) searchcnt++;
-            }
-
-            if (searchcnt==2) cont=true;
-
-*/
 
                 posStr=49;
                 for (o=49; o>0; o--) if (Global1.SearchData[i].City.charAt(o)!=' ') {posStr=o+1;break;}
@@ -399,10 +325,6 @@ public class WeatherDetails extends AppCompatActivity {
                 for (o=99; o>0; o--) if (Global1.SearchData[i].Comment.charAt(o)!=' ') {posStr=o+1;break;}
                 Global1.SearchData[i].Comment=Global1.SearchData[i].Comment.substring(0,posStr);
 
-                //Global1.SearchData[i].City=String.valueOf(posStr);
-
-                //CHECK 1 RUN HERE
-                //if (cont)
                 Contents+="Site:"+Global1.SearchData[i].Site+"\n"+
                         "City:"+Global1.SearchData[i].City+"\n"
                         +"Date:"+Global1.SearchData[i].Date+"\n"+
@@ -420,10 +342,9 @@ public class WeatherDetails extends AppCompatActivity {
 
         }
 
-
+        //Μετανομασία του button commit σε delete για χρήση σε ρουτίνα service
         if (Period==11)
         {
-            //mCommit.setVisibility(View.GONE);
             mCommit.setText("Delete");
             mEditCommit.setVisibility(View.GONE);
 
@@ -433,6 +354,7 @@ public class WeatherDetails extends AppCompatActivity {
 
         }
 
+        //Μετανομασία του button commit σε delete για χρήση σε ρουτίνα coordinates
         if (Period==12) {
 
             mCommit.setText("Delete");
@@ -446,6 +368,7 @@ public class WeatherDetails extends AppCompatActivity {
 
     }
 
+    //Επανεγγραφή της λίστας των υπηρεσιών χωρίς την διαγραφόμενη υπηρεσία
     public void SaveServicesAll()
     {
         String datapath;
@@ -483,22 +406,18 @@ public class WeatherDetails extends AppCompatActivity {
                     for (i=TimeT.length();i<20;i++) TimeT+=" ";
                     for (i=AlarmT.length();i<20;i++) AlarmT+=" ";
 
+                    fileWriter.write(SiteT, 0, 20);
+                    fileWriter.write(CityT, 0, 50);
+                    fileWriter.write(DaysT, 0, 1);
+                    fileWriter.write(SiteIdT, 0, 1);
+                    fileWriter.write(TimeT, 0, 20);
+                    fileWriter.write(AlarmT, 0, 20);
 
-                        //fileSc.createNewFile();
-                        //FileWriter fileWriter = new FileWriter(fileSc,true); //Append File
-                        //FileWriter fileWriter = new FileWriter(fileSc); //New File //This needed here
-                        fileWriter.write(SiteT, 0, 20);
-                        fileWriter.write(CityT, 0, 50);
-                        fileWriter.write(DaysT, 0, 1);
-                        fileWriter.write(SiteIdT, 0, 1);
-                        fileWriter.write(TimeT, 0, 20);
-                        fileWriter.write(AlarmT, 0, 20);
+                    fileWriter.flush();
 
-                        fileWriter.flush();
-
-                            OutText += "Site:" + Global1.ServiceData[o].site + "\n" +
-                                    "City:" + Global1.ServiceData[o].City + "\n" +
-                                    "Time:"+ ConvertLongtoDate(Global1.ServiceData[o].time)+"\n"+
+                       OutText += "Site:" + Global1.ServiceData[o].site + "\n" +
+                               "City:" + Global1.ServiceData[o].City + "\n" +
+                               "Time:"+ ConvertLongtoDate(Global1.ServiceData[o].time)+"\n"+
                                     "_____________________________\n";
 
                 }
@@ -521,6 +440,7 @@ public class WeatherDetails extends AppCompatActivity {
     }
 
 
+    //Κατήργηση μίας ειδοποίησης service (alarm)
     public void DisableAlarm(long time)
 
     {
@@ -535,63 +455,8 @@ public class WeatherDetails extends AppCompatActivity {
 
     }
 
-    public void DisableAlarmPrev2(long time)
-
-    {
-        AlarmManager am=Global1.am;
-        //AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
-        //Intent i = new Intent(this, AlarmService.class);
-        Intent i=Global1.i;
-
-        //PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT); //PREV
-
-        //PendingIntent pi = PendingIntent.getBroadcast(this, Global1.ServiceSelDel, i, PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent pi = PendingIntent.getBroadcast(this, Global1.ServiceSelDel, i, PendingIntent.FLAG_CANCEL_CURRENT); //NEW
-        //PendingIntent pi = PendingIntent.getBroadcast(getBaseContext(), Global1.ServiceSelDel, i, PendingIntent.FLAG_CANCEL_CURRENT); //NEW
-        //PendingIntent pi = PendingIntent.getBroadcast(getBaseContext(), Global1.ServiceSelDel, i, PendingIntent.FLAG_UPDATE_CURRENT); //NEW
-        //PendingIntent pi = PendingIntent.getBroadcast(this, Global1.ServiceSelDel, i, 0);
-        Log.d("AlarmService","Service Num Off:"+String.valueOf(Global1.ServiceSelDel));
-        //am.setRepeating(AlarmManager.RTC, time, AlarmManager.INTERVAL_DAY, pi); //PREV
-
-        //am.setRepeating(AlarmManager.RTC_WAKEUP, time, AlarmManager.INTERVAL_DAY, pi); //PREV
-
-
-        am.cancel(pi);
-
-    }
-
-
-
-    public void DisableAlarmPrev(long time)
-
-    {
-        AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        //Intent i = new Intent(this, AlarmService.class); //PREV
-        Intent i = new Intent(this, AlarmService.class);
-        //PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT); //PREV
-
-
-
-        //PREV
-        //PendingIntent pi = PendingIntent.getBroadcast(this, Global1.ServiceSelDel, i, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        //NEW
-        //PendingIntent pi = PendingIntent.getBroadcast(this, Global1.ServiceSelDel, i, 0);
-
-        PendingIntent pi = PendingIntent.getBroadcast(this, Global1.ServiceSelDel, i, PendingIntent.FLAG_CANCEL_CURRENT); //NEW
-        //PendingIntent pi = PendingIntent.getBroadcast(this, Global1.ServiceSelDel, i, 0);
-        Log.d("AlarmService","Service Num Off:"+String.valueOf(ServicePos));
-        //am.setRepeating(AlarmManager.RTC, time, AlarmManager.INTERVAL_DAY, pi); //PREV
-
-
-        //am.setRepeating(AlarmManager.RTC_WAKEUP, time, AlarmManager.INTERVAL_DAY, pi); //PREV
-        am.cancel(pi);
-
-    }
-
-    //NEW
-    public void ReadService()
+    //Δίαβασμα εγγραφής υπηρεσιών
+     public void ReadService()
 
     {
         String datapath,strdata;
@@ -616,15 +481,12 @@ public class WeatherDetails extends AppCompatActivity {
             //fileSc.createNewFile();//TMP
             FileReader fileReader = new FileReader(fileSc);
             StringBuffer stringBuffer = new StringBuffer();
-            int numCharsRead = 0; //NEW
-            char[] charArrayCity = new char[50]; //PREV
+            int numCharsRead = 0;
+            char[] charArrayCity = new char[50];
             char[] charArray1=new char[20];
             char[] charArray2=new char[1];
             OutText="";
 
-
-            //ArraySize=(int)(fileSc.length()-1)/320;
-            //FullscreenActivity.Global1.ArraySize=ArraySize;
             if (fileSc.length()!=0) //NEW NEEDED HERE
                 for (i=0;i<=(fileSc.length()-1)/112;i++)
                 {
@@ -674,7 +536,6 @@ public class WeatherDetails extends AppCompatActivity {
                     TimeT=TimeT.substring(0,posStr);
                     Global1.ServiceData[ServicePos].time=Long.valueOf(TimeT);
 
-                    //NEW
                     posStr=49;
                     for (o=49; o>0; o--) if (CityT.charAt(o)!=' ') {posStr=o+1;break;}
                     CityT=CityT.substring(0,posStr);
@@ -685,27 +546,14 @@ public class WeatherDetails extends AppCompatActivity {
                     AlarmT=AlarmT.substring(0,posStr);
                     Global1.ServiceData[ServicePos].AlarmId=Integer.valueOf(AlarmT);
 
-
-
-                    //-----------------
-                    //PREV //CHECK
                     ServicePos++;
-                    //-----------------
 
-                    //NEW ///CCHECK
                     Global1.ServiceRecs=ServicePos;
 
-                    //if (2<1) //PREV
                     OutText+="Site:"+ Global1.ServiceData[ServicePos-1].site+"\n"+
                             "City:"+ Global1.ServiceData[ServicePos-1].City+"\n"+
                             "Time:"+ ConvertLongtoDate(Global1.ServiceData[ServicePos-1].time)+"\n"+
                             "_____________________________\n";
-
-                    if (2<1) //NEW
-                        OutText+="Site:"+ Global1.ServiceData[ServicePos].site+"\n"+
-                                "City:"+ Global1.ServiceData[ServicePos].City+"\n"+
-                                "Time:"+ ConvertLongtoDate(Global1.ServiceData[ServicePos].time)+"\n"+
-                                "_____________________________\n";
 
                 }
             fileReader.close();
@@ -719,12 +567,12 @@ public class WeatherDetails extends AppCompatActivity {
     }
 
 
+    //Διαγραφή υπηρεσίας απο την λίστα εγγραφών και κατάργηση απο την μνήμη (background service)
     public void DeleteService() {
         String datapath, strdata;
         char[] scArray = new char[29];
         datapath = getApplicationInfo().dataDir + "/Servicedat.txt";
         int o;
-        int stopPos;
 
         String SiteT;
         String CityT;
@@ -732,9 +580,7 @@ public class WeatherDetails extends AppCompatActivity {
         String SiteIdT;
         String AlarmT;
 
-
         ServicePos = 0;
-
 
         try {
             File fileSc = new File(datapath);
@@ -746,11 +592,15 @@ public class WeatherDetails extends AppCompatActivity {
             char[] charArray2 = new char[1];
             OutText = "";
 
-            //NEW //CHECK
+            //Έλενχος αν η εγγραφή των υπηρεσιών (services) είναι άδεια
+            if ((Global1.ServiceRecs==0) || (fileSc.length()<112)) {
+                Toast.makeText(this, "Services Records Empty", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            //Κατάργηση ειδοποίησης απο την μνήμη
             DisableAlarm(Global1.ServiceData[Global1.ServiceSelDel].time);
 
-            //ArraySize=(int)(fileSc.length()-1)/320;
-            //FullscreenActivity.Global1.ArraySize=ArraySize;
             for (i = 0; i <= (fileSc.length() - 1) / 112; i++)
                 if (i != Global1.ServiceSelDel) {
                     SiteT = "";
@@ -833,14 +683,14 @@ public class WeatherDetails extends AppCompatActivity {
             e.printStackTrace();
         }
 
-
-
-        SaveServicesAll(); //PREV
+        //Επανεγγραφή της λίστας των υπηρεσιών χωρίς την διαγραφόμενη υπηρεσία
+        SaveServicesAll();
 
         return;
     }
 
 
+    //Επανεγγραφή της λίστας χωρίς την διαγραφόμενη καταχώρηση
     public void SaveNamesAll()
     {
 
@@ -858,12 +708,6 @@ public class WeatherDetails extends AppCompatActivity {
             //fileSc.createNewFile();
             //FileWriter fileWriter = new FileWriter(fileSc,true); //Append File
             FileWriter fileWriter = new FileWriter(fileSc); //New File //This Needed Here
-
-            //Clean Memory
-            //Global1.CoordsNamesData[0].Name=""; //PREV
-
-            //Clear Memory of previous Name
-            //Global1.CoordsNamesData[Global1.NameSelDel].Name="";
 
             for (o=0;o<=(filelen-1)/80;o++)
                 if (o!=Global1.NameSelDel)
@@ -911,6 +755,7 @@ public class WeatherDetails extends AppCompatActivity {
 
     }
 
+    //Διαγραφή μιας εγγραφής ονομασίας συντεταγμένων (coordinates)
     public void DeleteName()
     {
 
@@ -918,11 +763,9 @@ public class WeatherDetails extends AppCompatActivity {
         char[] scArray = new char[29];
         datapath = getApplicationInfo().dataDir + "/Coords.txt";
         int o;
-        int stopPos;
-
         String TimeT;
-
         CoordsPos = 0;
+
 
 
         try {
@@ -935,13 +778,19 @@ public class WeatherDetails extends AppCompatActivity {
             OutText = "";
 
 
-            //For 1 entry only delete, clean memory
-                FullscreenActivity.Global1.CoordsNamesData[0].Name="";
+            //Έλενχος αν η εγγραφή λίστας είναι άδεια, εμφανίζοντας το κατάλληλο μύνημα
+            if ((Global1.CoordsRecs==0) || (fileSc.length()<80)) {
+                Toast.makeText(this, "Coordinates Records Empty", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
+
+            //For 1 entry only delete, clean memory
+                Global1.CoordsNamesData[0].Name="";
 
                 //Clear Memory of previous Name
-            //if (Global1.NameSelDel!=0)
-               FullscreenActivity.Global1.CoordsNamesData[Global1.NameSelDel].Name=""; //PREV //CHECK
+               Global1.CoordsNamesData[Global1.NameSelDel].Name=""; //PREV //CHECK
+
 
                 for (i = 0; i <= (fileSc.length() - 1) / 80; i++)
                 if (i != Global1.NameSelDel) {
@@ -974,14 +823,8 @@ public class WeatherDetails extends AppCompatActivity {
                     NameT=NameT.substring(0,posStr);
                     FullscreenActivity.Global1.CoordsNamesData[CoordsPos].Name=NameT;
 
-
-
-                    //-----------------
-                    //PREV //CHECK
                     CoordsPos++;
-                    //-----------------
-
-                    FullscreenActivity.Global1.CoordsRecs=CoordsPos;
+                    Global1.CoordsRecs=CoordsPos;
 
                     OutText+="Name:"+ FullscreenActivity.Global1.CoordsNamesData[CoordsPos-1].Name+"\n"+
                             "Latitude:"+FullscreenActivity.Global1.CoordsNamesData[CoordsPos-1].lat+"\n"+
@@ -996,8 +839,8 @@ public class WeatherDetails extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        //if (CoordsPos>0) CoordsPos--; //MAYBE NOT NEEDED HERE
-        SaveNamesAll(); //PREV
+        //Επανεγγραφή της λίστας χωρίς την διαγραφόμενη καταχώρησης
+        SaveNamesAll();
 
         return;
     }

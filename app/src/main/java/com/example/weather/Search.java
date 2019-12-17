@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileReader;
@@ -33,10 +34,6 @@ import static com.example.weather.FullscreenActivity.Global1.ArraySize;
 import static com.example.weather.FullscreenActivity.Global1.HistoryData;
 import static com.example.weather.FullscreenActivity.Global1.Period;
 
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- */
 public class Search extends AppCompatActivity {
     private View mContentView;
     private View mControlsView;
@@ -90,6 +87,8 @@ public class Search extends AppCompatActivity {
     private int posStr;
     private String CityT,DateT;
     private long days,daysFrom,daysTo;
+
+    //Μετατροπή Unix ημεροηνία σε ημερομηνία/ώρα
     public String ConvertLongtoDate(long unixSeconds) {
 
 
@@ -104,6 +103,7 @@ public class Search extends AppCompatActivity {
         return formattedDate;
     }
 
+    //Μετατροπή Unix ημεροηνία σε πλήρης ημερομηνία
     public String ConvertLongtoDateFull(long unixSeconds) {
 
 
@@ -119,7 +119,7 @@ public class Search extends AppCompatActivity {
     }
 
 
-    //CHECK HERE FOR FILTERS !!!
+     //Διαβάζει και φιλτράρει το ιστορικό
     public void ReadHistory()
 
     {
@@ -230,26 +230,8 @@ public class Search extends AppCompatActivity {
                 Global1.HistoryData[HistoryPos].pos=HistoryPos;
 
                 HistoryPos++;
-
-                //ContinueRec=false;
-
-                //if (SearchCityOn)
-                //if (Global1.HistoryData[HistoryPos-1].City.contains(SearchCity)) ContinueRec=true;
-
-
-                //if (!SearchCityOn) ContinueRec=true;
-
-                //for (o=49; o>0; o--) if (Global1.HistoryData[HistoryPos-1].City.charAt(o)!=' ') {posStr=o;break;}
-                //Global1.HistoryData[HistoryPos-1].City.substring(0,posStr);
-
-                //NEW HERE !!!
-                //HERE IS NEEDED THIS CODE
-
                 SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MM-yyyy HH:mm:ss z");
                 sdf.setTimeZone(TimeZone.getTimeZone("Europe/Athens")); //NEW
-                //String formattedDate = sdf.format(DateExp);
-                //DateExpSTR=formattedDate;
-
                 dateSTR=Global1.HistoryData[i].Date;
 
                 Log.d("WeatherSearch:","Record DateSTR:"+dateSTR);
@@ -257,8 +239,6 @@ public class Search extends AppCompatActivity {
                 month=Integer.valueOf(dateSTR.substring(3,5));
                 year=Integer.valueOf(dateSTR.substring(6,10));
                 Log.d("WeatherSearch:","Date1:"+day+"/"+month+"/"+year);
-                //days=(long)(year-1970)*12*month*30*((day)*24*60*60*1000);
-
 
                 dateSTR=ConvertLongtoDateFull(Global1.DateFromM);
 
@@ -325,18 +305,12 @@ public class Search extends AppCompatActivity {
                 if ((HistoryData[i].Temperature>=Global1.FromT) && (HistoryData[i].Temperature<=Global1.ToT)) siteCont=true;
                 else siteCont=false;
 
-
-                //Log.d("WeatherSearch:","days:"+String.valueOf(days));
-                //Log.d("WeatherSearch:","days From:"+String.valueOf(daysFrom));
-                //Log.d("WeatherSearch:","days To:"+String.valueOf(daysTo));
-
-                //CHECK 5/2/18-5/2/20
-                if (Global1.HistoryData[i].City.toLowerCase().contains(Global1.City.toLowerCase()))
-                if ((days>=daysFrom) && (days<=daysTo))
+                if (Global1.HistoryData[i].City.toLowerCase().contains(Global1.City.toLowerCase())) //Έλεγχος για την πόλη
+                if ((days>=daysFrom) && (days<=daysTo)) //Ελενχος για εύρος ημερομηνίων
                 if (siteCont)
-                if (siteContW)
-                if (siteContS)
-                    if (siteContSt)
+                if (siteContW)  //Έλενχος για καιρικές συνθήκεςε
+                if (siteContS)  //Έλενγχος αν είναι μονο για service
+                    if (siteContSt) //Έλενχος για τα επιλεγμένα site προβολής
                 OutText+="Site:"+Global1.HistoryData[HistoryPos-1].Site+"\n"+
                         "City:"+Global1.HistoryData[HistoryPos-1].City+"\n"
                         +"Date:"+Global1.HistoryData[HistoryPos-1].Date+"\n"+
@@ -358,152 +332,39 @@ public class Search extends AppCompatActivity {
         Period=10;
         Contents="Records\n";
 
-
-
-        searchpos = 0;
-        if (2<1) //MAYBE NOT NEEDED (DOUBLICATES CONTEXT)
-        for (i = 0; i < HistoryPos; i++) {
-            SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MM-yyyy HH:mm:ss z");
-            sdf.setTimeZone(TimeZone.getTimeZone("Europe/Athens")); //NEW
-            //String formattedDate = sdf.format(DateExp);
-            //DateExpSTR=formattedDate;
-
-
-            try {
-
-                DateExp=sdf.parse(Global1.HistoryData[i].Date);
-            } catch (ParseException e) {
-                e.printStackTrace();
-
-            }
-
-            DateComp=Global1.DateFrom;
-            DateComp2=Global1.DateTo;
-
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(Global1.DateTo);
-            calendar.add(Calendar.DAY_OF_MONTH, 1); //CHECK //PREV
-
-            //calendar.add(Calendar.DAY_OF_MONTH, 2); //NEW
-            //Log.d("WeatherSearch:","To:"+Global1.DateTo.toString());
-
-            calendar.set(Calendar.HOUR_OF_DAY,23);
-            calendar.set(Calendar.MINUTE,59);
-            calendar.set(Calendar.SECOND,59);
-
-
-            //PREV //CHECK !!!
-            calendar.add(Calendar.HOUR_OF_DAY,-2); //GMC +2 Compbatibility
-
-            DateComp=calendar.getTime();
-
-            Log.d("WeatherSearch:","To:"+DateComp.toString());
-            Calendar calendar2 = Calendar.getInstance();
-            calendar2.setTime(Global1.DateFrom);
-
-            //Log.d("WeatherSearch:","From:"+Global1.DateFrom.toString());
-            //-------------------------------------------------
-            //PREV
-            calendar2.add(Calendar.DAY_OF_MONTH, 1); //NEW //CHECK !!!
-            //-------------------------------------------------
-
-            //calendar2.add(Calendar.DAY_OF_MONTH, -1); //NEW
-
-            calendar2.set(Calendar.HOUR_OF_DAY,0);
-            calendar2.set(Calendar.MINUTE,0);
-            calendar2.set(Calendar.SECOND,0);
-
-            //PREV //CHECK !!!
-            calendar2.add(Calendar.HOUR_OF_DAY,-2); //GMC +2 Compbatibility
-            DateComp2=calendar2.getTime();
-
-            Log.d("WeatherSearch:","From:"+DateComp2.toString());
-
-            String formattedDate = sdf.format(DateComp);
-            DateExpSTR=formattedDate;
-
-            String formattedDate2 = sdf.format(DateComp2);
-            DateExpSTR2=formattedDate2;
-
-            //Log.d("Date Message P","HistoryData: "+HistoryData[i].Date);
-            //Log.d("Date Message P","DateComp2: "+DateExpSTR2);
-            //Log.d("Date Message P","DateComp: "+DateExpSTR);
-
-            //HERE'S NOT NEEDED HERE
-
-            siteCont=false;
-            if (CheckOpen) if (HistoryData[i].Site.contains("Open Weather Map")) siteCont=true;
-            if (CheckAccu) if (HistoryData[i].Site.contains("AccuWeather")) siteCont=true;
-            if (CheckStack) if (HistoryData[i].Site.contains("Weather Stacks")) siteCont=true;
-            if (CheckDark) if (HistoryData[i].Site.contains("Dark Sky")) siteCont=true;
-            if (CheckBit) if (HistoryData[i].Site.contains("Weatherbit.io")) siteCont=true;
-
-            if (CheckService)
-            {
-                if (HistoryData[i].Site.contains("(s)")) siteCont = true; else siteCont=false;
-            }
-
-
-            siteContW=false;
-            if (Global1.Clear)
-                if (HistoryData[i].WeatherCon.toLowerCase().contains("clear")) siteContW=true;
-
-            if (Global1.Clouds)
-            {
-                if (HistoryData[i].WeatherCon.toLowerCase().contains("cloud")) siteContW = true;
-                if (HistoryData[i].WeatherCon.toLowerCase().contains("mist")) siteContW=true;
-            }
-            if (Global1.Rain)
-            {
-                if (HistoryData[i].WeatherCon.toLowerCase().contains("rain")) siteContW = true;
-                if (HistoryData[i].WeatherCon.toLowerCase().contains("drizzle")) siteContW = true;
-            }
-            if (Global1.Snow)
-                if (HistoryData[i].WeatherCon.toLowerCase().contains("snow")) siteContW=true;
-
-            if (Global1.Thunder)
-                if (HistoryData[i].WeatherCon.toLowerCase().contains("thunder")) siteContW=true;
-
-
-            //History 1
-            if ((HistoryData[i].Temperature>=Global1.FromT) && (HistoryData[i].Temperature<=Global1.ToT)) siteCont=true;
-            else siteCont=false;
-
-            if (Global1.HistoryData[i].City.toLowerCase().contains(Global1.City.toLowerCase()))
-                if ((DateExp.after(DateComp2)) && (DateExp.before(DateComp)))
-                    if (siteCont)
-                        if (siteContW) //NEW Weather Conditions
-
-                        {
-                            //Log.d("Date Message","HistoryData: "+HistoryData[i].Date);
-                            //Log.d("Date Message","DateComp2: "+DateExpSTR2);
-                            //Log.d("Date Message","DateComp: "+DateExpSTR);
-                            Global1.SearchData[searchpos]=new FullscreenActivity.HistoryDataClass();
-                            Global1.SearchData[searchpos].pos = i;
-                            Global1.SearchData[searchpos].City = Global1.HistoryData[i].City;
-                            Global1.SearchData[searchpos].Temperature = Global1.HistoryData[i].Temperature;
-                            Global1.SearchData[searchpos].Humidity = Global1.HistoryData[i].Humidity;
-                            Global1.SearchData[searchpos].Comment = Global1.HistoryData[i].Comment;
-                            Global1.SearchData[searchpos].Site = Global1.HistoryData[i].Site;
-                            Global1.SearchData[searchpos].WeatherCon = Global1.HistoryData[i].WeatherCon;
-                            Global1.SearchData[searchpos].Date = Global1.HistoryData[i].Date;
-                            Global1.SearchData[searchpos].Units = Global1.HistoryData[i].Units;
-
-                            searchpos++;
-                        }
-        }
-
+        searchpos = 0; //CHECK
 
         Period=Period;
         Global1.SearchArraySize=searchpos;
         Global1.Contents=OutText;
-
-        //PREV RUNNED
-        //OpenDetailed();
-
         Period=PrevPeriod;
 
         return;
+    }
+
+    //Έλενχος για στωστή ημερομηνία
+    public boolean checkdate(String DateS)
+    {
+
+        int digits;
+        int pavles;
+
+        digits=0;
+        pavles=0;
+
+        if (DateS.length()!=10) return false;
+
+        for (i=0;i<10;i++)
+            if ((DateS.charAt(i)>='0') && (DateS.charAt(i)<='9')) digits++;
+        if (digits!=8) return false;
+
+
+        if (DateS.charAt(2)=='-') pavles++;
+        if (DateS.charAt(5)=='-') pavles++;
+
+        if (pavles!=2) return false;
+
+        return true;
     }
 
     @Override
@@ -522,9 +383,9 @@ public class Search extends AppCompatActivity {
         mFrom= (EditText) findViewById(R.id.editDateFrom);
         mTo= (EditText) findViewById(R.id.editDateTo);
 
-        //Get Current Date
+        //Διάβασμα της τωρινής ημερομηνίας
         Date date1 = new Date();
-        String strDateFormat = "dd-MM-yyyy"; //NEW
+        String strDateFormat = "dd-MM-yyyy";
         DateFormat dateFormat = new SimpleDateFormat(strDateFormat);
         dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Athens"));
         String formattedDate= dateFormat.format(date1);
@@ -545,7 +406,6 @@ public class Search extends AppCompatActivity {
         mButtonSearch= (Button) findViewById(R.id.buttonSearch);
         mButtonAdvSearch= (Button) findViewById(R.id.buttonSearch2);
 
-
         mCheckOpen=(CheckBox)findViewById(R.id.checkBox);
         mCheckAccu=(CheckBox)findViewById(R.id.checkBox2);
         mCheckStack=(CheckBox)findViewById(R.id.checkBox3);
@@ -553,10 +413,10 @@ public class Search extends AppCompatActivity {
         mCheckBit=(CheckBox)findViewById(R.id.checkBox5);
         mCheckService=(CheckBox)findViewById(R.id.checkBox6);
 
+        //Μηδενίζει την πόλη για να ψαχνει αρχικά για όλες τις περιπτώσεις
+        mCity.setText("");
 
-        //if (!Global1.City.isEmpty()) mCity.setText(Global1.City); //PREV
-
-        mCity.setText(""); //NEW
+        //Μαρκάρει όλα τα checkboxes
         mButtonSel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -569,8 +429,7 @@ public class Search extends AppCompatActivity {
             }
         });
 
-
-
+        //Ξεμαρκάρει όλα τα checkboxes
         mButtonDis.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -583,6 +442,7 @@ public class Search extends AppCompatActivity {
             }
         });
 
+        //Καθαρίζει την φόρμα
         mButtonClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -592,13 +452,13 @@ public class Search extends AppCompatActivity {
             }
         });
 
+        //Ημερήσια ημερομηνία
         mButtonDaily.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 Date date = new Date();
-                //String strDateFormat = "yyyy-MM-dd HH:mm:ss z"; //PREV
-                String strDateFormat = "dd-MM-yyyy"; //NEW
+                String strDateFormat = "dd-MM-yyyy";
                 DateFormat dateFormat = new SimpleDateFormat(strDateFormat);
                 dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Athens"));
                 String formattedDate= dateFormat.format(date);
@@ -613,6 +473,7 @@ public class Search extends AppCompatActivity {
             }
         });
 
+        //Εβδομαδιαία ημερομηνία
         mButtonWeekly.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -650,27 +511,7 @@ public class Search extends AppCompatActivity {
             }
         });
 
-        mButtonDaily.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Date date = new Date();
-                //String strDateFormat = "yyyy-MM-dd HH:mm:ss z"; //PREV
-                String strDateFormat = "dd-MM-yyyy"; //NEW
-                DateFormat dateFormat = new SimpleDateFormat(strDateFormat);
-                dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Athens"));
-                String formattedDate= dateFormat.format(date);
-                DateFrom=formattedDate;
-                DateTo=formattedDate;
-
-                mFrom.setText(DateFrom);
-                mTo.setText(DateFrom);
-
-                Global1.DateFrom=date;
-                Global1.DateTo=date;
-            }
-        });
-
+        //Μηνιαία ημερομηνία
         mButtonMonthly.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -700,25 +541,20 @@ public class Search extends AppCompatActivity {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                //String formattedDate= dateFormat.format(date);
-                //formattedDate= dateFormat.format(date);
 
                 calendar2 = Calendar.getInstance();
                 calendar2.setTime(date);
                 calendar2.set(Calendar.DAY_OF_MONTH,1);
                 date=calendar2.getTime();
 
-                dateFormat.format(date); //CHECK
+                dateFormat.format(date);
                 formattedDate= dateFormat.format(date);
                 DateFrom=formattedDate;
-                //DateFrom=date.toString(); //TMP //RUNS
 
                 //DateTo
                 calendar = Calendar.getInstance();
                 calendar.setTime(date);
-                //calendar.add(Calendar.MONTH, 1);
                 calendar.set(Calendar.DAY_OF_MONTH,calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
-                //calendar.set(Calendar.DAY_OF_MONTH,5);
 
                 date2=calendar.getTime();
                 formattedDate= dateFormat.format(date2);
@@ -735,7 +571,7 @@ public class Search extends AppCompatActivity {
         });
 
 
-
+        //Εκκίνηση έρευνας ιστορικού
         mButtonSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -750,15 +586,31 @@ public class Search extends AppCompatActivity {
 
                 Period=10;
 
-                Global1.City=mCity.getText().toString(); //CHECK
+                Global1.City=mCity.getText().toString();
+
 
                 dateSTR=mFrom.getText().toString();
+
+                //Έλενχος για ημερομηνία απο
+                if (!checkdate(dateSTR))
+                {
+                    Toast.makeText(Search.this, "Wrong date from", Toast.LENGTH_SHORT).show();
+                return;
+                }
 
                 dayfrom=Integer.valueOf(dateSTR.substring(0,2));
                 monthfrom=Integer.valueOf(dateSTR.substring(3,5));
                 yearfrom=Integer.valueOf(dateSTR.substring(6,10));
 
                 dateSTR=mTo.getText().toString();
+
+                //Έλενχος για ημερομηνία εώς
+                if (!checkdate(dateSTR))
+                {
+                    Toast.makeText(Search.this, "Wrong date to", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
 
                 dayto=Integer.valueOf(dateSTR.substring(0,2));
                 monthto=Integer.valueOf(dateSTR.substring(3,5));
@@ -767,13 +619,8 @@ public class Search extends AppCompatActivity {
                 daysFrom=(long)(yearfrom-1970)*356+(monthfrom*30)+dayfrom;
                 daysTo=(long)(yearto-1970)*356+(monthto*30)+dayto;
 
-                //Problem
-                //1-12-19 -> 5-12-20
-
-                //NEW //CHECK
                 Global1.DateFromM=daysFrom;
                 Global1.DateToM=daysTo;
-
 
                 Log.d("WeatherSearch","From1:"+dayfrom+"/"+monthfrom+"/"+yearfrom);
                 Log.d("WeatherSearch","To1:"+dayto+"/"+monthto+"/"+yearto);
@@ -793,7 +640,7 @@ public class Search extends AppCompatActivity {
             }
         });
 
-
+        //Ρυθμίσεις ενισχυμένης αναζήτησης
         mButtonAdvSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
