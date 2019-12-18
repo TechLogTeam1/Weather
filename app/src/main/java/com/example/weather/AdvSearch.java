@@ -113,6 +113,14 @@ public class AdvSearch extends AppCompatActivity {
         if (Global1.Snow) mCheckSnow.setChecked(true); else mCheckSnow.setChecked(false);
         if (Global1.Thunder) mCheckThunder.setChecked(true); else mCheckThunder.setChecked(false);
 
+        mRadio1.setChecked(false); mRadio2.setChecked(false); mRadio3.setChecked(false);
+
+        if (Global1.Units2=="C") mRadio1.setChecked(true);
+        if (Global1.Units2=="F") mRadio2.setChecked(true);
+        if (Global1.Units2=="K") mRadio3.setChecked(true);
+
+        Units=Global1.Units2;
+
         //Διαβάζει και περνάει στην μνήμη τις τιμές των checkboxes όταν κάποιο/κάποια απο τα checkboxes αλλάξουν
         mCheckClear.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -202,7 +210,9 @@ public class AdvSearch extends AppCompatActivity {
                 if (!checkTemperature(mFromTemp.getText().toString()))
                 {
                     Toast.makeText(AdvSearch.this, "Wrong Temperature from", Toast.LENGTH_SHORT).show();
-                    Global1.FromT=FromT;
+                    if (Units=="C") Global1.FromT=FromT;
+                    if (Units=="F") Global1.FromT=(FromT-32)/(float)1.8;
+                    if (Units=="K") Global1.FromT=FromT-(float) 273.15;
                     return;
                 }
 
@@ -213,6 +223,10 @@ public class AdvSearch extends AppCompatActivity {
                 if (!checkTemperature(mToTemp.getText().toString()))
                 {
                     Toast.makeText(AdvSearch.this, "Wrong Temperature To", Toast.LENGTH_SHORT).show();
+                    if (Units=="C") Global1.ToT=ToT;
+                    if (Units=="F") Global1.ToT=(ToT-32)/(float)1.8;
+                    if (Units=="K") Global1.ToT=ToT-(float) 273.15;
+
                     Global1.ToT=ToT;
                     return;
                 }
@@ -234,7 +248,7 @@ public class AdvSearch extends AppCompatActivity {
                 mRadio1.setChecked(true);
                 mRadio2.setChecked(false);
                 mRadio3.setChecked(false);
-                Units="C";
+                Units="C";Global1.Units2="C";
             }
         });
 
@@ -245,7 +259,7 @@ public class AdvSearch extends AppCompatActivity {
                 mRadio1.setChecked(false);
                 mRadio2.setChecked(true);
                 mRadio3.setChecked(false);
-                Units="F";
+                Units="F";Global1.Units2="F";
             }
         });
         mRadio3.setOnClickListener(new View.OnClickListener() {
@@ -255,7 +269,7 @@ public class AdvSearch extends AppCompatActivity {
                 mRadio1.setChecked(false);
                 mRadio2.setChecked(false);
                 mRadio3.setChecked(true);
-                Units="K";
+                Units="K";Global1.Units2="K";
             }
         });
 

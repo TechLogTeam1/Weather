@@ -244,6 +244,7 @@ public class Services extends AppCompatActivity {
         for (recvalue=0;recvalue<=10000;recvalue++) //PREV
         {
         notcont=false;
+
             for (o = 0; o <= ServicePos; o++)
                 if (o != ServicePos) {
                     if (Global1.ServiceData[o].AlarmId == recvalue) notcont = true;
@@ -261,6 +262,13 @@ public class Services extends AppCompatActivity {
         i.putExtra("ServicePos",Global1.ServiceData[ServicePos].AlarmId);
         i.putExtra("Site",Global1.ServiceData[ServicePos].siteId);
 
+        //NEW
+        i.putExtra("Site1",CheckOpen);
+        i.putExtra("Site2",CheckAccu);
+        i.putExtra("Site3",CheckStack);
+        i.putExtra("Site4",CheckDark);
+        i.putExtra("Site5",CheckBit);
+
         //PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
         PendingIntent pi = PendingIntent.getBroadcast(this, ServicePos, i, PendingIntent.FLAG_UPDATE_CURRENT);
         Log.d("AlarmService","Service Num Set:"+String.valueOf(Global1.ServiceData[ServicePos].AlarmId));
@@ -269,7 +277,6 @@ public class Services extends AppCompatActivity {
         am.setRepeating(AlarmManager.RTC_WAKEUP, time, AlarmManager.INTERVAL_DAY, pi);
 
     }
-
 
     //Έλενχει αν υπάρχει εγγραφή με την ίδια ώρα και πολή και site
     public boolean HasSame(int days,Calendar calendar)
@@ -307,78 +314,23 @@ public class Services extends AppCompatActivity {
     public void NewRec(int days,Calendar calendar)
 
     {
-
-
         if (mCheckOpen.isChecked()) CheckOpen=true; else CheckOpen=false;
         if (mCheckAccu.isChecked()) CheckAccu=true; else CheckAccu=false;
         if (mCheckStack.isChecked()) CheckStack=true; else CheckStack=false;
         if (mCheckDark.isChecked()) CheckDark=true; else CheckDark=false;
         if (mCheckBit.isChecked()) CheckBit=true; else CheckBit=false;
 
-        if (CheckOpen) {
-            Global1.ServiceData[ServicePos]=new FullscreenActivity.ServicesDataClass();
-            Global1.ServiceData[ServicePos].daysnum = days;
-            Global1.ServiceData[ServicePos].site="OpenWeather";
-            Global1.ServiceData[ServicePos].siteId=1;
-            Global1.ServiceData[ServicePos].City=City;
-            Global1.ServiceData[ServicePos].hasdone=false;
-            Global1.ServiceData[ServicePos].time=calendar.getTimeInMillis();
-            setAlarm(calendar.getTimeInMillis());
-            Log.d("AlarmService:","Date Service = "+ConvertLongtoDate(calendar.getTimeInMillis()));
-            SaveService(); //CHECK FOR ERROR
-        }
-
-        if (CheckAccu) {
-            Global1.ServiceData[ServicePos]=new FullscreenActivity.ServicesDataClass();
-            Global1.ServiceData[ServicePos].daysnum = days;
-            Global1.ServiceData[ServicePos].site="AccuWeather";
-            Global1.ServiceData[ServicePos].siteId=2;
-            Global1.ServiceData[ServicePos].City=City;
-            Global1.ServiceData[ServicePos].hasdone=false;
-            Global1.ServiceData[ServicePos].time=calendar.getTimeInMillis();
-            setAlarm(calendar.getTimeInMillis());
-            SaveService();
-        }
-
-        if (CheckStack) {
-            Global1.ServiceData[ServicePos]=new FullscreenActivity.ServicesDataClass();
-            Global1.ServiceData[ServicePos].daysnum = days;
-            Global1.ServiceData[ServicePos].site="WeatherStack";
-            Global1.ServiceData[ServicePos].siteId=3;
-            Global1.ServiceData[ServicePos].City=City;
-            Global1.ServiceData[ServicePos].hasdone=false;
-            Global1.ServiceData[ServicePos].time=calendar.getTimeInMillis();
-            setAlarm(calendar.getTimeInMillis());
-            SaveService();
-        }
-
-        if (CheckDark) {
-            Global1.ServiceData[ServicePos]=new FullscreenActivity.ServicesDataClass();
-            Global1.ServiceData[ServicePos].daysnum = days;
-            Global1.ServiceData[ServicePos].site="DarkSky";
-            Global1.ServiceData[ServicePos].siteId=4;
-            Global1.ServiceData[ServicePos].City=City;
-            Global1.ServiceData[ServicePos].hasdone=false;
-            Global1.ServiceData[ServicePos].time=calendar.getTimeInMillis();
-            setAlarm(calendar.getTimeInMillis());
-            SaveService();
-        }
-
-        if (CheckBit) {
-            Global1.ServiceData[ServicePos]=new FullscreenActivity.ServicesDataClass();
-            Global1.ServiceData[ServicePos].daysnum = days;
-            Global1.ServiceData[ServicePos].site="Weatherbit";
-            Global1.ServiceData[ServicePos].siteId=5;
-            Global1.ServiceData[ServicePos].City=City;
-            Global1.ServiceData[ServicePos].hasdone=false;
-            Global1.ServiceData[ServicePos].time=calendar.getTimeInMillis();
-            setAlarm(calendar.getTimeInMillis());
-            SaveService();
-        }
-
-
+        Global1.ServiceData[ServicePos]=new FullscreenActivity.ServicesDataClass();
+        Global1.ServiceData[ServicePos].daysnum = days;
+        Global1.ServiceData[ServicePos].site="OpenWeather";
+        Global1.ServiceData[ServicePos].siteId=1;
+        Global1.ServiceData[ServicePos].City=City;
+        Global1.ServiceData[ServicePos].hasdone=false;
+        Global1.ServiceData[ServicePos].time=calendar.getTimeInMillis();
+        setAlarm(calendar.getTimeInMillis());
+        Log.d("AlarmService:","Date Service = "+ConvertLongtoDate(calendar.getTimeInMillis()));
+        SaveService();
     }
-
 
     //Θέτει τις ώρες του alarm service και το ίδιο το sevice μέσο της setAlarm
     public void SetAlarmService()
@@ -417,18 +369,16 @@ public class Services extends AppCompatActivity {
             hours=14;minutes=0;
             calendar.setTimeInMillis(System.currentTimeMillis()); //NEW
 
-            //Eδώ χρησιμοποιείται η plusDay για να την περίωπτωση που η alarm service ειναι πριν απο την δεδομένη ώρα
-            //Δηλαδή την επόμενη μέρα
-            plusDay=false;
-            if (hours<hoursCur) plusDay=true;
-            if ((hours==hoursCur) && (minutes<minutesCur)) plusDay=true;
-
-            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1);
-
             //Alarm Mεσημέρι 14:00
             calendar.set(Calendar.HOUR_OF_DAY, 14);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
+
+            //Eδώ χρησιμοποιείται η plusDay για να την περίωπτωση που η alarm service ειναι πριν απο την δεδομένη ώρα
+            //Δηλαδή την επόμενη μέρα
+            plusDay=false;
+            if (System.currentTimeMillis()>calendar.getTimeInMillis()) plusDay=true;
+            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1);
 
             if (!HasSame(1,calendar))
             {
@@ -463,24 +413,18 @@ public class Services extends AppCompatActivity {
 
             calendar.setTimeInMillis(System.currentTimeMillis()); //NEW
 
-            plusDay=false;
-            if (hours<hoursCur) plusDay=true;
-            if ((hours==hoursCur) && (minutes<minutesCur)) plusDay=true;
-
-            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1);
-
-            if (plusDay) Log.d("AlarmService","PlusDay");
-            else Log.d("AlarmService","Not PlusDay");
-
-            //hours+=2; //GMT +2 (Athens)
-            //if (hours==25) hours=1;
-            //if (hours==26) hours=2;
             //Alarm Custom ώρα
             calendar.set(Calendar.HOUR_OF_DAY, hours);
             calendar.set(Calendar.MINUTE, minutes);
             calendar.set(Calendar.SECOND, 0);
 
-           Log.d("AlarmService","calendar time:"+String.valueOf(calendar.getTime().toString()));
+            plusDay=false;
+            if (System.currentTimeMillis()>calendar.getTimeInMillis()) plusDay=true;
+            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1);
+
+            if (plusDay) Log.d("AlarmService","PlusDay");  else Log.d("AlarmService","Not PlusDay");
+
+            Log.d("AlarmService","calendar time:"+String.valueOf(calendar.getTime().toString()));
 
 
             if (!HasSame(1,calendar))
@@ -511,16 +455,16 @@ public class Services extends AppCompatActivity {
             hours=8;minutes=0;
             calendar.setTimeInMillis(System.currentTimeMillis()); //NEW
 
-            plusDay=false;
-            if (hours<hoursCur) plusDay=true;
-            if ((hours==hoursCur) && (minutes<minutesCur)) plusDay=true;
-
-            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1); //NEW //CHECK
 
             //Alarm Πρωί 8:00
             calendar.set(Calendar.HOUR_OF_DAY, 8);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
+
+            plusDay=false;
+            if (System.currentTimeMillis()>calendar.getTimeInMillis()) plusDay=true;
+            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1);
+
             if (!HasSame(1,calendar)) NewRec(1,calendar); else sameone=true;
 
             date = new Date();
@@ -539,16 +483,15 @@ public class Services extends AppCompatActivity {
             hours=22;minutes=0;
             calendar.setTimeInMillis(System.currentTimeMillis()); //NEW
 
-            plusDay=false;
-            if (hours<hoursCur) plusDay=true;
-            if ((hours==hoursCur) && (minutes<minutesCur)) plusDay=true;
-
-            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1);
-
             //Alarm βράδυ 22:00
             calendar.set(Calendar.HOUR_OF_DAY,22 );
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
+
+            plusDay=false;
+            if (System.currentTimeMillis()>calendar.getTimeInMillis()) plusDay=true;
+            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1);
+
             if (!HasSame(1,calendar)) NewRec(1,calendar); else sameone=true;
 
             if (!sameone) Toast.makeText(this, "Service is set", Toast.LENGTH_SHORT).show();
@@ -575,17 +518,15 @@ public class Services extends AppCompatActivity {
             hours=8;minutes=0;
             calendar.setTimeInMillis(System.currentTimeMillis()); //NEW
 
-            plusDay=false;
-            if (hours<hoursCur) plusDay=true;
-            if ((hours==hoursCur) && (minutes<minutesCur)) plusDay=true;
-
-            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1); //NEW //CHECK
-
-
             //Alarm Πρωί 8:00
             calendar.set(Calendar.HOUR_OF_DAY,8 );
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
+
+            plusDay=false;
+            if (System.currentTimeMillis()>calendar.getTimeInMillis()) plusDay=true;
+            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1);
+
             if (!HasSame(1,calendar)) NewRec(1,calendar); else sameone=true;
 
             date = new Date();
@@ -604,16 +545,15 @@ public class Services extends AppCompatActivity {
             hours=14;minutes=0;
             calendar.setTimeInMillis(System.currentTimeMillis()); //NEW
 
-            plusDay=false;
-            if (hours<hoursCur) plusDay=true;
-            if ((hours==hoursCur) && (minutes<minutesCur)) plusDay=true;
-
-            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1);
-
             //Alarm Μεσημέρι 14:00
             calendar.set(Calendar.HOUR_OF_DAY,14 );
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
+
+            plusDay=false;
+            if (System.currentTimeMillis()>calendar.getTimeInMillis()) plusDay=true;
+            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1);
+
             if (!HasSame(1,calendar)) NewRec(1,calendar); else sameone=true;
 
             date = new Date();
@@ -632,16 +572,15 @@ public class Services extends AppCompatActivity {
             hours=22;minutes=0;
             calendar.setTimeInMillis(System.currentTimeMillis()); //NEW
 
-            plusDay=false;
-            if (hours<hoursCur) plusDay=true;
-            if ((hours==hoursCur) && (minutes<minutesCur)) plusDay=true;
-
-            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1); //NEW //CHECK
-
             //Alarm Βράδυ 22:00
             calendar.set(Calendar.HOUR_OF_DAY,22 );
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
+
+            plusDay=false;
+            if (System.currentTimeMillis()>calendar.getTimeInMillis()) plusDay=true;
+            if (plusDay) calendar.add(Calendar.DAY_OF_YEAR,1);
+
             if (!HasSame(1,calendar)) NewRec(1,calendar); else sameone=true;
 
             if (!sameone) Toast.makeText(this, "Service is set", Toast.LENGTH_SHORT).show();

@@ -177,7 +177,7 @@ public class FullscreenActivity extends AppCompatActivity {
         public static int ServiceSelDel;
         public static int ServiceRecs;
         public static ServicesDataClass ServiceData[]=new ServicesDataClass[10000];
-        public static String Units;
+        public static String Units,Units2;
         public static float FromT,ToT;
         public static boolean Clear,Clouds,Rain,Snow,Thunder;
         public static int CoordsRecs;
@@ -244,7 +244,8 @@ public class FullscreenActivity extends AppCompatActivity {
 
         //Αρχικοποίηση τιμών
         City="London";Code="";
-        Units="C";Period=1;LastPeriod=1;
+        Units="C";Global1.Units2="C";
+        Period=1;LastPeriod=1;
         SiteUse="OpenWeather";
         mCity.setText(City);
         Temperature=0;
@@ -343,7 +344,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 mRadio1.setChecked(true);
                 mRadio2.setChecked(false);
                 mRadio3.setChecked(false);
-                Units="C";
+                Units="C";Global1.Units2="C";
             }
         });
 
@@ -355,7 +356,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 mRadio1.setChecked(false);
                 mRadio2.setChecked(true);
                 mRadio3.setChecked(false);
-                Units="F";
+                Units="F";Global1.Units2="F";
             }
         });
 
@@ -367,7 +368,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 mRadio1.setChecked(false);
                 mRadio2.setChecked(false);
                 mRadio3.setChecked(true);
-                Units="K";
+                Units="K";Global1.Units2="K";
             }
         });
 
@@ -555,6 +556,15 @@ public class FullscreenActivity extends AppCompatActivity {
 
     }
 
+    public float ShowTemp(float TempF)
+    {
+    if (Global1.Units2=="C") return TempF;
+    if (Global1.Units2=="F") return (TempF*(float)1.8+32);
+    if (Global1.Units2=="K") return TempF+(float)273.15;
+    return 0;
+    }
+
+
     //Διαβάζει το ιστορικό
     public void ReadHistory()
 
@@ -652,7 +662,8 @@ public class FullscreenActivity extends AppCompatActivity {
                          OutText+="Site:"+Global1.HistoryData[HistoryPos-1].Site+"\n"+
                         "City:"+Global1.HistoryData[HistoryPos-1].City+"\n"
                         +"Date:"+Global1.HistoryData[HistoryPos-1].Date+"\n"+
-                        "Temp:"+Global1.HistoryData[HistoryPos-1].Temperature+" "+ Global1.HistoryData[HistoryPos-1].Units+"\n"+
+                        //"Temp:"+Global1.HistoryData[HistoryPos-1].Temperature+" "+ Global1.HistoryData[HistoryPos-1].Units+"\n"+
+                        "Temp:"+ShowTemp(Float.valueOf(Global1.HistoryData[HistoryPos-1].Temperature))+" "+ Global1.Units2+"\n"+
                         "Humidity:"+Global1.HistoryData[HistoryPos-1].Humidity+"%\n"
                         +"Conditions:"+Global1.HistoryData[HistoryPos-1].WeatherCon+"\n"
                         +"Comment:"+Global1.HistoryData[HistoryPos-1].Comment+"\n"+
@@ -685,7 +696,8 @@ public class FullscreenActivity extends AppCompatActivity {
                     Global1.SearchData[searchpos].Site = Global1.HistoryData[i].Site;
                     Global1.SearchData[searchpos].WeatherCon = Global1.HistoryData[i].WeatherCon;
                     Global1.SearchData[searchpos].Date = Global1.HistoryData[i].Date;
-                    Global1.SearchData[searchpos].Units = Global1.HistoryData[i].Units;
+                    //Global1.SearchData[searchpos].Units = Global1.HistoryData[i].Units;
+                    Global1.SearchData[searchpos].Units = Global1.Units2;
 
                 searchpos++;
                 }
@@ -871,6 +883,7 @@ public class FullscreenActivity extends AppCompatActivity {
             super.onPostExecute(aVoid);
 
             boolean nulldata;
+            float Temperaturef;
 
             nulldata=false;
             if (OutText=="") nulldata=true;
@@ -894,7 +907,20 @@ public class FullscreenActivity extends AppCompatActivity {
             int minusx;
             minusx=85;
 
-            mDeg.setText(String.valueOf(Temperature));
+            String StrTemp;
+            Temperaturef=ShowTemp(Temperature);
+            StrTemp=String.valueOf(Temperaturef);
+
+            //θέτει τα ψηφία σε μέγιστο 2
+            commapos=0;
+            for (i=0;i<StrTemp.length();i++)
+            if (StrTemp.charAt(i)=='.') {commapos=i;break;}
+
+            if (StrTemp.length()>3)
+            if (commapos!=0) StrTemp=StrTemp.substring(0,commapos+3);
+            Temperaturef=Float.valueOf(StrTemp);
+
+            mDeg.setText(StrTemp);
             mHum.setText("Humidity "+String.valueOf(Humidity)+" %");
             mConditions.setText(WeatherCon);
 
@@ -1084,11 +1110,11 @@ public class FullscreenActivity extends AppCompatActivity {
             //Εδώ υπολογίζεται η θέση την οποία πρέπει να έχει το oC σύμβολο για παράδειγμα.
             //σύμφωνα με τα δεδομένα του κινητού...
 
-            mUnits.setText(Units);
+            mUnits.setText(Global1.Units2);
             FrameLayout.LayoutParams params1 = new FrameLayout.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
             final float scale = getBaseContext().getResources().getDisplayMetrics().density;
 
-            deglen=String.valueOf(Temperature).length();
+            deglen=String.valueOf(Temperaturef).length();
             valuex=165;valuey=490;
             if (deglen>5) valuex+=10;
 
@@ -1098,7 +1124,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
 
-            deglen=String.valueOf(Temperature).length();
+            deglen=String.valueOf(Temperaturef).length();
             valuex=210;valuey=480;valuex+=deglen*10;
             if (deglen>5) valuex+=10;
 
@@ -1108,7 +1134,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
             FrameLayout.LayoutParams params2 = new FrameLayout.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
 
-            deglen=String.valueOf(Temperature).length();
+            deglen=String.valueOf(Temperaturef).length();
             valuex=210+30;valuey=480;valuex+=deglen*10;
             if (deglen>5) valuex+=10;
 
@@ -1117,7 +1143,6 @@ public class FullscreenActivity extends AppCompatActivity {
 
             mUnits.setLayoutParams(params2);
 
-            //mTextView.setText(OutText);
             progressDialog.dismiss();
         }
 
@@ -1255,7 +1280,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
                 for (i=0;i<ArraySize;i++)
                 {
-                    Contents+=DateTxt[i]+"\n"+"Temp:"+TemperatureData[i]+Units+"  Humidity:"+HumidityData[i]+"%"+"\n";
+                    Contents+=DateTxt[i]+"\n"+"Temp:"+ShowTemp(TemperatureData[i])+Global1.Units2+"  Humidity:"+HumidityData[i]+"%"+"\n";
                 }
 
                 Global1.Contents=Contents;
@@ -1465,7 +1490,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 //Contents+=OutText;
                 for (i=0;i<ArraySize;i++)
                 {
-                    Contents+=DateTxt[i]+"\n"+"Temp:"+TemperatureData[i]+Units+"  Humidity:"+HumidityData[i]+"%"+"\n";
+                Contents+=DateTxt[i]+"\n"+"Temp:"+ShowTemp(TemperatureData[i])+Global1.Units2+"  Humidity:"+HumidityData[i]+"%"+"\n";
                 }
 
                 Global1.Contents=Contents;
@@ -1908,6 +1933,7 @@ public class FullscreenActivity extends AppCompatActivity {
             Document doc= null;
             OutText="";
             WeatherCon="";
+            Units="C"; //Όλες οι μετρήσεις θα είναι σε κελσίου, μετά με ειδική ρουτίνα θα αλλάζουν
 
             //Eδω γίνονται οι κλήσεις στις ιστοσελίδες καιρού
             if (SiteUse=="OpenWeather") ReadFromOpen();

@@ -75,14 +75,8 @@ public class AlarmService extends BroadcastReceiver {
     ProgressDialog progressDialog;
 
     int siteId;
-    int siteIdArray[]=new int[1000];
-    int daysnum;
-    int daysnumArray[]=new int[1000];
-    boolean hasdone;
-    boolean hasdoneArray[]=new boolean[1000];
     int ServiceIdPos;
     boolean isOpen,isAccu,isStack,isDark,isBit;
-    int isOpen1,isAccu1,isStack1,isDark1,isBit1;
 
     //Σώσιμο των κλήσεων των υπηρεσιών στην μνήμη
     public void SaveHistory() {
@@ -190,20 +184,22 @@ public class AlarmService extends BroadcastReceiver {
 
         intent=Global1.i;
 
-        Action=intent.getAction();
-
-        //Ελένχει κάθε action κωδικό της service κλήσης
-        //Οι action κωδικοί παίρνουν τιμές σε αύξοντα ρυθμό π.χ "0","1","2","3" κ.τ.λ.
-                for (i=0;i<=Global1.ServiceRecs;i++)
-                if (Action.equals(String.valueOf(i))) {
                 City = intent.getStringExtra("City");
                 ServiceIdPos = intent.getIntExtra("ServicePos", 0);
                 siteId=intent.getIntExtra("Site", 0);
+
+                //NEW
+                isOpen=intent.getBooleanExtra("Site1", false);
+                isAccu=intent.getBooleanExtra("Site2", false);
+                isStack=intent.getBooleanExtra("Site3", false);
+                isDark=intent.getBooleanExtra("Site4", false);
+                isBit=intent.getBooleanExtra("Site5", false);
+
                 Log.d("AlarmService", "City:" + City);
                 Log.d("AlarmService", "Service Pos:" + String.valueOf(ServiceIdPos));
+                Log.d("AlarmService", "SiteId:" + String.valueOf(siteId));
                 content = new Content(); //NEW POS
                 content.execute();
-            }
 
     }
 
@@ -213,12 +209,20 @@ public class AlarmService extends BroadcastReceiver {
         @Override
         protected Void doInBackground(Void... voids) {
 
+            Units="C";
             //Κλήση των ιστοσελίδων απο το alarm service
+            /*
             if (siteId==1) ReadFromOpen();
             if (siteId==2) ReadFromAccu();
             if (siteId==3) ReadFromStack();
             if (siteId==4) ReadFromDark();
             if (siteId==5) ReadFromBit();
+            */
+            if (isOpen) ReadFromOpen();
+            if (isAccu) ReadFromAccu();
+            if (isStack) ReadFromStack();
+            if (isDark) ReadFromDark();
+            if (isBit) ReadFromBit();
 
             Log.d("AlarmService", "Alarm just fired 2");
 

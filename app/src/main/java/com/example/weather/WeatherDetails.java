@@ -89,6 +89,14 @@ public class WeatherDetails extends AppCompatActivity {
         return formattedDate;
     }
 
+    public float ShowTemp(float TempF)
+    {
+        if (Global1.Units2=="C") return TempF;
+        if (Global1.Units2=="F") return (TempF*(float)1.8+32);
+        if (Global1.Units2=="K") return TempF+(float)273.15;
+        return 0;
+    }
+
     //Εισαγωγή σχολίου σε μια εγγραφή
     public void SaveHistory2()
     {
@@ -328,7 +336,7 @@ public class WeatherDetails extends AppCompatActivity {
                 Contents+="Site:"+Global1.SearchData[i].Site+"\n"+
                         "City:"+Global1.SearchData[i].City+"\n"
                         +"Date:"+Global1.SearchData[i].Date+"\n"+
-                        "Temp:"+Global1.SearchData[i].Temperature+" "+ Global1.SearchData[i].Units+"\n"+
+                        "Temp:"+ShowTemp(Global1.SearchData[i].Temperature)+" "+ Global1.SearchData[i].Units+"\n"+
                         "Humidity:"+Global1.SearchData[i].Humidity+"%\n"
                         +"Conditions:"+Global1.SearchData[i].WeatherCon+"\n"
                         +"Comment:"+Global1.SearchData[i].Comment+"\n"+

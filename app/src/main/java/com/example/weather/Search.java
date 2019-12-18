@@ -88,6 +88,14 @@ public class Search extends AppCompatActivity {
     private String CityT,DateT;
     private long days,daysFrom,daysTo;
 
+    public float ShowTemp(float TempF)
+    {
+        if (Global1.Units2=="C") return TempF;
+        if (Global1.Units2=="F") return (TempF*(float)1.8+32);
+        if (Global1.Units2=="K") return TempF+(float)273.15;
+        return 0;
+    }
+
     //Μετατροπή Unix ημεροηνία σε ημερομηνία/ώρα
     public String ConvertLongtoDate(long unixSeconds) {
 
@@ -216,16 +224,23 @@ public class Search extends AppCompatActivity {
                 for (o=99; o>0; o--) if (CommentT.charAt(o)!=' ') {posStr=o+1;break;}
                 CommentT=CommentT.substring(0,posStr);
 
+                //NEW //CHECK
+                posStr=9;
+                for (o=9; o>0; o--) if (TempT.charAt(o)!=' ') {posStr=o+1;break;}
+                TempT=TempT.substring(0,posStr);
+
+
                 City=CityT;Date=DateT;
 
                 Global1.HistoryData[HistoryPos]=new FullscreenActivity.HistoryDataClass();
                 Global1.HistoryData[HistoryPos].Site=SiteT;
                 Global1.HistoryData[HistoryPos].City=City;
                 Global1.HistoryData[HistoryPos].Date=Date;
-                Global1.HistoryData[HistoryPos].Temperature=Float.valueOf(TempT);
+                Global1.HistoryData[HistoryPos].Temperature=ShowTemp(Float.valueOf(TempT));
                 Global1.HistoryData[HistoryPos].Humidity=Float.valueOf(HumidityT);
                 Global1.HistoryData[HistoryPos].WeatherCon=WeatherConT; //CHECK
-                Global1.HistoryData[HistoryPos].Units=UnitsT;
+                //Global1.HistoryData[HistoryPos].Units=UnitsT;
+                Global1.HistoryData[HistoryPos].Units=Global1.Units2;
                 Global1.HistoryData[HistoryPos].Comment=CommentT;
                 Global1.HistoryData[HistoryPos].pos=HistoryPos;
 
