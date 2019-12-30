@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background">
+    android:background="@drawable/background2">
     tools:context=".Coords">
 
     <!-- The primary full-screen view. This can be replaced with whatever view
@@ -70,6 +70,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="160dp"
             android:layout_marginTop="400dp"
+            android:background="#50FFFFFF"
             android:text="Save" />
 
         <Button
@@ -78,6 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="400dp"
+            android:background="#50FFFFFF"
             android:text="Show Records" />
     </FrameLayout>
 

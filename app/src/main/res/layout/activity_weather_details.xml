@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background">
+    android:background="@drawable/background2">
     tools:context=".WeatherDetails">
 
     <!-- The primary full-screen view. This can be replaced with whatever view
@@ -42,20 +42,21 @@
             android:layout_height="453dp"
             android:layout_marginTop="80dp"
             android:text="TextView"
-            android:textColor="#FFFF"
+            android:textColor="#000000"
             android:textSize="24sp" />
 
         <Button
             android:id="@+id/button2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="300dp"
+            android:layout_marginLeft="250dp"
             android:layout_marginTop="550dp"
+            android:background="#50FFFFFF"
             android:text="Commit" />
 
         <EditText
             android:id="@+id/editCommit"
-            android:layout_width="285dp"
+            android:layout_width="238dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="550dp"
             android:ems="10"
@@ -66,7 +67,7 @@
             android:id="@+id/textView10"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="370dp"
+            android:layout_marginLeft="300dp"
             android:layout_marginTop="80dp"
             android:text="←"
             android:textColor="#FFFF"

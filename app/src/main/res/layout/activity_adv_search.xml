@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background">
+    android:background="@drawable/background2">
     tools:context=".AdvSearch">
 
     <!-- The primary full-screen view. This can be replaced with whatever view
@@ -74,7 +74,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="280dp"
             android:text="Weather Conditions"
-            android:textColor="#FFFF"
+            android:textColor="#306571"
             android:textSize="24sp" />
 
         <TextView
@@ -106,7 +106,7 @@
             android:layout_marginTop="220dp"
             android:checked="true"
             android:text="Celsius"
-            android:textColor="#FFFF" />
+            android:textColor="#306571" />
 
         <RadioButton
             android:id="@+id/radioButton13"
@@ -115,7 +115,7 @@
             android:layout_marginLeft="120dp"
             android:layout_marginTop="220dp"
             android:text="Fahrenheit"
-            android:textColor="#FFFF" />
+            android:textColor="#306571" />
 
         <RadioButton
             android:id="@+id/radioButton14"
@@ -124,7 +124,7 @@
             android:layout_marginLeft="240dp"
             android:layout_marginTop="220dp"
             android:text="Kelvin"
-            android:textColor="#FFFF" />
+            android:textColor="#306571" />
 
         <CheckBox
             android:id="@+id/checkBox7"
@@ -134,7 +134,7 @@
             android:layout_marginTop="350dp"
             android:checked="true"
             android:text="Clear"
-            android:textColor="#FFFF" />
+            android:textColor="#306571" />
 
         <CheckBox
             android:id="@+id/checkBox11"
@@ -144,7 +144,7 @@
             android:layout_marginTop="400dp"
             android:checked="true"
             android:text="Thunderstorm"
-            android:textColor="#FFFF" />
+            android:textColor="#306571" />
 
         <CheckBox
             android:id="@+id/checkBox8"
@@ -154,7 +154,7 @@
             android:layout_marginTop="350dp"
             android:checked="true"
             android:text="Clouds"
-            android:textColor="#FFFF" />
+            android:textColor="#306571" />
 
         <CheckBox
             android:id="@+id/checkBox9"
@@ -164,7 +164,7 @@
             android:layout_marginTop="350dp"
             android:checked="true"
             android:text="Rain"
-            android:textColor="#FFFF" />
+            android:textColor="#306571" />
 
         <CheckBox
             android:id="@+id/checkBox10"
@@ -174,14 +174,15 @@
             android:layout_marginTop="350dp"
             android:checked="true"
             android:text="Snow"
-            android:textColor="#FFFF" />
+            android:textColor="#306571" />
 
         <Button
             android:id="@+id/buttonSelAll1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
+            android:layout_marginLeft="10dp"
             android:layout_marginTop="450dp"
+            android:background="#50FFFFFF"
             android:text="@android:string/selectAll" />
 
         <Button
@@ -190,6 +191,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="130dp"
             android:layout_marginTop="450dp"
+            android:background="#50FFFFFF"
             android:text="Diselect All" />
 
         <Button
@@ -198,6 +200,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="250dp"
             android:layout_marginTop="450dp"
+            android:background="#50FFFFFF"
             android:text="Clear" />
 
         <Button
@@ -206,6 +209,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="150dp"
             android:layout_marginTop="500dp"
+            android:background="#50FFFFFF"
             android:text="@android:string/ok" />
     </FrameLayout>
 

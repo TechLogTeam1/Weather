@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background">
+    android:background="@drawable/background2">
     tools:context=".Search">
 
     <!-- The primary full-screen view. This can be replaced with whatever view
@@ -93,7 +93,7 @@
             android:ems="10"
             android:inputType="textPersonName"
             android:text="2/12/2019"
-            android:textColor="#FFFF" />
+            android:textColor="#306571" />
 
         <EditText
             android:id="@+id/editDateTo"
@@ -104,20 +104,22 @@
             android:ems="10"
             android:inputType="textPersonName"
             android:text="2/12/2019"
-            android:textColor="#FFFF" />
+            android:textColor="#306571" />
 
         <Button
             android:id="@+id/buttonDaily"
             android:layout_width="110dp"
             android:layout_height="63dp"
-            android:layout_marginTop="350dp"
+            android:layout_marginTop="315dp"
+            android:background="#50FFFFFF"
             android:text="Daily" />
 
         <Button
             android:id="@+id/buttonClear"
             android:layout_width="110dp"
             android:layout_height="63dp"
-            android:layout_marginTop="420dp"
+            android:layout_marginTop="380dp"
+            android:background="#50FFFFFF"
             android:text="Clear" />
 
         <Button
@@ -125,7 +127,8 @@
             android:layout_width="110dp"
             android:layout_height="63dp"
             android:layout_marginLeft="110dp"
-            android:layout_marginTop="420dp"
+            android:layout_marginTop="380dp"
+            android:background="#50FFFFFF"
             android:text="@android:string/selectAll" />
 
         <Button
@@ -133,7 +136,8 @@
             android:layout_width="110dp"
             android:layout_height="63dp"
             android:layout_marginLeft="220dp"
-            android:layout_marginTop="420dp"
+            android:layout_marginTop="380dp"
+            android:background="#50FFFFFF"
             android:text="diselect all" />
 
         <Button
@@ -141,15 +145,17 @@
             android:layout_width="110dp"
             android:layout_height="63dp"
             android:layout_marginLeft="110dp"
-            android:layout_marginTop="350dp"
-            android:text="WEekly" />
+            android:layout_marginTop="315dp"
+            android:background="#50FFFFFF"
+            android:text="Weekly" />
 
         <Button
             android:id="@+id/buttonMonthly"
             android:layout_width="110dp"
             android:layout_height="63dp"
             android:layout_marginLeft="220dp"
-            android:layout_marginTop="350dp"
+            android:layout_marginTop="315dp"
+            android:background="#50FFFFFF"
             android:text="Montly" />
 
         <Button
@@ -157,7 +163,8 @@
             android:layout_width="110dp"
             android:layout_height="63dp"
             android:layout_marginLeft="150dp"
-            android:layout_marginTop="600dp"
+            android:layout_marginTop="530dp"
+            android:background="#50FFFFFF"
             android:text="@android:string/search_go" />
 
         <Button
@@ -165,14 +172,15 @@
             android:layout_width="110dp"
             android:layout_height="63dp"
             android:layout_marginLeft="25dp"
-            android:layout_marginTop="600dp"
+            android:layout_marginTop="530dp"
+            android:background="#50FFFFFF"
             android:text="Advanced Search" />
 
         <CheckBox
             android:id="@+id/checkBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="500dp"
+            android:layout_marginTop="450dp"
             android:checked="true"
             android:text="OpenWeather"
             android:textColor="#FFFF" />
@@ -181,7 +189,7 @@
             android:id="@+id/checkBox4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="540dp"
+            android:layout_marginTop="490dp"
             android:checked="true"
             android:text="DarkSky"
             android:textColor="#FFFF" />
@@ -191,7 +199,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="130dp"
-            android:layout_marginTop="540dp"
+            android:layout_marginTop="490dp"
             android:checked="true"
             android:text="WeatherBit"
             android:textColor="#FFFF" />
@@ -201,7 +209,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="250dp"
-            android:layout_marginTop="540dp"
+            android:layout_marginTop="490dp"
             android:text="Only From Service"
             android:textColor="#FFFF" />
 
@@ -210,7 +218,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="130dp"
-            android:layout_marginTop="500dp"
+            android:layout_marginTop="450dp"
             android:checked="true"
             android:text="AccuWeather"
             android:textColor="#FFFF" />
@@ -220,7 +228,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="250dp"
-            android:layout_marginTop="500dp"
+            android:layout_marginTop="450dp"
             android:checked="true"
             android:text="WeatherStack"
             android:textColor="#FFFF" />

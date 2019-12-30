@@ -297,6 +297,7 @@ public class Search extends AppCompatActivity {
                 {
                     if (HistoryData[i].WeatherCon.toLowerCase().contains("cloud")) siteContW = true;
                     if (HistoryData[i].WeatherCon.toLowerCase().contains("mist")) siteContW=true;
+                    if (HistoryData[i].WeatherCon.toLowerCase().contains("haze")) siteContW = true;
                 }
                 if (Global1.Rain)
                 {

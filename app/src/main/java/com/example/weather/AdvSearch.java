@@ -193,9 +193,9 @@ public class AdvSearch extends AppCompatActivity {
                 mCheckSnow.setChecked(true);
                 mCheckThunder.setChecked(true);
                 Global1.FromT=(float)-273.15;
-                Global1.ToT=100;
+                Global1.ToT=400;
                 mFromTemp.setText("-273.15");
-                mToTemp.setText("100.0");
+                mToTemp.setText("400.0");
             }
         });
 

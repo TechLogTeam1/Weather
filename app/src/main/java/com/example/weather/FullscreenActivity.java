@@ -1,6 +1,10 @@
 package com.example.weather;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 import android.app.ActionBar;
 import android.app.AlarmManager;
@@ -22,6 +26,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import com.google.android.material.tabs.TabLayout;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -67,7 +73,7 @@ public class FullscreenActivity extends AppCompatActivity {
     private Button mButton3;
     private Button mButton4;
     private Button mButtonCoords;
-    private EditText mCity,mCode;
+    private EditText mCity, mCode;
     private RadioButton mRadio1;
     private RadioButton mRadio2;
     private RadioButton mRadio3;
@@ -83,11 +89,11 @@ public class FullscreenActivity extends AppCompatActivity {
     ProgressDialog progressDialog;
 
     //API κλειδιά για τα sites καιρού
-    private String APIOpen="400b0e4928077be78efaf4523cd3a3b5";
-    private String APIAccu="GXj9XbCK7EOk5cVRnAOVN62PdDGJaTD6";
-    private String APIDark="e478e283b61f95dc70771be89db8ce1c";
-    private String APIBit="307702986d074885b6bdf41d74768e0c";
-    private String APIStack="516a194fae7c7db19dc99de1bfce0c6e";
+    private String APIOpen = "400b0e4928077be78efaf4523cd3a3b5";
+    private String APIAccu = "GXj9XbCK7EOk5cVRnAOVN62PdDGJaTD6";
+    private String APIDark = "e478e283b61f95dc70771be89db8ce1c";
+    private String APIBit = "307702986d074885b6bdf41d74768e0c";
+    private String APIStack = "516a194fae7c7db19dc99de1bfce0c6e";
 
     private String City;
     private String Code;
@@ -99,9 +105,9 @@ public class FullscreenActivity extends AppCompatActivity {
 
     private float Temperature;
     private float Humidity;
-    private String[] DateTxt= new String[1000];
-    private float[] TemperatureData= new float[1000];
-    private float[] HumidityData= new float[1000];
+    private String[] DateTxt = new String[1000];
+    private float[] TemperatureData = new float[1000];
+    private float[] HumidityData = new float[1000];
 
     private String HumidityTxt;
     private String Contents;
@@ -117,16 +123,15 @@ public class FullscreenActivity extends AppCompatActivity {
     private String WeatherConIcon;
     private int i;
     private int Period;
-    private int PrevPeriod,LastPeriod;
+    private int PrevPeriod, LastPeriod;
     private int ArraySize;
-    private String Longitude,Latitude;
+    private String Longitude, Latitude;
     private String jsonSTR;
     private long DateUnix;
     private String SearchCity;
-    private boolean SearchCityOn,ContinueRec;
+    private boolean SearchCityOn, ContinueRec;
 
-    static class HistoryDataClass
-    {
+    static class HistoryDataClass {
         int pos;
         String Site;
         String City;
@@ -138,8 +143,7 @@ public class FullscreenActivity extends AppCompatActivity {
         String Comment;
     }
 
-    static class ServicesDataClass
-    {
+    static class ServicesDataClass {
         String City;
         String site;
         int daysnum;
@@ -149,20 +153,19 @@ public class FullscreenActivity extends AppCompatActivity {
         int AlarmId;
     }
 
-    static class CoordsNames
-    {
+    static class CoordsNames {
         String Name;
-        double lat,lon;
+        double lat, lon;
     }
 
 
-    HistoryDataClass HistoryData[]=new HistoryDataClass[10000];
+    HistoryDataClass HistoryData[] = new HistoryDataClass[10000];
 
     //Κλάση η οποία θα είναι Global και θα μπορεί να καλείτε απο όλες τις activity
     public static class Global1 {
         public static HistoryDataClass HistoryData[] = new HistoryDataClass[10000];
         public static HistoryDataClass SearchData[] = new HistoryDataClass[10000];
-        public static CoordsNames CoordsNamesData[]=new CoordsNames[1000];
+        public static CoordsNames CoordsNamesData[] = new CoordsNames[1000];
         public static int ArraySize;
         public static int SearchArraySize;
         public static boolean ServiceRun;
@@ -176,28 +179,28 @@ public class FullscreenActivity extends AppCompatActivity {
         public static ProgressDialog progressDialog;
         public static int ServiceSelDel;
         public static int ServiceRecs;
-        public static ServicesDataClass ServiceData[]=new ServicesDataClass[10000];
-        public static String Units,Units2;
-        public static float FromT,ToT;
-        public static boolean Clear,Clouds,Rain,Snow,Thunder;
+        public static ServicesDataClass ServiceData[] = new ServicesDataClass[10000];
+        public static String Units, Units2;
+        public static float FromT, ToT;
+        public static boolean Clear, Clouds, Rain, Snow, Thunder;
         public static int CoordsRecs;
         public static int NameSelDel;
-        public static long DateFromM,DateToM;
+        public static long DateFromM, DateToM;
         public static AlarmManager am;
         public static Intent i;
     }
 
 
     private int HistoryPos;
-    private String TempT,HumidityT,UnitsT,SiteT,CommentT;
+    private String TempT, HumidityT, UnitsT, SiteT, CommentT;
     private String CurrentDateT;
     private String Temp1;
     private String Humidity1;
     private String Site1;
     private String Comment1;
     private int searchpos;
-    private boolean CoordsRun,CoordsRunRec;
-    private double Lat,Lon;
+    private boolean CoordsRun, CoordsRunRec;
+    private double Lat, Lon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -207,62 +210,101 @@ public class FullscreenActivity extends AppCompatActivity {
 
         androidx.appcompat.app.ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
+        final TabLayout tabLayout = (TabLayout) findViewById(R.id.Tabs);
+        //ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
+        //viewPager.setAdapter(new SectionPagerAdapter(getSupportFragmentManager()));
+        //tabLayout.setupWithViewPager(viewPager);
+        tabLayout.addTab(tabLayout.newTab().setText("OpenWeather"));
+        tabLayout.addTab(tabLayout.newTab().setText("AccuWeather"));
+        tabLayout.addTab(tabLayout.newTab().setText("WeatherStack"));
+        tabLayout.addTab(tabLayout.newTab().setText("Dark Sky"));
+        tabLayout.addTab(tabLayout.newTab().setText("Weatherbit"));
 
-        Global1.ServiceRun=false;
+        Global1.ServiceRun = false;
 
-        Global1.am=(AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Global1.am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Global1.i = new Intent(this, AlarmService.class); //PREV
 
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mTextView = findViewById(R.id.textView);
         mDeg = findViewById(R.id.textTemp);
         mUnits = findViewById(R.id.textUnit);
-        mDegSymbol=findViewById(R.id.textDeg);
-        mHum=findViewById(R.id.textHum);
-        mConditions=findViewById(R.id.WeatherState);
+        mDegSymbol = findViewById(R.id.textDeg);
+        mHum = findViewById(R.id.textHum);
+        mConditions = findViewById(R.id.WeatherState);
 
-        mButton1= (Button) findViewById(R.id.button);
-        mButton2= (Button) findViewById(R.id.buttonHistory);
-        mButton3= (Button) findViewById(R.id.buttonHistory2);
-        mButton4= (Button) findViewById(R.id.buttonService);
-        mButtonCoords= (Button) findViewById(R.id.buttonCoords);
-        mCity=(EditText) findViewById(R.id.editText);
-        mRadio1= (RadioButton) findViewById(R.id.radioButton);
-        mRadio2= (RadioButton) findViewById(R.id.radioButton2);
-        mRadio3= (RadioButton) findViewById(R.id.radioButton3);
-        mRadio4= (RadioButton) findViewById(R.id.radioButton5);
-        mRadio5= (RadioButton) findViewById(R.id.radioButton6);
-        mRadio6= (RadioButton) findViewById(R.id.radioButton7);
+        mButton1 = (Button) findViewById(R.id.button);
+        mButton2 = (Button) findViewById(R.id.buttonHistory);
+        mButton3 = (Button) findViewById(R.id.buttonHistory2);
+        mButton4 = (Button) findViewById(R.id.buttonService);
+        mButtonCoords = (Button) findViewById(R.id.buttonCoords);
+        mCity = (EditText) findViewById(R.id.editText);
+        mRadio1 = (RadioButton) findViewById(R.id.radioButton);
+        mRadio2 = (RadioButton) findViewById(R.id.radioButton2);
+        mRadio3 = (RadioButton) findViewById(R.id.radioButton3);
+        mRadio4 = (RadioButton) findViewById(R.id.radioButton5);
+        mRadio5 = (RadioButton) findViewById(R.id.radioButton6);
+        mRadio6 = (RadioButton) findViewById(R.id.radioButton7);
 
-        mRadio7= (RadioButton) findViewById(R.id.radioButton4);
-        mRadio8= (RadioButton) findViewById(R.id.radioButton8);
-        mRadio9= (RadioButton) findViewById(R.id.radioButton9);
-        mRadio10= (RadioButton) findViewById(R.id.radioButton10);
-        mRadio11= (RadioButton) findViewById(R.id.radioButton11);
+        /*
+        mRadio7 = (RadioButton) findViewById(R.id.radioButton4);
+        mRadio8 = (RadioButton) findViewById(R.id.radioButton8);
+        mRadio9 = (RadioButton) findViewById(R.id.radioButton9);
+        mRadio10 = (RadioButton) findViewById(R.id.radioButton10);
+        mRadio11 = (RadioButton) findViewById(R.id.radioButton11);
+        */
 
-        mWIcon= (ImageView) findViewById(R.id.imageView2);
+
+        mWIcon = (ImageView) findViewById(R.id.imageView2);
 
         //Αρχικοποίηση τιμών
-        City="London";Code="";
-        Units="C";Global1.Units2="C";
-        Period=1;LastPeriod=1;
-        SiteUse="OpenWeather";
+        City = "London";
+        Code = "";
+        Units = "C";
+        Global1.Units2 = "C";
+        Period = 1;
+        LastPeriod = 1;
+        SiteUse = "OpenWeather";
         mCity.setText(City);
-        Temperature=0;
-        Humidity=0;
+        Temperature = 0;
+        Humidity = 0;
 
-        Global1.FromT=(float) -273.15;
-        Global1.ToT=100;
+        Global1.FromT = (float) -273.15;
+        Global1.ToT = 400;
 
-        Global1.Clear=true;
-        Global1.Clouds=true;
-        Global1.Rain=true;
-        Global1.Snow=true;
-        Global1.Thunder=true;
+        Global1.Clear = true;
+        Global1.Clouds = true;
+        Global1.Rain = true;
+        Global1.Snow = true;
+        Global1.Thunder = true;
 
         mDeg.setText("--");
-        mHum.setText("Humidity "+"--"+" %");
+        mHum.setText("Humidity " + "--" + " %");
         mConditions.setText("--");
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab)
+            {
+                if (tabLayout.getSelectedTabPosition() == 0) SiteUse="OpenWeather";
+                if (tabLayout.getSelectedTabPosition() == 1) SiteUse="AccuWeather";
+                if (tabLayout.getSelectedTabPosition() == 2) SiteUse="WeatherStack";
+                if (tabLayout.getSelectedTabPosition() == 3) SiteUse="DarkSky";
+                if (tabLayout.getSelectedTabPosition() == 4) SiteUse="Weatherbit";
+
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
 
         //Εύρεση θερμοκραρσία πόλεως
         mButton1.setOnClickListener(new View.OnClickListener() {
@@ -423,7 +465,7 @@ public class FullscreenActivity extends AppCompatActivity {
         //WeatherStack -> Ψάξιμο με AccuStack
         //DarkSky -> Ψάξιμο με Dark Sky
         //Weatherbit -> Ψάξιμο με Weatherbit
-
+/*
         mRadio7.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
@@ -487,7 +529,7 @@ public class FullscreenActivity extends AppCompatActivity {
             }
         });
 
-
+*/
     }
 
     //Mετατροπή UNIX ημερομηνίας σε String ημερομηνία
@@ -552,7 +594,6 @@ public class FullscreenActivity extends AppCompatActivity {
         Global1.Contents=Contents;
         Intent intent=new Intent(this,Search.class);
         startActivity(intent);
-
 
     }
 
@@ -916,8 +957,12 @@ public class FullscreenActivity extends AppCompatActivity {
             for (i=0;i<StrTemp.length();i++)
             if (StrTemp.charAt(i)=='.') {commapos=i;break;}
 
+            //CHECK !!!
             if (StrTemp.length()>3)
-            if (commapos!=0) StrTemp=StrTemp.substring(0,commapos+3);
+            if (commapos!=0)
+            if (commapos+3<StrTemp.length()) //NEW
+            StrTemp=StrTemp.substring(0,commapos+3);
+
             Temperaturef=Float.valueOf(StrTemp);
 
             mDeg.setText(StrTemp);
@@ -1948,3 +1993,4 @@ public class FullscreenActivity extends AppCompatActivity {
 
 
 }
+

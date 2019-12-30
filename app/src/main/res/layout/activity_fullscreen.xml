@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background">
+    android:background="@drawable/background2">
     tools:context=".FullscreenActivity">
 
     <!-- The primary full-screen view. This can be replaced with whatever view
@@ -41,16 +41,18 @@
             android:id="@+id/button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="150dp"
+            android:layout_marginLeft="120dp"
             android:layout_marginTop="350dp"
+            android:background="#50FFFFFF"
             android:text="Search" />
 
         <Button
             android:id="@+id/buttonCoords"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="280dp"
+            android:layout_marginLeft="230dp"
             android:layout_marginTop="350dp"
+            android:background="#50FFFFFF"
             android:text="Coordinates" />
 
         <Button
@@ -59,6 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="350dp"
+            android:background="#50FFFFFF"
             android:text="Services" />
 
         <TextView
@@ -87,7 +90,7 @@
             android:layout_marginTop="250dp"
             android:checked="true"
             android:text="Celsius"
-            android:textColor="#FFFF" />
+            android:textColor="#306571" />
 
         <RadioButton
             android:id="@+id/radioButton2"
@@ -96,7 +99,7 @@
             android:layout_marginLeft="100dp"
             android:layout_marginTop="250dp"
             android:text="Fahrenheit "
-            android:textColor="#FFFF" />
+            android:textColor="#306571" />
 
         <RadioButton
             android:id="@+id/radioButton3"
@@ -105,7 +108,7 @@
             android:layout_marginLeft="220dp"
             android:layout_marginTop="250dp"
             android:text="Kelvin"
-            android:textColor="#FFFF" />
+            android:textColor="#306571" />
 
         <RadioButton
             android:id="@+id/radioButton5"
@@ -114,7 +117,7 @@
             android:layout_marginTop="300dp"
             android:checked="true"
             android:text="Current"
-            android:textColor="#FFFF" />
+            android:textColor="#306571" />
 
         <RadioButton
             android:id="@+id/radioButton6"
@@ -123,7 +126,7 @@
             android:layout_marginLeft="100dp"
             android:layout_marginTop="300dp"
             android:text="24hrs"
-            android:textColor="#FFFF" />
+            android:textColor="#306571" />
 
         <RadioButton
             android:id="@+id/radioButton7"
@@ -132,57 +135,11 @@
             android:layout_marginLeft="200dp"
             android:layout_marginTop="300dp"
             android:text="5 Days"
-            android:textColor="#FFFF" />
+            android:textColor="#306571" />
 
         <RadioGroup
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-
-        <RadioButton
-            android:id="@+id/radioButton4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="0dp"
-            android:layout_marginTop="150dp"
-            android:checked="true"
-            android:text="OpenWeather"
-            android:textColor="#FFFF" />
-
-        <RadioButton
-            android:id="@+id/radioButton8"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="120dp"
-            android:layout_marginTop="150dp"
-            android:text="AccuWeather"
-            android:textColor="#FFFF" />
-
-        <RadioButton
-            android:id="@+id/radioButton9"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="250dp"
-            android:layout_marginTop="150dp"
-            android:text="WeatherStack"
-            android:textColor="#FFFF" />
-
-        <RadioButton
-            android:id="@+id/radioButton10"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="0dp"
-            android:layout_marginTop="200dp"
-            android:text="DarkSky"
-            android:textColor="#FFFF" />
-
-        <RadioButton
-            android:id="@+id/radioButton11"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="120dp"
-            android:layout_marginTop="200dp"
-            android:text="Weatherbit"
-            android:textColor="#FFFF" />
 
         <TextView
             android:id="@+id/textView"
@@ -256,17 +213,28 @@
             android:id="@+id/buttonHistory"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="225dp"
+            android:layout_marginLeft="50dp"
             android:layout_marginTop="190dp"
+            android:background="#50FFFFFF"
             android:text="History" />
 
         <Button
             android:id="@+id/buttonHistory2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="315dp"
+            android:layout_marginLeft="200dp"
             android:layout_marginTop="190dp"
+            android:background="#50FFFFFF"
             android:text="HSearch" />
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/Tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="100dp"
+            android:visibility="visible"
+            app:tabGravity="fill"
+            app:tabMode="scrollable"/>
 
     </FrameLayout>
 

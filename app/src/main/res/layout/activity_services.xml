@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background">
+    android:background="@drawable/background2">
     tools:context=".Services">
 
     <!-- The primary full-screen view. This can be replaced with whatever view
@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="200dp"
             android:text="1 Time in day"
-            android:textColor="#FFFF" />
+            android:textColor="#306571" />
 
         <RadioButton
             android:id="@+id/radioButtonTwo"
@@ -71,7 +71,7 @@
             android:layout_marginLeft="130dp"
             android:layout_marginTop="200dp"
             android:text="2 Times in day"
-            android:textColor="#FFFF" />
+            android:textColor="#306571" />
 
         <RadioButton
             android:id="@+id/radioButtonThree"
@@ -81,7 +81,7 @@
             android:layout_marginTop="200dp"
             android:checked="true"
             android:text="3 Times in day"
-            android:textColor="#FFFF" />
+            android:textColor="#306571" />
 
         <RadioButton
             android:id="@+id/radioButtonFour"
@@ -91,7 +91,7 @@
             android:layout_marginTop="350dp"
             android:checked="false"
             android:text="Custom Time"
-            android:textColor="#FFFF" />
+            android:textColor="#306571" />
 
         <CheckBox
             android:id="@+id/checkBoxOpen"
@@ -100,7 +100,7 @@
             android:layout_marginTop="250dp"
             android:checked="true"
             android:text="Open Weather"
-            android:textColor="#FFFF" />
+            android:textColor="#306571" />
 
         <CheckBox
             android:id="@+id/checkBoxAccu"
@@ -109,7 +109,7 @@
             android:layout_marginLeft="130dp"
             android:layout_marginTop="250dp"
             android:text="AccuWeather"
-            android:textColor="#FFFF" />
+            android:textColor="#306571" />
 
         <CheckBox
             android:id="@+id/checkBoxStack"
@@ -118,7 +118,7 @@
             android:layout_marginLeft="250dp"
             android:layout_marginTop="250dp"
             android:text="WeatherStack"
-            android:textColor="#FFFF" />
+            android:textColor="#306571" />
 
         <CheckBox
             android:id="@+id/checkBoxDark"
@@ -127,7 +127,7 @@
             android:layout_marginLeft="0dp"
             android:layout_marginTop="300dp"
             android:text="Dark Sky"
-            android:textColor="#FFFF" />
+            android:textColor="#306571" />
 
         <CheckBox
             android:id="@+id/checkBoxBit"
@@ -136,7 +136,7 @@
             android:layout_marginLeft="130dp"
             android:layout_marginTop="300dp"
             android:text="WeatherBit"
-            android:textColor="#FFFF" />
+            android:textColor="#306571" />
 
         <Button
             android:id="@+id/buttonSetSer"
@@ -144,6 +144,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="150dp"
             android:layout_marginTop="500dp"
+            android:background="#50FFFFFF"
             android:text="Set Service" />
 
         <Button
@@ -152,6 +153,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="0dp"
             android:layout_marginTop="500dp"
+            android:background="#50FFFFFF"
             android:text="Show Services" />
 
         <EditText
@@ -163,7 +165,7 @@
             android:ems="10"
             android:inputType="textPersonName"
             android:text="10:00"
-            android:textColor="#FFFF" />
+            android:textColor="#306571" />
 
     </FrameLayout>
 
