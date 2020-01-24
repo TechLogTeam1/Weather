@@ -115,7 +115,8 @@ public class FullscreenActivity extends AppCompatActivity {
     private String UnitsTxt;
     private String SiteUse;
     private String OutList;
-    private String Date;
+    private static String Date;
+    //private static Date;
     private String CityKey;
     private String WeatherCon;
     private String WeatherCon1;
@@ -201,6 +202,7 @@ public class FullscreenActivity extends AppCompatActivity {
     private int searchpos;
     private boolean CoordsRun, CoordsRunRec;
     private double Lat, Lon;
+    boolean CoordsWrong;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -310,6 +312,8 @@ public class FullscreenActivity extends AppCompatActivity {
         mButton1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                CoordsWrong=false;
 
                 City=mCity.getText().toString();
                 if (City.isEmpty()) {
@@ -457,7 +461,7 @@ public class FullscreenActivity extends AppCompatActivity {
             }
         });
 
-        //Θέτει την ιστοσελίδα που θα κλειθεί για ψάξιμπ
+        //Θέτει την ιστοσελίδα που θα κλειθεί για ψάξιμο
         //@param SiteUse Είναι η μεταβλητή που δηλώνει την ιστοσελίδα ψαξίματος
         //Παίρνει τιμές
         //OpenWeather -> Ψάξιμο με Open Weather
@@ -535,7 +539,8 @@ public class FullscreenActivity extends AppCompatActivity {
     //Mετατροπή UNIX ημερομηνίας σε String ημερομηνία
     //@param unixSeconds Τιμή σε UnixSeconds
     //@param Date String που επιστρέφει την ημερομηνία σε String
-    public String ConvertUNIXtoDate(long unixSeconds) {
+    //public String ConvertUNIXtoDate(long unixSeconds) {
+    public static String ConvertUNIXtoDate(long unixSeconds) {
 
         //long unixSeconds = DateUnix;
         java.util.Date date = new java.util.Date(unixSeconds * 1000L);
@@ -597,7 +602,8 @@ public class FullscreenActivity extends AppCompatActivity {
 
     }
 
-    public float ShowTemp(float TempF)
+    //public float ShowTemp(float TempF) //PREV
+    public static float ShowTemp(float TempF) //NEW
     {
     if (Global1.Units2=="C") return TempF;
     if (Global1.Units2=="F") return (TempF*(float)1.8+32);
@@ -850,6 +856,100 @@ public class FullscreenActivity extends AppCompatActivity {
         //Log.d("Sites:","Saves");
         return;
     }
+
+
+    //Έλενχος συντεταγμένων
+    public boolean checkcoordsCity(String CoordsS)
+    {
+
+        int digits;
+        int commasnum,commapos;
+        int minusnum;
+        int dotsnum;
+        int dot1,dot2;
+        int zerosnum;
+
+        boolean acceptvalue,minusAccept,Dotcont;
+
+        digits=0;
+        commasnum=0;
+        minusnum=0;
+        commapos=0;
+        dotsnum=0;
+        dot1=0;
+        dot2=0;
+        zerosnum=0;
+
+        acceptvalue=false;
+        minusAccept=false;
+        Dotcont=false;
+        if (CoordsS=="") return false;
+
+        //if ((CoordsS.charAt(0)!='"') || (CoordsS.charAt(CoordsS.length()-1)!='"')) return false;
+
+        for (i=0;i<CoordsS.length();i++)
+        {
+
+            acceptvalue=false;
+            if (((CoordsS.charAt(i) >= '0') && (CoordsS.charAt(i) <= '9')) ||
+                    ((CoordsS.charAt(i) == '-') || (CoordsS.charAt(i) == '.') || (CoordsS.charAt(i) == ',')))
+            {
+                if (CoordsS.charAt(i)==',') {commasnum++;commapos=i;}
+
+                if (CoordsS.charAt(i)=='-') minusnum++;
+                if (CoordsS.charAt(i)=='.')
+                {
+                    if (i==0) return false;
+
+                    if ((CoordsS.charAt(i-1)>='0') && (CoordsS.charAt(i-1)<='9')) Dotcont=true; else Dotcont=false;
+
+                    if (!Dotcont) return false;
+
+                    dotsnum++;
+                }
+
+
+                if (i==1)
+                    if (CoordsS.charAt(i) == '0')
+                        if (CoordsS.charAt(i-1) == '0') return false;
+                if (i==commapos+2)
+                    if (CoordsS.charAt(i) == '0')
+                        if (CoordsS.charAt(i-1) == '0') return false;
+
+
+                if (commasnum==0) if (CoordsS.charAt(i)=='.') dot1++;
+                if (commasnum==1) if (CoordsS.charAt(i)=='.') dot2++;
+
+                acceptvalue = true;
+                digits++;
+            }
+
+            if (!acceptvalue) return false;
+        }
+
+        if (minusnum==1)
+        {
+            if ((CoordsS.charAt(0)=='-') || (CoordsS.charAt(commapos+1)=='-')) minusAccept=true;
+        }
+
+        if (minusnum==2)
+        {
+            if ((CoordsS.charAt(0)=='-') && (CoordsS.charAt(commapos+1)=='-')) minusAccept=true;
+        }
+
+
+        if ((minusnum>0) && (!minusAccept)) return false;
+        if (commasnum>1) return false;
+        if (minusnum>2) return false;
+        if (dotsnum>2) return false;
+        if ((dot1>1) || (dot2>1)) return false;
+        if (commapos==0) return false;
+        if (commapos==CoordsS.length()-1) return false;
+        if (digits!=CoordsS.length()) return false;
+
+        return true;
+    }
+
     private class Content extends AsyncTask<Void,Void,Void>
     {
         int commapos;
@@ -865,6 +965,20 @@ public class FullscreenActivity extends AppCompatActivity {
 
             City=mCity.getText().toString();
             if (City.charAt(0)=='"') CoordsRun=true;
+
+            if (CoordsRun)
+            {
+                City=City.substring(1,City.length()-1);
+            }
+
+            //Ελένχει αν είναι σωστές οι συντεταγμενες που δίνοται
+            if (CoordsRun)
+            if (!checkcoordsCity(City))
+            {
+                Toast.makeText(FullscreenActivity.this, "The Coordinates are wrong !", Toast.LENGTH_SHORT).show();
+                CoordsWrong=true;
+                return;
+            }
 
             for (i = 0; i <=Global1.CoordsRecs-1; i++)
                 if (CoordsNamesData[i].Name.toLowerCase().contains(City.toLowerCase()))
@@ -923,6 +1037,7 @@ public class FullscreenActivity extends AppCompatActivity {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
+            if (CoordsWrong) return;
             boolean nulldata;
             float Temperaturef;
 
@@ -1075,6 +1190,8 @@ public class FullscreenActivity extends AppCompatActivity {
 
                 //NEW //CHECK
                 if (WeatherCon.equalsIgnoreCase("Mostly Cloudy")) mWIcon.setImageResource(R.drawable.clouds);
+                if (WeatherCon.equalsIgnoreCase("Overcast")) mWIcon.setImageResource(R.drawable.clouds);
+
             }
 
             if (SiteUse=="Weatherbit") {
@@ -1979,6 +2096,8 @@ public class FullscreenActivity extends AppCompatActivity {
             OutText="";
             WeatherCon="";
             Units="C"; //Όλες οι μετρήσεις θα είναι σε κελσίου, μετά με ειδική ρουτίνα θα αλλάζουν
+
+            if (CoordsWrong) return null;
 
             //Eδω γίνονται οι κλήσεις στις ιστοσελίδες καιρού
             if (SiteUse=="OpenWeather") ReadFromOpen();

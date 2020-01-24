@@ -89,6 +89,8 @@ public class WeatherDetails extends AppCompatActivity {
         return formattedDate;
     }
 
+    //Mετατρέπει την θερμοκρασία απο Celsius σε Fahrenheit η Kelvin,
+    //εάν είναι Celsius η τιμή επιστρέφει όπως δόθηκε.
     public float ShowTemp(float TempF)
     {
         if (Global1.Units2=="C") return TempF;

@@ -287,6 +287,10 @@ public class Search extends AppCompatActivity {
                 }
 
                 siteContW=false;
+
+                if ((Global1.Clear) &&(Global1.Clouds)&&(Global1.Rain)&& (Global1.Snow) &&(Global1.Thunder))
+                    siteContW=true; //All cases
+
                 if (Global1.Clear)
                 {
                     if (HistoryData[i].WeatherCon.toLowerCase().contains("clear")) siteContW = true;
@@ -295,6 +299,7 @@ public class Search extends AppCompatActivity {
 
                 if (Global1.Clouds)
                 {
+                    if (HistoryData[i].WeatherCon.toLowerCase().contains("overcast")) siteContW = true;
                     if (HistoryData[i].WeatherCon.toLowerCase().contains("cloud")) siteContW = true;
                     if (HistoryData[i].WeatherCon.toLowerCase().contains("mist")) siteContW=true;
                     if (HistoryData[i].WeatherCon.toLowerCase().contains("haze")) siteContW = true;
@@ -359,11 +364,15 @@ public class Search extends AppCompatActivity {
     }
 
     //Έλενχος για στωστή ημερομηνία
-    public boolean checkdate(String DateS)
+    //public boolean checkdate(String DateS)
+    public static boolean checkdate(String DateS)
     {
 
         int digits;
         int pavles;
+        int i;
+        int day, month, year;
+        boolean cont;
 
         digits=0;
         pavles=0;
@@ -379,6 +388,18 @@ public class Search extends AppCompatActivity {
         if (DateS.charAt(5)=='-') pavles++;
 
         if (pavles!=2) return false;
+
+
+        day=Integer.valueOf(DateS.substring(0,2));
+        month=Integer.valueOf(DateS.substring(3,5));
+        year=Integer.valueOf(DateS.substring(6,10));
+
+        cont=false;
+        if ((day>=1) && (day<=31))
+        if ((month>=1) && (month<=12))
+        cont=true;
+
+        if (!cont) return false;
 
         return true;
     }

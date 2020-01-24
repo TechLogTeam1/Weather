@@ -42,14 +42,23 @@ public class AdvSearch extends AppCompatActivity {
 
 
     //Έλενχος για στωστή θερμοκρασία
-    public boolean checkTemperature(String TempS)
+    //public boolean checkTemperature(String TempS)
+    public static boolean checkTemperature(String TempS)
     {
 
         int i;
         int digits;
         boolean acceptvalue;
+        int minusNum,commasNum,zerosNum;
+        int commaPos;
+        boolean numGived;
+
 
         digits=0;
+        minusNum=0;
+        commasNum=0;
+        zerosNum=0;
+        numGived=false;
 
         acceptvalue=false;
         if (TempS=="") return false;
@@ -58,6 +67,18 @@ public class AdvSearch extends AppCompatActivity {
         {
 
             acceptvalue=false;
+
+            if (TempS.charAt(i) == '-') minusNum++;
+            if (TempS.charAt(i) == '.') {commaPos=i;commasNum++;}
+
+
+            if (commasNum==0)
+            if ((TempS.charAt(i)>'0') && (TempS.charAt(i)<='9')) numGived=true;
+
+            if (commasNum==0)
+                if (TempS.charAt(i) == '0') zerosNum++;
+
+
             if (((TempS.charAt(i) >= '0') && (TempS.charAt(i) <= '9')) ||
                     ((TempS.charAt(i) == '-') || (TempS.charAt(i) == '.')))
             {
@@ -68,8 +89,13 @@ public class AdvSearch extends AppCompatActivity {
             if (!acceptvalue) return false;
         }
 
-        if ((TempS.contains("-")) && (TempS.charAt(0)!='-')) return false;
+        if (!numGived)
+        if (zerosNum>1) return false;
 
+        if (minusNum>1) return false;
+        if (commasNum>1) return false;
+
+        if ((TempS.contains("-")) && (TempS.charAt(0)!='-')) return false;
         if (digits!=TempS.length()) return false;
 
         return true;

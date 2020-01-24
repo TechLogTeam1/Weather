@@ -705,9 +705,14 @@ public class Services extends AppCompatActivity {
     }
 
     //Έλενχος για σωστή ώρα
-    public boolean checktime(String TimeS)
+    //public boolean checktime(String TimeS)
+    public static boolean checktime(String TimeS)
     {
 
+        boolean cont;
+        int hours,minutes;
+
+        cont=false;
         if (TimeS=="") return false;
 
         if (TimeS.length()==5)
@@ -716,8 +721,16 @@ public class Services extends AppCompatActivity {
         if (TimeS.charAt(2) == ':')
         if ((TimeS.charAt(3) >= '0') && (TimeS.charAt(3) <= '9'))
         if ((TimeS.charAt(4) >= '0') && (TimeS.charAt(4) <= '9'))
-        return true;
+        cont=true;
 
+        if (!cont) return false;
+
+        hours=Integer.valueOf(TimeS.substring(0,2));
+        minutes=Integer.valueOf(TimeS.substring(3,5));
+
+        if ((hours>=0) && (hours<=23))
+        if ((minutes>=0) && (minutes<=59))
+        return true;
 
         return false;
     }

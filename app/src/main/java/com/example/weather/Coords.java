@@ -27,7 +27,8 @@ public class Coords extends AppCompatActivity {
     private Button mButtonRecs;
     private EditText mCoords,mName;
     private String Name1;
-    private int i;
+    //private int i;
+    private static int i;
     double lat,lon;
     private int CoordsPos;
     String OutText;
@@ -162,22 +163,31 @@ public class Coords extends AppCompatActivity {
     }
 
     //Έλενχος για στωστές συντεταγμένες
-    public boolean checkcoords(String CoordsS)
+    //public boolean checkcoords(String CoordsS)
+    public static boolean checkcoords(String CoordsS)
     {
 
         int digits;
         int commasnum,commapos;
         int minusnum;
+        int dotsnum;
+        int dot1,dot2;
+        int zerosnum;
 
-        boolean acceptvalue,minusAccept;
+        boolean acceptvalue,minusAccept,Dotcont;
 
         digits=0;
         commasnum=0;
         minusnum=0;
         commapos=0;
+        dotsnum=0;
+        dot1=0;
+        dot2=0;
+        zerosnum=0;
 
         acceptvalue=false;
         minusAccept=false;
+        Dotcont=false;
         if (CoordsS=="") return false;
 
         for (i=0;i<CoordsS.length();i++)
@@ -190,6 +200,28 @@ public class Coords extends AppCompatActivity {
                 if (CoordsS.charAt(i)==',') {commasnum++;commapos=i;}
 
                 if (CoordsS.charAt(i)=='-') minusnum++;
+                if (CoordsS.charAt(i)=='.')
+                {
+                    if (i==0) return false;
+
+                    if ((CoordsS.charAt(i-1)>='0') && (CoordsS.charAt(i-1)<='9')) Dotcont=true; else Dotcont=false;
+
+                if (!Dotcont) return false;
+
+                    dotsnum++;
+                }
+
+
+                if (i==1)
+                    if (CoordsS.charAt(i) == '0')
+                    if (CoordsS.charAt(i-1) == '0') return false;
+                if (i==commapos+2)
+                    if (CoordsS.charAt(i) == '0')
+                    if (CoordsS.charAt(i-1) == '0') return false;
+
+
+                if (commasnum==0) if (CoordsS.charAt(i)=='.') dot1++;
+                if (commasnum==1) if (CoordsS.charAt(i)=='.') dot2++;
 
                 acceptvalue = true;
                 digits++;
@@ -212,6 +244,8 @@ public class Coords extends AppCompatActivity {
         if ((minusnum>0) && (!minusAccept)) return false;
         if (commasnum>1) return false;
         if (minusnum>2) return false;
+        if (dotsnum>2) return false;
+        if ((dot1>1) || (dot2>1)) return false;
         if (commapos==0) return false;
         if (commapos==CoordsS.length()-1) return false;
         if (digits!=CoordsS.length()) return false;
